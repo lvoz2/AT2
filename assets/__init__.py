@@ -1,6 +1,6 @@
 from pathlib import Path
-from pygame import Surface, image
-from typing import *
+from pygame import image
+from typing import Any
 
 
 def __iterate_files(directory: Path, image_types: list[str]) -> Any:

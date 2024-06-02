@@ -2,6 +2,7 @@ from character import Character
 #from screen import Screen
 import pygame
 import math
+from typing import *
 
 class Player(Character):
     def __init__(self, surf: pygame.Surface, x: int, y: int, window: pygame.Surface, name: str, character_class: str, scale: int=1, defense: int=10, mana: int=10, strength: int=10, stamina: int=10, stamina_regen_speed: int=1, health_regen_speed: int=1) -> None:
@@ -32,11 +33,11 @@ class Player(Character):
             self.xp -= req_xp
             self.attr_pts += self.ATTR_PTS_PER_LVL
             # screen.show("Level Up", f"{self.name} is now level {self.level}")
-            req_xp: int = self.calc_req_xp(self.lvl + 1)
+            req_xp = self.calc_req_xp(self.lvl + 1)
 
     def calc_req_xp(self, lvl: int) -> int:
         return int((100 / 2) * lvl * (1 + lvl))
-    
+
     def regen_stamina(self) -> None:
         if (self.stamina + self.stamina_regen_speed) <= self.max_stamina:
             self.stamina += self.stamina_regen_speed

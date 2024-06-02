@@ -1,15 +1,19 @@
 from player import Player
+import pygame
+from typing import *
+from attack import Attack
+
 
 class Warrior(Player):
     def __init__(self, surf: pygame.Surface, x: int, y: int, window: pygame.Surface, name: str, scale: int=1):
         super().__init__(surf, x, y, window, name, "warrior", scale, strength=15)
-        self.attacks = {
-            "Basic Attack": {"method": self.basic_attack, "stamina_cost": 10},
-            "Charge": {"method": self.charge, "stamina_cost": 20},
-            "Cleave Attack": {"method": self.cleave_attack, "stamina_cost": 30},
-            "Shield Bash": {"method": self.shield_bash, "stamina_cost": 15},
-            "Defensive Stance": {"method": self.defensive_stance, "stamina_cost": 5},
-        }
+        self.attacks: Optional[list[Attack]] = None #{
+#            "Basic Attack": {"method": self.basic_attack, "stamina_cost": 10},
+#            "Charge": {"method": self.charge, "stamina_cost": 20},
+#            "Cleave Attack": {"method": self.cleave_attack, "stamina_cost": 30},
+#            "Shield Bash": {"method": self.shield_bash, "stamina_cost": 15},
+#            "Defensive Stance": {"method": self.defensive_stance, "stamina_cost": 5},
+#        }
 
     def choose_attack(self, target):
         print(f"Choose an attack (Current stamina: {self.current_stamina}):")

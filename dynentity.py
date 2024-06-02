@@ -6,7 +6,7 @@ from typing import *
 class DynEntity(Entity):
     def __init__(self, surf: pygame.Surface, x: int, y: int, window: pygame.Surface, health: int, health_regen_speed: int=5, visible: bool=False, scale: int=1) -> None:
         super().__init__(surf, x, y, window, health, health_regen_speed, visible, scale)
-    
+
     def move(self, dir: int, dist: int) -> None:
         """Move the dynamic entity.
 
@@ -28,7 +28,7 @@ class DynEntity(Entity):
         other (Entity): The target entity
         angle (bool): Whether to calculate the angle, in degrees. Defaults to False
         """
-        dir: list[Optional(int)] = [None, None]
+        dir: list[Optional[int]] = [None, None]
         opp_corner: dict[str, list[int]] = {"self": self.get_opp_corner(), "other": other.get_opp_corner()}
         if opp_corner["other"][0] < self.x:
             dir[0] = -1
@@ -46,8 +46,8 @@ class DynEntity(Entity):
             raise ValueError("Could not determine which eighth the other entity was located in relative to self")
         if dir == [0, 0] and not angle:
             return [0.0]
-        dist: Optional(float) = None
-        angle_val: Optional(float) = None
+        dist: Optional[float] = None
+        angle_val: Optional[float] = None
         lin_dists: list[float] = [
             self.y - opp_corner["other"][1],
             other.x - opp_corner["self"][0],
@@ -91,7 +91,8 @@ class DynEntity(Entity):
         if angle_val is None and angle:
             raise ValueError("Could not determine angle properly, which may be due to a failure to calculate angle or because other entity overlapped self but not detected")
         if angle:
-            return [dist, angle_val]
+            if dist is not None and angle_val is not None:
+                return [dist, angle_val]
         else:
             return [dist]
-        
+

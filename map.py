@@ -33,6 +33,8 @@ class Map:
         self.blue_orb = None
         self.game_over = False
         self.delta: list[int] = []
+        self.player_image = None
+        self.orb_position = [None, None]
         self.clock: pygame.time.Clock = pygame.time.Clock()
 
     def load_player(self, character_type):
@@ -96,7 +98,7 @@ class Map:
         Returns:
             bool: True if the player has collided with the blue orb, False otherwise.
         """
-        if self.blue_orb and pygame.math.Vector2(self.orb_position).distance_to(self.player_position) < 25:
+        if self.blue_orb and pygame.math.Vector2(self.orb_position).distance_to(self.player_position) < 25:  # noqa: I1101
             self.game_over = True
             print("YOU WIN")  # This can be modified to a more visual display if needed.
             return True

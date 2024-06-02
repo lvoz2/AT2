@@ -57,7 +57,7 @@ class DynEntity(Entity):
             dist = lin_dists[0]
         elif dir == [1, -1]:
             if angle:
-                angle_val = math.degrees(math.tan(lin_dists[1]/lin_dists[0]))
+                angle_val = math.degrees(math.tan(lin_dists[1] / lin_dists[0]))
             dist = math.sqrt(math.pow(lin_dists[0], 2) + math.pow(lin_dists[1], 2))
         elif dir == [1, 0]:
             if angle:
@@ -65,7 +65,7 @@ class DynEntity(Entity):
             dist = lin_dists[1]
         elif dir == [1, 1]:
             if angle:
-                angle_val = math.degrees(math.tan(lin_dists[2]/lin_dists[1])) + 90.0
+                angle_val = math.degrees(math.tan(lin_dists[2] / lin_dists[1])) + 90.0
             dist = math.sqrt(math.pow(lin_dists[1], 2) + math.pow(lin_dists[2], 2))
         elif dir == [0, 1]:
             if angle:
@@ -73,7 +73,7 @@ class DynEntity(Entity):
             dist = lin_dists[2]
         elif dir == [-1, 1]:
             if angle:
-                angle_val = math.degrees(math.tan(lin_dists[3]/lin_dists[2])) + 180.0
+                angle_val = math.degrees(math.tan(lin_dists[3] / lin_dists[2])) + 180.0
             dist = math.sqrt(math.pow(lin_dists[2], 2) + math.pow(lin_dists[3], 2))
         elif dir == [-1, 0]:
             if angle:
@@ -81,7 +81,7 @@ class DynEntity(Entity):
             dist = lin_dists[3]
         elif dir == [-1, -1]:
             if angle:
-                angle_val = math.degrees(math.tan(lin_dists[0]/lin_dists[3])) + 270.0
+                angle_val = math.degrees(math.tan(lin_dists[0] / lin_dists[3])) + 270.0
             dist = math.sqrt(math.pow(lin_dists[3], 2) + math.pow(lin_dists[0], 2))
         if dist is None:
             raise ValueError("Could not determine distance properly, which may be due to a failure to calculate distance or because other entity overlapped self but not detected")

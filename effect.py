@@ -1,6 +1,3 @@
-from entity import Entity
-
-
 class Effect:
     def __init__(self, name: str, duration: int, dps: int) -> None:
         self.name = name
@@ -10,7 +7,7 @@ class Effect:
     def is_finished(self) -> bool:
         return self.duration <= 0
 
-    def damage(self, target: Entity, delta: int) -> None:
+    def damage(self, target, delta: int) -> None:
         seconds: float = 0
         if delta < self.duration:
             self.duration -= delta

@@ -35,7 +35,8 @@ class Player(Character):
             # screen.show("Level Up", f"{self.name} is now level {self.level}")
             req_xp = self.calc_req_xp(self.lvl + 1)
 
-    def calc_req_xp(self, lvl: int) -> int:
+    @staticmethod
+    def calc_req_xp(lvl: int) -> int:
         return int((100 / 2) * lvl * (1 + lvl))
 
     def regen_stamina(self) -> None:

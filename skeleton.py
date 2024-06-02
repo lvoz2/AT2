@@ -1,5 +1,5 @@
-import random
 import pygame
+import helpers
 
 
 class Skeleton:
@@ -11,8 +11,8 @@ class Skeleton:
 
     def move(self):
         # Move the skeleton randomly within a specified range
-        self.position[0] += random.randint(-15, 15)  # Move horizontally
-        self.position[1] += random.randint(-15, 15)  # Move vertically
+        self.position[0] += helpers.randint(-15, 15)  # Move horizontally
+        self.position[1] += helpers.randint(-15, 15)  # Move vertically
 
         # Ensure the skeleton stays within the bounds of the window
         self.position[0] = max(0, min(self.window.get_width() - self.image.get_width(), self.position[0]))  # Limit horizontal movement

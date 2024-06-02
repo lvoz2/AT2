@@ -1,4 +1,4 @@
-import random
+import helpers
 import pygame
 from assets import GAME_ASSETS
 from enemy import Enemy
@@ -65,7 +65,7 @@ class Map:
         Handle combat between the player and the current enemy.
         """
         if self.in_combat and self.current_enemy:
-            player_damage = random.randint(5, 10)
+            player_damage = helpers.randint(5, 10)
             enemy_defeated = self.current_enemy.take_damage(player_damage)
             print(f"Player attacks! Deals {player_damage} damage to the enemy.")
             if enemy_defeated:
@@ -76,7 +76,7 @@ class Map:
                 if not self.enemies:
                     self.spawn_blue_orb()
             else:
-                enemy_damage = random.randint(5, 10)
+                enemy_damage = helpers.randint(5, 10)
                 print(f"Enemy attacks back! Deals {enemy_damage} damage to the player.")
                 # Assume player has a method to take damage
                 # self.player.take_damage(enemy_damage)

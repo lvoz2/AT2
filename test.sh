@@ -6,5 +6,5 @@ dmypy run -- *.py
 flake8 *.py --count --select=E9,F63,F7,F82 --show-source --statistics
 # exit-zero treats all errors as warnings
 flake8 *.py --count --exit-zero --max-complexity=10 --max-line-length=319 --statistics
-bandit --skip B311 -r *.py
+bandit -r *.py
 pylint --rcfile ./.pylintrc *.py

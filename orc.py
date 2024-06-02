@@ -1,5 +1,5 @@
-import random
 import pygame
+import helpers
 
 
 class Orc:
@@ -11,8 +11,8 @@ class Orc:
 
     def move(self):
         # Move the orc randomly within a specified range
-        self.position[0] += random.randint(-20, 20)  # Randomly change the x-coordinate
-        self.position[1] += random.randint(-20, 20)  # Randomly change the y-coordinate
+        self.position[0] += helpers.randint(-20, 20)  # Randomly change the x-coordinate
+        self.position[1] += helpers.randint(-20, 20)  # Randomly change the y-coordinate
 
         # Ensure the orc stays within the bounds of the window
         self.position[0] = max(0, min(self.window.get_width() - self.image.get_width(), self.position[0]))  # Clamp the x-coordinate

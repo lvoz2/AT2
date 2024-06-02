@@ -2,13 +2,13 @@ from effect import Effect
 from entity import Entity
 
 class Attack:
-    def __init__(self, dmg: int, cost: int, effects: dict[str, Effect]=None) -> None:
+    def __init__(self, dmg: int, cost: int, effects: Optional(dict[str, Effect])=None) -> None:
         self.dmg = dmg
         self.cost = cost
         self.effects = effects
         self.duration = 0
         if self.effects is not None and len(self.effects) != 0:
-            for value in self.effect.values():
+            for value in self.effects.values():
                 if value.duration > self.duration:
                     self.duration = value.duration
     

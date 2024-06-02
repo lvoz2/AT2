@@ -1,4 +1,5 @@
 import pygame
+import effect
 
 class Entity:
     def __init__(self, surf: pygame.Surface, x: int, y: int, window: pygame.Surface, health: int=-1, health_regen_speed: int=5, visible: bool=False, scale: int=1) -> None:
@@ -12,7 +13,7 @@ class Entity:
         self.health = health
         self.max_health = health
         self.health_regen_speed = health_regen_speed
-        self.effects = {}
+        self.effects: dict[str, effect.Effect] = {}
 
     def get_opp_corner(self) -> list[int]:
         return [self.x + self.width, self.y + self.height]

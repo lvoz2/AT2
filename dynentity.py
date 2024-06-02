@@ -1,6 +1,7 @@
 import pygame
 from entity import Entity
 import math
+from typing import *
 
 class DynEntity(Entity):
     def __init__(self, surf: pygame.Surface, x: int, y: int, window: pygame.Surface, health: int, health_regen_speed: int=5, visible: bool=False, scale: int=1) -> None:
@@ -27,7 +28,7 @@ class DynEntity(Entity):
         other (Entity): The target entity
         angle (bool): Whether to calculate the angle, in degrees. Defaults to False
         """
-        dir: list[int] = [None, None]
+        dir: list[Optional(int)] = [None, None]
         opp_corner: dict[str, list[int]] = {"self": self.get_opp_corner(), "other": other.get_opp_corner()}
         if opp_corner["other"][0] < self.x:
             dir[0] = -1
@@ -45,8 +46,8 @@ class DynEntity(Entity):
             raise ValueError("Could not determine which eighth the other entity was located in relative to self")
         if dir == [0, 0] and not angle:
             return [0.0]
-        dist: float = None
-        angle_val: float = None
+        dist: Optional(float) = None
+        angle_val: Optional(float) = None
         lin_dists: list[float] = [
             self.y - opp_corner["other"][1],
             other.x - opp_corner["self"][0],

@@ -17,17 +17,6 @@ def __iterate_files(directory: Path, image_types: list[str]) -> Any:
 
         # if a sub-folder is found
         elif item.is_dir():
-
-    
-          
-            
-    
-
-          
-          Expand Down
-    
-    
-  
             assets[item.name] = __iterate_files(item, image_types)
     return assets
 def load_assets() -> Any:

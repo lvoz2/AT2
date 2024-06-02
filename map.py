@@ -15,9 +15,9 @@ class Map:
             window (pygame.Surface): The game window surface.
         """
         self.window = window
-        self.map_image: Surface = GAME_ASSETS["dungeon_map"].convert_alpha()
+        self.map_image: pygame.Surface = GAME_ASSETS["dungeon_map"].convert_alpha()
         self.map_image = pygame.transform.scale(self.map_image, (self.window.get_width(), self.window.get_height()))
-        self.player_images: dict[str, Surface] = {
+        self.player_images: dict[str, pygame.Surface] = {
             "Warrior": GAME_ASSETS["warrior"].convert_alpha(),
             "Mage": GAME_ASSETS["mage"].convert_alpha(),
             "Rogue": GAME_ASSETS["rogue"].convert_alpha()

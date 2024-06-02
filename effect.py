@@ -7,7 +7,7 @@ class Effect:
         self.dps = dps
     
     def is_finished(self) -> bool:
-        return duration <= 0
+        return self.duration <= 0
     
     def damage(self, target: Entity, delta: int) -> None:
         seconds: float = 0

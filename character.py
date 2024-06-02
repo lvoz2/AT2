@@ -3,6 +3,7 @@ from entity import Entity
 from attack import Attack
 import pygame
 import math
+from typing import *
 
 class Character(DynEntity):
     def __init__(self, surf: pygame.Surface, x: int, y: int, window: pygame.Surface, name: str, health_regen_speed: int=5, scale: int=1, defense: int=10, mana: int=10, strength: int=10) -> None:

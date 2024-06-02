@@ -16,7 +16,7 @@ class Attack:
         return (self.effects is not None and len(self.effects) != 0)
     
     def damage(self, target: Entity):
-        target.damage(dmg)
+        target.damage(self.dmg)
     
     def apply_effects(self, target: Entity, delta: int) -> None:
         self.duration -= delta

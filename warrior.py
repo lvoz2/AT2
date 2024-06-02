@@ -1,14 +1,8 @@
-from character import Character
+from player import Player
 
-class Warrior(Character):
-    def __init__(self, name, max_hp):
-        super().__init__(name, "Warrior", armor=10)
-        self.max_stamina = 100
-        self.current_stamina = self.max_stamina
-        self.stamina_regeneration = 10
-        self.strength = 15
-        self.max_hp = max_hp
-        self.current_hp = max_hp
+class Warrior(Player):
+    def __init__(self, surf: pygame.Surface, x: int, y: int, window: pygame.Surface, name: str, scale: int=1):
+        super().__init__(surf, x, y, window, name, "warrior", scale, strength=15)
         self.attacks = {
             "Basic Attack": {"method": self.basic_attack, "stamina_cost": 10},
             "Charge": {"method": self.charge, "stamina_cost": 20},
@@ -33,10 +27,6 @@ class Warrior(Character):
                 print("Not enough stamina for this attack.")
         else:
             print("Invalid attack.")
-
-    def regenerate_stamina(self):
-        self.current_stamina = min(self.max_stamina, self.current_stamina + self.stamina_regeneration)
-
 
 
 
@@ -69,7 +59,3 @@ class Warrior(Character):
         damage = self.strength + 5  # Example: Shield bash deals warrior's strength plus 5 additional damage
         print(f"{self.name} performs a shield bash on {target} for {damage} damage!")
         target.take_damage(damage)
-
-    def defensive_stance(self):
-        self.armor_class += 5  # Example: Defensive stance increases armor class by 5
-        print(f"{self.name} enters a defensive stance, increasing armor class!")

@@ -23,7 +23,7 @@ class DynEntity(Entity):
         elif dir in [3, 4, 5]:
             self.y -= dist
 
-    def find_eighth(self, other: Entity) -> list[int]:
+    def find_eighth(self, other: Entity) -> list[Optional[int]]:
         dir: list[Optional[int]] = [None, None]
         opp_corner: dict[str, list[int]] = {"self": self.get_opp_corner(), "other": other.get_opp_corner()}
         if opp_corner["other"][0] < self.x:
@@ -42,7 +42,7 @@ class DynEntity(Entity):
             raise ValueError("Could not determine which eighth the other entity was located in relative to self")
         return dir
 
-    def get_dist(self, dir: list[int], other: Entity, angle: bool) -> list[Optional[float]]:
+    def get_dist(self, dir: list[Optional[int]], other: Entity, angle: bool) -> list[Optional[float]]:
         opp_corner: dict[str, list[int]] = {"self": self.get_opp_corner(), "other": other.get_opp_corner()}
         angle_val: Optional[float] = None
         lin_dists: list[float] = [
@@ -97,7 +97,7 @@ class DynEntity(Entity):
         other (Entity): The target entity
         angle (bool): Whether to calculate the angle, in degrees. Defaults to False
         """
-        dir: list[int] = self.find_eighth(other)
+        dir: list[Optional[int]] = self.find_eighth(other)
         if dir == [0, 0] and not angle:
             return [0.0]
         return self.get_dist(dir, other, angle)

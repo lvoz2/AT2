@@ -1,6 +1,8 @@
 from pathlib import Path
 from pygame import Surface, image
 from typing import *
+
+
 def __iterate_files(directory: Path, image_types: list[str]) -> Any:
     """
         Iterates over files in a directory adding them 
@@ -19,6 +21,8 @@ def __iterate_files(directory: Path, image_types: list[str]) -> Any:
         elif item.is_dir():
             assets[item.name] = __iterate_files(item, image_types)
     return assets
+
+
 def load_assets() -> Any:
     """
     Searches the local directory for assets
@@ -35,4 +39,10 @@ def load_assets() -> Any:
     #   each image to the dictionary. Images will  \
     #   be added by the file name, sans the suffix
     return __iterate_files(assets_folder, image_types)
+
+
 GAME_ASSETS = load_assets()
+
+
+# def create_asset(name: str) -> pygame.Surface:
+#     

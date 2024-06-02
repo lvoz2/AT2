@@ -1,5 +1,5 @@
-import helpers
 import pygame
+import helpers
 from assets import GAME_ASSETS
 from enemy import Enemy
 
@@ -125,7 +125,7 @@ class Map:
 
         if not self.in_combat:
             if self.check_for_combat():
-                return
+                return None
         self.handle_combat()
 
         if self.blue_orb and self.check_orb_collision():

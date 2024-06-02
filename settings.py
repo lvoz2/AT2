@@ -32,5 +32,7 @@ class Settings:
                             return 'back'
                         # Placeholder for setting adjustment functionality
                         print(f"Adjusting {self.options[self.selected_option]}")
+                else:
+                    pass
 
             return None

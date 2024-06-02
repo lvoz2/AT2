@@ -89,5 +89,7 @@ class CharacterSelect:
                     for character, (image, rect) in self.character_buttons.items():
                         if rect.collidepoint(event.pos):
                             return character
+                else:
+                    pass
 
         return None

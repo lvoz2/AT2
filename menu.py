@@ -42,5 +42,7 @@ class MainMenu:
                     elif event.key == pygame.K_RETURN:
                         # Return the current selected option when Enter is pressed
                         return self.menu_options[self.selected_option]
+                else:
+                    pass
 
         return 'quit'  # Default return value if the loop ends

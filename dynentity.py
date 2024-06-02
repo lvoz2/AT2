@@ -22,7 +22,7 @@ class DynEntity(Entity):
         elif dir in [3, 4, 5]:
             self.y -= dist
 
-    def collide(self, other: Entity, angle: bool=False) -> list[float]:
+    def collide(self, other: Entity, angle: bool=False) -> list[Optional[float]]:
         """Calculates the distance to another entity
 
         other (Entity): The target entity
@@ -91,8 +91,7 @@ class DynEntity(Entity):
         if angle_val is None and angle:
             raise ValueError("Could not determine angle properly, which may be due to a failure to calculate angle or because other entity overlapped self but not detected")
         if angle:
-            if dist is not None and angle_val is not None:
-                return [dist, angle_val]
+            return [dist, angle_val]
         else:
             return [dist]
 

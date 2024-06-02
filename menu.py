@@ -1,6 +1,7 @@
 import pygame
 from assets import GAME_ASSETS
 
+
 class MainMenu:
     def __init__(self, window):
         self.window = window

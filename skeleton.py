@@ -1,5 +1,6 @@
-import pygame
 import random
+import pygame
+
 
 class Skeleton:
     def __init__(self, position, window):

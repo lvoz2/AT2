@@ -1,12 +1,12 @@
-from character import Character
-#from screen import Screen
+from typing import Any
 import pygame
-import math
-from typing import *
+from character import Character
+# import screen
+
 
 class Player(Character):
-    def __init__(self, surf: pygame.Surface, x: int, y: int, window: pygame.Surface, name: str, character_class: str, scale: int=1, defense: int=10, mana: int=10, strength: int=10, stamina: int=10, stamina_regen_speed: int=1, health_regen_speed: int=1) -> None:
-        super().__init__(surf, x, y, window, name, health_regen_speed, 100, True, scale, defense, mana, strength)
+    def __init__(self, surf: pygame.Surface, x: int, y: int, window: pygame.Surface, name: str, character_class: str, scale: int = 1, defense: int = 10, mana: int = 10, strength: int = 10, stamina: int = 10, stamina_regen_speed: int = 1, health_regen_speed: int = 1) -> None:
+        super().__init__(surf, x, y, window, name, health_regen_speed, scale, defense, mana, strength)
         self.character_class = character_class
         self.stamina: int = stamina
         self.stamina_regen_speed = stamina_regen_speed
@@ -48,6 +48,4 @@ class Player(Character):
         if (self.stamina - amount) >= 0:
             self.stamina -= amount
             return True
-        else:
-            return False
-        
+        return False

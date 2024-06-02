@@ -1,9 +1,7 @@
 import random
-
 import pygame
 from assets import GAME_ASSETS
 from enemy import Enemy
-import math
 
 
 class Map:
@@ -107,7 +105,7 @@ class Map:
     def handle_events(self):
         """
         Handle user input events.
-        
+
         Returns:
             str: "quit" if the game is over and should be exited, None otherwise.
         """

@@ -1,11 +1,9 @@
 from player import Player
 import pygame
-from typing import *
-from attack import Attack
 
 
 class Warrior(Player):
-    def __init__(self, surf: pygame.Surface, x: int, y: int, window: pygame.Surface, name: str, scale: int=1):
+    def __init__(self, surf: pygame.Surface, x: int, y: int, window: pygame.Surface, name: str, scale: int = 1):
         super().__init__(surf, x, y, window, name, "warrior", scale, strength=15)
         # self.attacks: list[Attack] = None {
 #            "Basic Attack": {"method": self.basic_attack, "stamina_cost": 10},
@@ -14,7 +12,7 @@ class Warrior(Player):
 #            "Shield Bash": {"method": self.shield_bash, "stamina_cost": 15},
 #            "Defensive Stance": {"method": self.defensive_stance, "stamina_cost": 5},
 #        }
-
+"""
     def choose_attack(self, target):
         print(f"Choose an attack (Current stamina: {self.current_stamina}):")
         attack_list = list(self.attacks.items())
@@ -31,8 +29,6 @@ class Warrior(Player):
                 print("Not enough stamina for this attack.")
         else:
             print("Invalid attack.")
-
-
 
     def attack(self, target):
         # Calculate damage based on warrior's level, strength, and any weapon modifiers
@@ -63,3 +59,4 @@ class Warrior(Player):
         damage = self.strength + 5  # Example: Shield bash deals warrior's strength plus 5 additional damage
         print(f"{self.name} performs a shield bash on {target} for {damage} damage!")
         target.take_damage(damage)
+"""

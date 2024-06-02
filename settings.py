@@ -1,6 +1,5 @@
 import pygame
 
-# settings.py
 
 class Settings:
     def __init__(self, window):
@@ -31,8 +30,7 @@ class Settings:
                     elif event.key == pygame.K_RETURN:
                         if self.options[self.selected_option] == "Back":
                             return 'back'
-                        else:
-                            # Placeholder for setting adjustment functionality
-                            print(f"Adjusting {self.options[self.selected_option]}")
+                        # Placeholder for setting adjustment functionality
+                        print(f"Adjusting {self.options[self.selected_option]}")
 
             return None

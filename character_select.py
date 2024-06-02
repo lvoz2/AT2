@@ -1,6 +1,7 @@
 import pygame
 from assets import GAME_ASSETS
 
+
 class CharacterSelect:
     """
     A class representing the character selection screen.

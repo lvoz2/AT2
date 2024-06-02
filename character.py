@@ -6,7 +6,7 @@ import math
 from typing import *
 
 class Character(DynEntity):
-    def __init__(self, surf: pygame.Surface, x: int, y: int, window: pygame.Surface, name: str, char_class: str, health_regen_speed: int=5, scale: int=1, defense: int=10, mana: int=10, strength: int=10) -> None:
+    def __init__(self, surf: pygame.Surface, x: int, y: int, window: pygame.Surface, name: str, health_regen_speed: int=5, scale: int=1, defense: int=10, mana: int=10, strength: int=10) -> None:
         super().__init__(surf, x, y, window, 100, health_regen_speed, True, scale)
         self.name = name
         self.lvl: int = 0
@@ -16,7 +16,6 @@ class Character(DynEntity):
         self.mana: int = mana
         self.strength: int = strength
         self.MAX_LVL: int = 50
-        self.char_class = char_class
 
     def attack(self, type: int, target: Entity) -> None:
         self.attacks[type].damage(target)

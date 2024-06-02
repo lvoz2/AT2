@@ -7,7 +7,7 @@ from attack import Attack
 class Warrior(Player):
     def __init__(self, surf: pygame.Surface, x: int, y: int, window: pygame.Surface, name: str, scale: int=1):
         super().__init__(surf, x, y, window, name, "warrior", scale, strength=15)
-        self.attacks: Optional[list[Attack]] = None #{
+        # self.attacks: list[Attack] = None {
 #            "Basic Attack": {"method": self.basic_attack, "stamina_cost": 10},
 #            "Charge": {"method": self.charge, "stamina_cost": 20},
 #            "Cleave Attack": {"method": self.cleave_attack, "stamina_cost": 30},

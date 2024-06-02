@@ -1,4 +1,5 @@
 from player import Player
+import pygame
 
 class Warrior(Player):
     def __init__(self, surf: pygame.Surface, x: int, y: int, window: pygame.Surface, name: str, scale: int=1):

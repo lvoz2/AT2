@@ -9,7 +9,7 @@ class Player(Character):
         self.character_class = character_class
         self.stamina: int = stamina
         self.stamina_regen_speed = stamina_regen_speed
-        self.max_stamina: int = 
+        self.max_stamina: int = stamina
         self.xp: int = 0
         self.inventory: list[Any] = []
         self.money: int = 0

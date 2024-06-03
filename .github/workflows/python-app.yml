@@ -21,22 +21,21 @@ jobs:
     - uses: actions/checkout@v4
     - name: Install dependencies
       run: |
-        sudo apt -y install python3-venv pylint
-        python3 -m venv .venv
+        sudo apt -y install pypy
+        ./install-deps.sh
         source .venv/bin/activate
-        python -m pip install --upgrade pip
-        python -m pip install flake8 bandit[baseline]
-        python -m pip install -U mypy
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        if [ -f requirements.txt ]; then pypy -m pip install -r requirements.txt; fi
     - name: Lint, enforce static typing and check for bad practices
       run: |
         source .venv/bin/activate
         dmypy run -- *.py
         dmypy run -- */*.py
         # stop the build if there are Python syntax errors or undefined names
-        flake8 . --exclude ['.venv', '.svn', 'CVS', '.bzr', '.hg', '.git', '__pycache__', '.tox', '.eggs', '*.egg'] --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --extend-exclude=".venv" --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings
-        flake8 . --exclude ['.venv', '.svn', 'CVS', '.bzr', '.hg', '.git', '__pycache__', '.tox', '.eggs', '*.egg'] --ignore=C901 --count --exit-zero --max-complexity=10 --max-line-length=319 --statistics
+        flake8 . --extend-exclude=".venv" --ignore=C901 --count --exit-zero --max-complexity=10 --max-line-length=319 --statistics
         bandit -r *.py
         bandit -r */*.py
-        pylint --rcfile ./.pylintrc .
+        pylint --rcfile ./.pylintrc *.py
+        pylint --rcfile ./.pylintrc */*.py
+

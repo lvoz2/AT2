@@ -21,7 +21,9 @@ jobs:
     - uses: actions/checkout@v4
     - name: Install dependencies
       run: |
-        sudo apt -y install pypy python-pip python3-venv
+        wget https://downloads.python.org/pypy/pypy3.10-v7.3.16-linux64.tar.bz2
+        tar xf pypy3.10-v7.3.16-linux64.tar.bz2
+        which bash
         ./install-deps.sh
         source .venv/bin/activate
         if [ -f requirements.txt ]; then pypy -m pip install -r requirements.txt; fi

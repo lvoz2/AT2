@@ -21,11 +21,13 @@ jobs:
     - uses: actions/checkout@v4
     - name: Install dependencies
       run: |
-        wget https://downloads.python.org/pypy/pypy3.10-v7.3.16-linux64.tar.bz2
+        wget -q https://downloads.python.org/pypy/pypy3.10-v7.3.16-linux64.tar.bz2
         tar xf pypy3.10-v7.3.16-linux64.tar.bz2
         mv pypy3.10-v7.3.16-linux64.tar.bz2 pypy
         loc=${pwd}/pypy/bin
-        rm -rf /usr/bin/pypy*
+        echo $PATH
+        rm -rf /usr/bin/pypy
+        rm -rf /usr/bin/pypy3
         ln -s ${loc}/pypy3 /usr/bin/pypy3
         ln -s ${loc}/pypy /usr/bin/pypy
         ./install-deps.sh

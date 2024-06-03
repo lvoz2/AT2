@@ -20,7 +20,7 @@ class Settings:
             pygame.display.flip()
 
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:  # noqa: R1705
+                if event.type == pygame.QUIT:  # pylint: disable=no-else-return
                     return 'quit'
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_DOWN:

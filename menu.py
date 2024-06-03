@@ -32,7 +32,7 @@ class MainMenu:
 
             # Event handling in the menu
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:  # noqa: R1705
+                if event.type == pygame.QUIT:  # pylint: disable=no-else-return
                     return 'quit'  # Return 'quit' if the window is closed
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_DOWN:

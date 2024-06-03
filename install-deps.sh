@@ -1,5 +1,6 @@
 pypy -m venv .venv
 source .venv/bin/activate
+pypy -m ensurepip
 pypy -m pip install --upgrade pip
 pypy -m pip install flake8 bandit[baseline] pylint
 pypy -m pip install -U mypy

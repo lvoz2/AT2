@@ -21,7 +21,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Install dependencies
       run: |
-        sudo apt -y install pypy
+        sudo apt -y install pypy python-pip python-venv
         ./install-deps.sh
         source .venv/bin/activate
         if [ -f requirements.txt ]; then pypy -m pip install -r requirements.txt; fi

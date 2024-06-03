@@ -80,7 +80,7 @@ class CharacterSelect:
         pygame.display.flip()
         while True:
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if event.type == pygame.QUIT:  # noqa: R1705
                     pygame.quit()
                     return None
                 elif event.type == pygame.MOUSEBUTTONDOWN:

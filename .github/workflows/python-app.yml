@@ -24,7 +24,10 @@ jobs:
         wget https://downloads.python.org/pypy/pypy3.10-v7.3.16-linux64.tar.bz2
         tar xf pypy3.10-v7.3.16-linux64.tar.bz2
         mv pypy3.10-v7.3.16-linux64.tar.bz2 pypy
-        pwd
+        loc=${pwd}/pypy/bin
+        rm -rf /usr/bin/pypy*
+        ln -s ${loc}/pypy3 /usr/bin/pypy3
+        ln -s ${loc}/pypy /usr/bin/pypy
         ./install-deps.sh
         source .venv/bin/activate
         if [ -f requirements.txt ]; then pypy/bin/pypy3 -m pip install -r requirements.txt; fi

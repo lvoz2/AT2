@@ -23,10 +23,11 @@ jobs:
       run: |
         wget https://downloads.python.org/pypy/pypy3.10-v7.3.16-linux64.tar.bz2
         tar xf pypy3.10-v7.3.16-linux64.tar.bz2
-        which bash
+        mv pypy3.10-v7.3.16-linux64.tar.bz2 pypy
+        pwd
         ./install-deps.sh
         source .venv/bin/activate
-        if [ -f requirements.txt ]; then pypy -m pip install -r requirements.txt; fi
+        if [ -f requirements.txt ]; then pypy/bin/pypy3 -m pip install -r requirements.txt; fi
     - name: Lint, enforce static typing and check for bad practices
       run: |
         source .venv/bin/activate

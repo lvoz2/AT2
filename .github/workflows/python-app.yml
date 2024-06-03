@@ -22,6 +22,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt -y install pypy
+        pypy -m ensurepip
         ./install-deps.sh
         source .venv/bin/activate
         if [ -f requirements.txt ]; then pypy -m pip install -r requirements.txt; fi

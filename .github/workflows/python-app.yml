@@ -22,8 +22,6 @@ jobs:
     - name: Install dependencies
       run: |
         ./install-deps.sh
-        source .venv/bin/activate
-        if [ -f requirements.txt ]; then pypy/bin/pypy3 -m pip install -r requirements.txt; fi
     - name: Lint, enforce static typing and check for bad practices
       run: |
         source .venv/bin/activate

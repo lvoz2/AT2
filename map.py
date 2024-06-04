@@ -132,6 +132,7 @@ class Map:
 
         if self.blue_orb and self.check_orb_collision():
             return "quit"
+        return "jghf"
 
     def draw(self):
         """

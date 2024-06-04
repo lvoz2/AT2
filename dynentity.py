@@ -5,8 +5,8 @@ from entity import Entity
 
 
 class DynEntity(Entity):
-    def __init__(self, surf: pygame.Surface, x: int, y: int, window: pygame.Surface, health: int, health_regen_speed: int = 5, visible: bool = False, scale: int = 1) -> None:
-        super().__init__(surf, x, y, window, health, health_regen_speed, visible, scale)
+    def __init__(self, surf: pygame.Surface, x: int, y: int, health: int, health_regen_speed: int = 5, visible: bool = False, scale: int = 1) -> None:
+        super().__init__(surf, x, y, health, health_regen_speed, visible, scale)
 
     def move(self, dir: int, dist: int) -> None:
         """Move the dynamic entity.
@@ -51,6 +51,7 @@ class DynEntity(Entity):
             other.y - opp_corner["self"][1],
             self.x - opp_corner["other"][0]
         ]
+        dist: Optional[float] = None
         if dir == [0, -1]:
             if angle:
                 angle_val = 0.0

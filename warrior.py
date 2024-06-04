@@ -3,8 +3,8 @@ from player import Player
 
 
 class Warrior(Player):
-    def __init__(self, surf: pygame.Surface, x: int, y: int, window: pygame.Surface, name: str, scale: int = 1):
-        super().__init__(surf, x, y, window, name, "warrior", scale, strength=15)
+    def __init__(self, surf: pygame.Surface, x: int, y: int, name: str, scale: int = 1):
+        super().__init__(surf, x, y, name, "warrior", scale, strength=15)
         # self.attacks: list[Attack] = None {
 #            "Basic Attack": {"method": self.basic_attack, "stamina_cost": 10},
 #            "Charge": {"method": self.charge, "stamina_cost": 20},

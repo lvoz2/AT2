@@ -8,8 +8,8 @@ from attack import Attack
 
 
 class Character(DynEntity):
-    def __init__(self, surf: pygame.Surface, x: int, y: int, window: pygame.Surface, name: str, health_regen_speed: int = 5, scale: int = 1, defense: int = 10, mana: int = 10, strength: int = 10) -> None:
-        super().__init__(surf, x, y, window, 100, health_regen_speed, True, scale)
+    def __init__(self, surf: pygame.Surface, x: int, y: int, name: str, health_regen_speed: int = 5, scale: int = 1, defense: int = 10, mana: int = 10, strength: int = 10) -> None:
+        super().__init__(surf, x, y, 100, health_regen_speed, True, scale)
         self.name = name
         self.lvl: int = 0
         self.skills: dict[str, Any] = {}

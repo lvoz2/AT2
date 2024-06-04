@@ -35,11 +35,13 @@ class Display(metaclass=Singleton):
         self.window.fill([0, 0, 0])
         self.window.blit(self.cur_screen.bground, [0, 0])
         if self.cur_screen.entities != [None]:
-            for entity in self.cur_screen.entities:
-                entity.draw(self.window)
+            for z in self.cur_screen.entities:
+                for entity in z:
+                    entity.draw(self.window)
         if self.cur_screen.ui != [None]:
-            for e in self.cur_screen.ui:
-                e.draw(self.window)
+            for z in self.cur_screen.ui:
+                for e in z:
+                    e.draw(self.window)
         self.handle_events()
         self.update(self.delta)
         pygame.display.flip()

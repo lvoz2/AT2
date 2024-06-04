@@ -1,10 +1,11 @@
 import pygame
-from player import Player
+import player
+import assets
 
 
-class Warrior(Player):
-    def __init__(self, surf: pygame.Surface, x: int, y: int, name: str, scale: int = 1):
-        super().__init__(surf, x, y, name, "warrior", scale, strength=15)
+class Warrior(player.Player):
+    def __init__(self, x: int, y: int, name: str, scale: int = 1):
+        super().__init__(assets.GAME_ASSETS["warrior"], x, y, name, "warrior", scale, strength=15)
         # self.attacks: list[Attack] = None {
 #            "Basic Attack": {"method": self.basic_attack, "stamina_cost": 10},
 #            "Charge": {"method": self.charge, "stamina_cost": 20},

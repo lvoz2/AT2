@@ -38,6 +38,3 @@ class Screen:
         if self.clickables[target][0] != name:
             raise KeyError(f"Click listener has already been registered, albeit with a separate name. Please use {self.clickables[target][0]} as the name to deregister it.")
         del self.clickables[target]
-
-    def draw(self) -> None:
-        pass

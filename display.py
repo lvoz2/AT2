@@ -1,10 +1,10 @@
 import sys
 import pygame
 import screen
-from singleton import Singleton
+import singleton
 
 
-class Display(metaclass=Singleton):
+class Display(metaclass=singleton.Singleton):
     def __init__(self, cur_screen: str, scr: screen.Screen) -> None:
         self.screens: dict[str, screen.Screen] = {cur_screen: scr}
         self.cur_screen = self.screens[cur_screen]

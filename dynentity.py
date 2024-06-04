@@ -1,10 +1,10 @@
 from typing import Optional
 import math
 import pygame
-from entity import Entity
+import entity
 
 
-class DynEntity(Entity):
+class DynEntity(entity.Entity):
     def __init__(self, surf: pygame.Surface, x: int, y: int, health: int, health_regen_speed: int = 5, visible: bool = False, scale: int = 1) -> None:
         super().__init__(surf, x, y, health, health_regen_speed, visible, scale)
 
@@ -23,7 +23,7 @@ class DynEntity(Entity):
         elif dir in [3, 4, 5]:
             self.y -= dist
 
-    def find_eighth(self, other: Entity) -> list[Optional[int]]:
+    def find_eighth(self, other: entity.Entity) -> list[Optional[int]]:
         dir: list[Optional[int]] = [None, None]
         opp_corner: dict[str, list[int]] = {"self": self.get_opp_corner(), "other": other.get_opp_corner()}
         if opp_corner["other"][0] < self.x:
@@ -42,7 +42,7 @@ class DynEntity(Entity):
             raise ValueError("Could not determine which eighth the other entity was located in relative to self")
         return dir
 
-    def get_dist(self, dir: list[Optional[int]], other: Entity, angle: bool) -> list[Optional[float]]:
+    def get_dist(self, dir: list[Optional[int]], other: entity.Entity, angle: bool) -> list[Optional[float]]:
         opp_corner: dict[str, list[int]] = {"self": self.get_opp_corner(), "other": other.get_opp_corner()}
         angle_val: Optional[float] = None
         lin_dists: list[float] = [
@@ -92,10 +92,10 @@ class DynEntity(Entity):
             return [dist, angle_val]
         return [dist]
 
-    def collide(self, other: Entity, angle: bool = False) -> list[Optional[float]]:
+    def collide(self, other: entity.Entity, angle: bool = False) -> list[Optional[float]]:
         """Calculates the distance to another entity
 
-        other (Entity): The target entity
+        other (entity.Entity): The target entity
         angle (bool): Whether to calculate the angle, in degrees. Defaults to False
         """
         dir: list[Optional[int]] = self.find_eighth(other)

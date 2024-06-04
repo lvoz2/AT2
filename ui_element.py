@@ -14,6 +14,3 @@ class UI_Element:
 
     def draw(self, window: pygame.Surface) -> None:
         window.blit(self.design, [self.x, self.y])
-
-    def click(self) -> None:
-        pass

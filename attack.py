@@ -1,10 +1,10 @@
 from typing import Optional
-from effect import Effect
-from entity import Entity
+import effect
+import entity
 
 
 class Attack:
-    def __init__(self, dmg: int, cost: int, effects: Optional[dict[str, Effect]] = None) -> None:
+    def __init__(self, dmg: int, cost: int, effects: Optional[dict[str, effect.Effect]] = None) -> None:
         self.dmg = dmg
         self.cost = cost
         self.effects = effects
@@ -16,10 +16,10 @@ class Attack:
     def has_effects(self) -> bool:
         return self.effects is not None and len(self.effects) != 0
 
-    def damage(self, target: Entity):
+    def damage(self, target: entity.Entity):
         target.damage(self.dmg)
 
-    def apply_effects(self, target: Entity, delta: int) -> None:
+    def apply_effects(self, target: entity.Entity, delta: int) -> None:
         if self.effects is not None:
             self.duration -= delta
             self.duration = max(self.duration, 0)

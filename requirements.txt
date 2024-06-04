@@ -1,1 +1,0 @@
-pygame_cffi>=0.2.1

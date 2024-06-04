@@ -14,8 +14,7 @@ class MainMenu:
 
     def run(self):
         """Handles the display and interaction logic for the main menu."""
-        running = True
-        while running:
+        while True:
             # Blit the scaled background image to fill the entire window
             self.window.blit(self.scaled_background, (0, 0))
 
@@ -35,6 +34,9 @@ class MainMenu:
                 if event.type == pygame.QUIT:  # pylint: disable=no-else-return
                     return 'quit'  # Return 'quit' if the window is closed
                 elif event.type == pygame.KEYDOWN:
+                    print(event)
+                    print(event.key)
+                    print(event.mod)
                     if event.key == pygame.K_DOWN:
                         self.selected_option = (self.selected_option + 1) % len(self.menu_options)
                     elif event.key == pygame.K_UP:

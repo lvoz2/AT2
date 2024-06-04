@@ -11,8 +11,7 @@ class Attack:
         self.duration = 0
         if self.effects is not None and len(self.effects) != 0:
             for value in self.effects.values():
-                if value.duration > self.duration:
-                    self.duration = value.duration
+                self.duration = min(self.duration, value.duration)
 
     def has_effects(self) -> bool:
         return self.effects is not None and len(self.effects) != 0

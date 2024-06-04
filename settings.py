@@ -9,8 +9,7 @@ class Settings:
         self.selected_option = 0
 
     def run(self):
-        running = True
-        while running:
+        while True:
             self.window.fill((0, 0, 0))
             for index, option in enumerate(self.options):
                 color = (255, 0, 0) if index == self.selected_option else (255, 255, 255)
@@ -35,4 +34,4 @@ class Settings:
                 else:
                     pass
 
-            return None
+            return "None"

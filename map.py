@@ -127,7 +127,7 @@ class Map:
 
         if not self.in_combat:
             if self.check_for_combat():
-                return None
+                return "draw"
         self.handle_combat()
 
         if self.blue_orb and self.check_orb_collision():

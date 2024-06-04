@@ -5,7 +5,7 @@ import entity
 
 
 class DynEntity(entity.Entity):
-    def __init__(self, surf: pygame.Surface, x: int, y: int, health: int, health_regen_speed: int = 5, visible: bool = False, scale: int = 1) -> None:
+    def __init__(self, surf: pygame.Surface, x: int, y: int, health: int, health_regen_speed: float = 5, visible: bool = False, scale: int = 1) -> None:
         super().__init__(surf, x, y, health, health_regen_speed, visible, scale)
 
     def move(self, dir: int, dist: int) -> None:

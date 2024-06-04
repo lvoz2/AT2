@@ -3,7 +3,7 @@ import effect
 
 
 class Entity:
-    def __init__(self, surf: pygame.Surface, x: int, y: int, health: int = -1, health_regen_speed: int = 5, visible: bool = False, scale: int = 1) -> None:
+    def __init__(self, surf: pygame.Surface, x: int, y: int, health: int = -1, health_regen_speed: float = 5, visible: bool = False, scale: int = 1) -> None:
         self.surf = surf.convert_alpha()
         self.surf = pygame.transform.scale(self.surf, (int(self.surf.get_width() * scale), int(self.surf.get_height() * scale)))
         self.x = x

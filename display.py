@@ -30,6 +30,10 @@ class Display(metaclass=Singleton):
                         combo: dict[str, int] = {"key": e.key, "mods": e.mod}
                         if combo in keys.keys():
                             self.cur_screen.active_keys[keys][1]()
+                case pygame.MOUSEBUTTONDOWN:
+                    for el in self.cur_screen.clickables.keys():
+                        if el.get_rect().collidepoint(e.pos):
+                            self.cur_screen.clickables[el][1]()
                 case _:
                     pass
 

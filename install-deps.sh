@@ -6,6 +6,7 @@ pypy -m pip install flake8 bandit[baseline] pylint
 pypy -m pip install -U mypy
 git clone https://github.com/pygame/pygame.git
 cd pygame
+pypy -m pip install cython --user
 pypy3 setup.py -config -auto
 pypy3 setup.py build
 pypy3 setup.py install --user

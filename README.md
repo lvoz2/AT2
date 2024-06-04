@@ -1,4 +1,4 @@
-# T2-Project
+# AT2 (WIP, need a good name as well)
 
 This repo will contain the classes and functionality to produce a 2D RPG game, that has the following:
 

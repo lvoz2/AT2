@@ -1,4 +1,3 @@
-import pygame
 import player
 import assets
 

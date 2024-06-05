@@ -12,27 +12,27 @@ import ui_element
 import zombie
 
 
-def play() -> None:
+def play(args, kwargs) -> None:  # pylint: disable=unused-argument
     window: display.Display = display.Display()
-    window.set_screen("class_select")
+    window.set_screen("class_select_menu")
 
 
-def settings() -> None:
+def settings(args, kwargs) -> None:  # pylint: disable=unused-argument
     window: display.Display = display.Display()
-    window.set_screen("settings")
+    window.set_screen("settings_menu")
 
 
-def exit() -> None:
+def exit(args, kwargs) -> None:  # pylint: disable=unused-argument
     if not pygame.event.post(pygame.event.Event(pygame.QUIT)):
         sys.exit()
 
 
-def back(args) -> None:
+def back(args, kwargs) -> None:  # pylint: disable=unused-argument
     window: display.Display = display.Display()
     window.set_screen(args[0])
 
 
-def select_class(args) -> None:
+def select_class(args, kwargs) -> None:  # pylint: disable=unused-argument
     player_class: Optional[player.Player] = None
     match (args[0]):
         case "mage":

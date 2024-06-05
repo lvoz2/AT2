@@ -1,7 +1,9 @@
 from pathlib import Path
 from typing import Any
 
-from pygame import image
+from pygame import image, display
+
+import surf_rect
 
 
 def __iterate_files(directory: Path, image_types: list[str]) -> Any:
@@ -16,7 +18,9 @@ def __iterate_files(directory: Path, image_types: list[str]) -> Any:
     assets: Any = {}  # I'm not giving this an explicit type hint because it will end up being an n-dimensional dict, where n could be any number
     for item in Path.iterdir(directory):
         if item.is_file() and item.suffix in image_types:
-            assets[item.stem] = image.load(item)
+            surf = image.load(item).convert_alpha()
+            rect = surf.get_rect()
+            assets[item.stem] = surf_rect.Surf_Rect(surf, rect)
 
         # if a sub-folder is found
         elif item.is_dir():
@@ -25,6 +29,8 @@ def __iterate_files(directory: Path, image_types: list[str]) -> Any:
 
 
 def load_assets() -> Any:
+    display.init()
+    display.set_mode([1920, 1080])
     """
     Searches the local directory for assets
     using current working directory.
@@ -39,10 +45,11 @@ def load_assets() -> Any:
     # Iterate over files in the directory adding    \
     #   each image to the dictionary. Images will  \
     #   be added by the file name, sans the suffix
-    return __iterate_files(assets_folder, image_types)
+    res: Any = __iterate_files(assets_folder, image_types)
+    display.quit()
+    return res
 
 
 GAME_ASSETS = load_assets()
-
 
 # def create_asset(name: str) -> pygame.Surface:

@@ -47,7 +47,7 @@ def select_class(args, kwargs) -> None:  # pylint: disable=unused-argument
 
 
 def create_main_menu(width: int, window: display.Display, font: pygame.font.Font) -> screen.Screen:
-    bground = pygame.transform.scale(assets.GAME_ASSETS["main_menu_background"], (window.window.get_width(), window.window.get_height()))
+    bground = pygame.transform.scale(assets.GAME_ASSETS["main_menu_background"].surf, (window.window.get_width(), window.window.get_height()))
     main_menu: screen.Screen = screen.Screen(bground)
     main_menu.ui[0] = [
         ui_element.UI_Element("Start Game", width // 2, 150, font, True, [255, 0, 0], center=True),
@@ -62,7 +62,7 @@ def create_main_menu(width: int, window: display.Display, font: pygame.font.Font
 
 
 def create_settings_menu(height: int, window: display.Display, font: pygame.font.Font) -> screen.Screen:
-    bground = pygame.transform.scale(assets.GAME_ASSETS["main_menu_background"], (window.window.get_width(), window.window.get_height()))
+    bground = pygame.transform.scale(assets.GAME_ASSETS["main_menu_background"].surf, (window.window.get_width(), window.window.get_height()))
     settings_menu: screen.Screen = screen.Screen(bground)
     settings_menu.ui[0] = [
         ui_element.UI_Element(assets.GAME_ASSETS["white"], 50, height - 80, rect=pygame.Rect(50, height - 80, 100, 30))
@@ -75,7 +75,7 @@ def create_settings_menu(height: int, window: display.Display, font: pygame.font
 
 
 def create_class_select_menu(width: int, window: display.Display, height: int) -> screen.Screen:
-    bground = pygame.transform.scale(assets.GAME_ASSETS["main_menu_background"], (window.window.get_width(), window.window.get_height()))
+    bground = pygame.transform.scale(assets.GAME_ASSETS["main_menu_background"].surf, (window.window.get_width(), window.window.get_height()))
     class_select_menu: screen.Screen = screen.Screen(bground)
     images = [
         assets.GAME_ASSETS["mage"],
@@ -83,12 +83,12 @@ def create_class_select_menu(width: int, window: display.Display, height: int) -
         assets.GAME_ASSETS["warrior_button"]
     ]
     total_spacing = 50
-    scale = min(int(width - total_spacing * (len(images) + 1) // len(images) * images[0].get_height() / images[0].get_width()), height) / images[0].get_height()
+    scale = min(int(width - total_spacing * (len(images) + 1) // len(images) * images[0].surf.get_height() / images[0].surf.get_width()), height) / images[0].surf.get_height()
     class_select_menu.ui[0] = [
         ui_element.UI_Element(
             images[i],
-            total_spacing + (images[i].get_width() * scale * i),
-            images[i].get_height() * scale,
+            total_spacing + (images[i].surf.get_width() * scale * i),
+            images[i].surf.get_height() * scale,
             scale
         ) for i in range(len(images))
     ]

@@ -44,7 +44,7 @@ class Display(metaclass=singleton.Singleton):
                                 values[1](values[2]["args"], values[2]["kwargs"])
                     case pygame.MOUSEBUTTONDOWN:
                         for el, vals in self.cur_screen.clickables.items():
-                            if el.get_bounding_rect().collidepoint(e.pos):
+                            if el.rect.collidepoint(e.pos):
                                 vals[1](vals[2]["args"], vals[2]["kwargs"])
                     case _:
                         pass

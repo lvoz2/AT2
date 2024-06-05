@@ -8,19 +8,19 @@ class Screen:
     def __init__(self, bground: pygame.Surface) -> None:
         self.bground = bground
         self.renderables = None
-        self.active_keys: dict[tuple[int], tuple[str, Callable[..., None], dict[str, Any]]] = {}
+        self.active_keys: dict[tuple[int, int], tuple[str, Callable[..., None], dict[str, Any]]] = {}
         self.clickables: dict[pygame.Surface, tuple[str, Callable[..., None], dict[str, Any]]] = {}
         self.entities: list[list[entity.Entity]] = [[]]
         self.ui: list[list[ui_element.UI_Element]] = [[]]
 
     def register_key(self, name: str, key: int, mods: int, action: Callable[..., None], *args, **kwargs) -> None:
-        combo: tuple[int] = (key, mods)
-        if combo in self.active_keys.keys():
+        combo: tuple[int, int] = (key, mods)
+        if combo in self.active_keys:
             raise KeyError(f"Keypress action with keypresses {combo} already exists")
         self.active_keys[combo] = (name, action, {"args": args, "kwargs": kwargs})
 
     def deregister_key(self, key: int, mods: int, name: str):
-        combo: tuple[int] = (key, mods)
+        combo: tuple[int, int] = (key, mods)
         if combo not in self.active_keys:
             raise KeyError(f"Keypress action with keypresses {combo} does not exist, therefore cannot be deregistered.")
         if self.active_keys[combo][0] != name:

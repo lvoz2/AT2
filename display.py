@@ -29,6 +29,7 @@ class Display(metaclass=singleton.Singleton):
 
     def handle_events(self) -> None:
         if self.cur_screen is not None:
+            self.draw()
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
                     sys.exit()
@@ -36,7 +37,7 @@ class Display(metaclass=singleton.Singleton):
                     case pygame.KEYDOWN:
                         for keys in self.cur_screen.active_keys.keys():
                             combo: dict[str, int] = {"key": e.key, "mods": e.mod}
-                            if combo in keys.keys():
+                            if combo in keys:
                                 self.cur_screen.active_keys[keys][1](self.cur_screen.active_keys[keys][2]["args"], self.cur_screen.active_keys[keys][2]["kwargs"])
                     case pygame.MOUSEBUTTONDOWN:
                         for el in self.cur_screen.clickables.keys():
@@ -63,6 +64,5 @@ class Display(metaclass=singleton.Singleton):
                 for ui_layer in self.cur_screen.ui:
                     for ui_e in ui_layer:
                         ui_e.draw(self.window)
-            self.handle_events()
             self.update(self.delta)
             pygame.display.flip()

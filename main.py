@@ -46,8 +46,9 @@ def select_class(args) -> None:
     window.set_screen("game")
 
 
-def create_main_menu(width: int, font: pygame.font.Font) -> screen.Screen:
-    main_menu: screen.Screen = screen.Screen(assets.GAME_ASSETS["main_menu_background"])
+def create_main_menu(width: int, window: display.Display, font: pygame.font.Font) -> screen.Screen:
+    bground = pygame.transform.scale(assets.GAME_ASSETS["main_menu_background"], (window.window.get_width(), window.window.get_height()))
+    main_menu: screen.Screen = screen.Screen(bground)
     main_menu.ui[0] = [
         ui_element.UI_Element("Start Game", width // 2, 150, font, True, [255, 0, 0], center=True),
         ui_element.UI_Element("Settings", width // 2, 200, font, True, [255, 0, 0], center=True),
@@ -60,8 +61,9 @@ def create_main_menu(width: int, font: pygame.font.Font) -> screen.Screen:
     return main_menu
 
 
-def create_settings_menu(height: int, font: pygame.font.Font) -> screen.Screen:
-    settings_menu: screen.Screen = screen.Screen(assets.GAME_ASSETS["main_menu_background"])
+def create_settings_menu(height: int, window: display.Display, font: pygame.font.Font) -> screen.Screen:
+    bground = pygame.transform.scale(assets.GAME_ASSETS["main_menu_background"], (window.window.get_width(), window.window.get_height()))
+    settings_menu: screen.Screen = screen.Screen(bground)
     settings_menu.ui[0] = [
         ui_element.UI_Element(assets.GAME_ASSETS["white"], 50, height - 80, rect=pygame.Rect(50, height - 80, 100, 30))
     ]
@@ -72,8 +74,9 @@ def create_settings_menu(height: int, font: pygame.font.Font) -> screen.Screen:
     return settings_menu
 
 
-def create_class_select_menu(width: int, height: int) -> screen.Screen:
-    class_select_menu: screen.Screen = screen.Screen(assets.GAME_ASSETS["main_menu_background"])
+def create_class_select_menu(width: int, window: display.Display, height: int) -> screen.Screen:
+    bground = pygame.transform.scale(assets.GAME_ASSETS["main_menu_background"], (window.window.get_width(), window.window.get_height()))
+    class_select_menu: screen.Screen = screen.Screen(bground)
     images = [
         assets.GAME_ASSETS["mage"],
         assets.GAME_ASSETS["rogue_button"],
@@ -104,10 +107,12 @@ def init() -> None:
     height: int = 600
     window: display.Display = display.Display([width, height])
     font = pygame.font.Font(None, 36)
-    window.add_screen("main_menu", create_main_menu(width, font))
-    window.add_screen("settings_menu", create_settings_menu(height, font))
-    window.add_screen("class_select_menu", create_class_select_menu(width, height))
+    window.add_screen("main_menu", create_main_menu(width, window, font))
+    window.add_screen("settings_menu", create_settings_menu(height, window, font))
+    window.add_screen("class_select_menu", create_class_select_menu(width, window, height))
     window.set_screen("main_menu")
+    while True:
+        window.handle_events()
 
 
 if __name__ == "__main__":

@@ -109,7 +109,7 @@ def init() -> None:
     font = pygame.font.Font(None, 36)
     window.add_screen("main_menu", create_main_menu(width, window, font))
     window.add_screen("settings_menu", create_settings_menu(height, window, font))
-    print(window.add_screen("class_select_menu", create_class_select_menu(width, window, height)))
+    window.add_screen("class_select_menu", create_class_select_menu(width, window, height))
     window.set_screen("main_menu")
     while True:
         window.handle_events()

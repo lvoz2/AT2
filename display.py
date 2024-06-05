@@ -7,19 +7,20 @@ import singleton
 
 class Display(metaclass=singleton.Singleton):
     def __init__(self, dim: Sequence[int] = (800, 600)) -> None:
-        self.screens: dict[str, screen.Screen] = {}
-        self.cur_screen: Optional[screen.Screen] = None
-        pygame.init()
-        self.window = pygame.display.set_mode(dim)
-        self.clock: pygame.time.Clock = pygame.time.Clock()
-        self.delta: list[int] = [0]
-        self.game_over: bool = False
+        if not hasattr(self, "created"):
+            self.screens: dict[str, screen.Screen] = {}
+            self.cur_screen: Optional[screen.Screen] = None
+            pygame.init()
+            self.window = pygame.display.set_mode(dim)
+            self.clock: pygame.time.Clock = pygame.time.Clock()
+            self.delta: list[int] = [0]
+            self.game_over: bool = False
+            self.created: bool = True
 
     def set_screen(self, new_screen: str) -> None:
         if new_screen in self.screens:
             self.cur_screen = self.screens[new_screen]
         else:
-            print(self.screens)
             raise KeyError(f"Screen with identifier \"{new_screen}\" not found, either because it does not exist or hasn't been loaded into the Display")
 
     def add_screen(self, name: str, new_screen: screen.Screen) -> bool:
@@ -37,14 +38,14 @@ class Display(metaclass=singleton.Singleton):
                     sys.exit()
                 match (e.type):
                     case pygame.KEYDOWN:
-                        for keys in self.cur_screen.active_keys.keys():
+                        for keys, values in self.cur_screen.active_keys.items():
                             combo: dict[str, int] = {"key": e.key, "mods": e.mod}
                             if combo in keys:
-                                self.cur_screen.active_keys[keys][1](self.cur_screen.active_keys[keys][2]["args"], self.cur_screen.active_keys[keys][2]["kwargs"])
+                                values[1](values[2]["args"], values[2]["kwargs"])
                     case pygame.MOUSEBUTTONDOWN:
-                        for el in self.cur_screen.clickables.keys():
+                        for el, vals in self.cur_screen.clickables.items():
                             if el.get_bounding_rect().collidepoint(e.pos):
-                                self.cur_screen.clickables[el][1](self.cur_screen.clickables[el][2]["args"], self.cur_screen.clickables[el][2]["kwargs"])
+                                vals[1](vals[2]["args"], vals[2]["kwargs"])
                     case _:
                         pass
 

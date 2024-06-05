@@ -29,12 +29,12 @@ def __iterate_files(directory: Path, image_types: list[str]) -> Any:
 
 
 def load_assets() -> Any:
-    display.init()
-    display.set_mode([1920, 1080])
     """
     Searches the local directory for assets
     using current working directory.
     """
+    display.init()
+    display.set_mode([1920, 1080])
     # Constants
     cwd: Path = Path.cwd()
     assets_folder: Path = Path.joinpath(cwd, "assets")

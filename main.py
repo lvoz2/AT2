@@ -78,7 +78,7 @@ def create_class_select_menu(width: int, window: display.Display, height: int) -
     bground = pygame.transform.scale(assets.GAME_ASSETS["main_menu_background"].surf, (window.window.get_width(), window.window.get_height()))
     class_select_menu: screen.Screen = screen.Screen(bground)
     images = [
-        assets.GAME_ASSETS["mage"],
+        assets.GAME_ASSETS["mage_button"],
         assets.GAME_ASSETS["rogue_button"],
         assets.GAME_ASSETS["warrior_button"]
     ]

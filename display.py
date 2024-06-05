@@ -3,13 +3,15 @@ import pygame
 import screen
 import singleton
 
+from typing import Sequence
+
 
 class Display(metaclass=singleton.Singleton):
-    def __init__(self, cur_screen: str, scr: screen.Screen) -> None:
-        self.screens: dict[str, screen.Screen] = {cur_screen: scr}
-        self.cur_screen = self.screens[cur_screen]
+    def __init__(self, dim: Sequence[int]) -> None:
+        self.screens: dict[str, screen.Screen] = {}
+        self.cur_screen: Optional[screen.Screen] = None
         pygame.init()
-        self.window = pygame.display.set_mode((800, 600))
+        self.window = pygame.display.set_mode(dim)
         self.clock: pygame.time.Clock = pygame.time.Clock()
         self.delta: list[int] = [0]
         self.game_over: bool = False
@@ -20,6 +22,12 @@ class Display(metaclass=singleton.Singleton):
         else:
             raise KeyError("Screen not found, either because it does not exist or hasn't been loaded into the Display")
 
+    def add_screen(self, name: str, new_screen: screen.Screen) -> None:
+        if name not in self.screens:
+            self.screens[name] = new_screen
+        else:
+            raise KeyError("Screen couldn't be added, becuase another Screen with the same name already loaded. Find a different name and try again.")
+
     def handle_events(self) -> None:
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
@@ -29,11 +37,11 @@ class Display(metaclass=singleton.Singleton):
                     for keys in self.cur_screen.active_keys.keys():
                         combo: dict[str, int] = {"key": e.key, "mods": e.mod}
                         if combo in keys.keys():
-                            self.cur_screen.active_keys[keys][1]()
+                            self.cur_screen.active_keys[keys][1](self.cur_screen.active_keys[keys][2]["args"], self.cur_screen.active_keys[keys][2]["kwargs"])
                 case pygame.MOUSEBUTTONDOWN:
                     for el in self.cur_screen.clickables.keys():
                         if el.get_rect().collidepoint(e.pos):
-                            self.cur_screen.clickables[el][1]()
+                            self.cur_screen.clickables[el][1](self.cur_screen.clickables[el][2]["args"], self.cur_screen.clickables[2]["kwargs"])
                 case _:
                     pass
 

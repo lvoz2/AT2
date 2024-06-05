@@ -1,9 +1,9 @@
-from typing import Optional
+from typing import Optional, Sequence
 import pygame
 
 
 class UI_Element:
-    def __init__(self, design: pygame.Surface | str, x: int, y: int, font: Optional[pygame.font.Font] = None, anti_alias: Optional[bool] = None, fcolour: Optional[str] = None, bcolour: Optional[str] = None, center: bool = False, rect: Optional[pygame.Rect] = None, scale: int = 1) -> None:
+    def __init__(self, design: pygame.Surface | str, x: int, y: int, font: Optional[pygame.font.Font] = None, anti_alias: Optional[bool] = None, fcolour: Optional[Sequence[int]] = None, bcolour: Optional[Sequence[int]] = None, center: bool = False, rect: Optional[pygame.Rect] = None, scale: int = 1) -> None:
         if isinstance(design, str):
             if font is not None and anti_alias is not None and fcolour is not None:
                 self.design: pygame.Surface = font.render(design, anti_alias, fcolour, bcolour)

@@ -8,16 +8,16 @@ class Screen:
     def __init__(self, bground: pygame.Surface) -> None:
         self.bground = bground
         self.renderables = None
-        self.active_keys: dict[dict[str, int], tuple[str, Callable[Any, None], dict[str, Any]]] = {}
-        self.clickables: dict[pygame.Surface, tuple[str, Callable[Any, None], dict[str, Any]]] = {}
+        self.active_keys: dict[dict[str, int], tuple[str, Callable[..., None], dict[str, Any]]] = {}
+        self.clickables: dict[pygame.Surface, tuple[str, Callable[..., None], dict[str, Any]]] = {}
         self.entities: list[list[entity.Entity]] = [[]]
         self.ui: list[list[ui_element.UI_Element]] = [[]]
 
-    def register_key(self, name: str, key: int, mods: int, action: Callable[Any, None], *args, **kwargs) -> None:
+    def register_key(self, name: str, key: int, mods: int, action: Callable[..., None], *args, **kwargs) -> None:
         combo: dict[str, int] = {"key": key, "mods": mods}
         if combo in self.active_keys:
             raise KeyError(f"Keypress action with keypresses {combo} already exists")
-        self.active_keys[combo] = (name, action, {"args": args, "kwargs", kwargs})
+        self.active_keys[combo] = (name, action, {"args": args, "kwargs": kwargs})
 
     def deregister_key(self, key: int, mods: int, name: str):
         combo: dict[str, int] = {"key": key, "mods": mods}
@@ -27,10 +27,10 @@ class Screen:
             raise KeyError(f"Keypress listener with name {name} not found. Have you registered it yet?")
         del self.active_keys[combo]
 
-    def register_click_listener(self, target: pygame.Surface, name: str, action: Callable[[], None], *args, **kwargs) -> None:
+    def register_click_listener(self, target: pygame.Surface, name: str, action: Callable[..., None], *args, **kwargs) -> None:
         if target in self.clickables:
             raise KeyError(f"Could not add click listener {name}, because the attached Surface already has a listener.")
-        self.clickables[target] = (name, action, {"args": args, "kwargs", kwargs})
+        self.clickables[target] = (name, action, {"args": args, "kwargs": kwargs})
 
     def deregister_click_listener(self, target: pygame.Surface, name: str) -> None:
         if target not in self.clickables:

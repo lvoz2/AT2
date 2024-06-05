@@ -78,18 +78,20 @@ def create_class_select_menu(width: int, window: display.Display, height: int) -
     bground = pygame.transform.scale(assets.GAME_ASSETS["main_menu_background"].surf, (window.window.get_width(), window.window.get_height()))
     class_select_menu: screen.Screen = screen.Screen(bground)
     images = [
-        assets.GAME_ASSETS["mage_button"],
         assets.GAME_ASSETS["rogue_button"],
+        assets.GAME_ASSETS["mage_button"],
         assets.GAME_ASSETS["warrior_button"]
     ]
     total_spacing = 50
-    scale = min(int(width - total_spacing * (len(images) + 1) // len(images) * images[0].surf.get_height() / images[0].surf.get_width()), height) / images[0].surf.get_height()
+    scale = [
+        min(int(width - total_spacing * (len(images) + 1) // len(images) * images[i].surf.get_height() / images[i].surf.get_width()), height) / images[i].surf.get_height() for i in range(len(images))
+    ]
     class_select_menu.ui[0] = [
         ui_element.UI_Element(
             images[i],
-            total_spacing + (images[i].surf.get_width() * scale * i),
-            images[i].surf.get_height() * scale,
-            scale
+            total_spacing + (images[i].surf.get_width() * scale[i] * i),
+            images[i].surf.get_height() * scale[i],
+            scale=scale[i]
         ) for i in range(len(images))
     ]
     class_select_menu.register_click_listener(class_select_menu.ui[0][0].design, "mage", select_class, "mage")

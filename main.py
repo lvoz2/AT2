@@ -7,6 +7,7 @@ import display
 import player
 import mage
 import rogue
+import surf_rect
 import warrior
 import ui_element
 import zombie
@@ -75,9 +76,9 @@ def create_settings_menu(height: int, window: display.Display, font: pygame.font
 
 
 def create_class_select_menu(width: int, window: display.Display, height: int) -> screen.Screen:
-    bground = pygame.transform.scale(assets.GAME_ASSETS["main_menu_background"].surf, (window.window.get_width(), window.window.get_height()))
+    bground: pygame.Surface = pygame.transform.scale(assets.GAME_ASSETS["main_menu_background"].surf, (window.window.get_width(), window.window.get_height()))
     class_select_menu: screen.Screen = screen.Screen(bground)
-    images = [
+    images: list[surf_rect.Surf_Rect] = [
         assets.GAME_ASSETS["rogue_button"],
         assets.GAME_ASSETS["mage_button"],
         assets.GAME_ASSETS["warrior_button"]

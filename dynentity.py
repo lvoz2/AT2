@@ -63,6 +63,9 @@ class DynEntity(entity.Entity):
             other.y - opp_corner["self"][1],
             self.x - opp_corner["other"][0]
         ]
+        rad: Optional[float] = None
+        a_squared: Optional[float] = None
+        b_squared: Optional[float] = None
         dist: Optional[float] = None
         if dir == [0, -1]:
             if angle:
@@ -70,10 +73,10 @@ class DynEntity(entity.Entity):
             dist = lin_dists[0]
         elif dir == [1, -1]:
             if angle:
-                rad: float = math.tan(lin_dists[1] / lin_dists[0])
+                rad = math.tan(lin_dists[1] / lin_dists[0])
                 angle_val = math.degrees(rad)
-            a_squared: float = math.pow(lin_dists[0], 2)
-            b_squared: float = math.pow(lin_dists[1], 2)
+            a_squared = math.pow(lin_dists[0], 2)
+            b_squared = math.pow(lin_dists[1], 2)
             dist = math.sqrt(a_squared + b_squared)
         elif dir == [1, 0]:
             if angle:
@@ -81,10 +84,10 @@ class DynEntity(entity.Entity):
             dist = lin_dists[1]
         elif dir == [1, 1]:
             if angle:
-                rad: float = math.tan(lin_dists[2] / lin_dists[1])
+                rad = math.tan(lin_dists[2] / lin_dists[1])
                 angle_val = math.degrees(rad) + 90.0
-            a_squared: float = math.pow(lin_dists[1], 2)
-            b_squared: float = math.pow(lin_dists[2], 2)
+            a_squared = math.pow(lin_dists[1], 2)
+            b_squared = math.pow(lin_dists[2], 2)
             dist = math.sqrt(a_squared + b_squared)
         elif dir == [0, 1]:
             if angle:
@@ -92,10 +95,10 @@ class DynEntity(entity.Entity):
             dist = lin_dists[2]
         elif dir == [-1, 1]:
             if angle:
-                rad: float = math.tan(lin_dists[3] / lin_dists[2])
+                rad = math.tan(lin_dists[3] / lin_dists[2])
                 angle_val = math.degrees(rad) + 180.0
-            a_squared: float = math.pow(lin_dists[2], 2)
-            b_squared: float = math.pow(lin_dists[3], 2)
+            a_squared = math.pow(lin_dists[2], 2)
+            b_squared = math.pow(lin_dists[3], 2)
             dist = math.sqrt(a_squared + b_squared)
         elif dir == [-1, 0]:
             if angle:
@@ -103,10 +106,10 @@ class DynEntity(entity.Entity):
             dist = lin_dists[3]
         elif dir == [-1, -1]:
             if angle:
-                rad: float = math.tan(lin_dists[0] / lin_dists[3])
+                rad = math.tan(lin_dists[0] / lin_dists[3])
                 angle_val = math.degrees(rad) + 270.0
-            a_squared: float = math.pow(lin_dists[3], 2)
-            b_squared: float = math.pow(lin_dists[0], 2)
+            a_squared = math.pow(lin_dists[3], 2)
+            b_squared = math.pow(lin_dists[0], 2)
             dist = math.sqrt(a_squared + b_squared)
         if dist is None:
             raise ValueError("Could not determine distance properly, which" +

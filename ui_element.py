@@ -11,8 +11,6 @@ class UI_Element:
                 self.design: surf_rect.Surf_Rect = surf_rect.Surf_Rect(surf, surf.get_rect())
         else:
             self.design: surf_rect.Surf_Rect = design  # type: ignore  # This line may or may not actually get called, because it is wrapped in an if-else. Otherwise, mypy thinks I'm trying to redefine something that hasn't been defined yet
-        print(self.design.surf.get_height())
-        print(self.design.surf.get_width())
         self.design.surf = pygame.transform.scale(self.design.surf, (int(self.design.surf.get_width() * scale), int(self.design.surf.get_height() * scale)))
         self.x = x if x is not None else self.design.rect.x
         self.y = y if y is not None else self.design.rect.y

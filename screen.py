@@ -1,6 +1,7 @@
 from typing import Any, Callable
 import pygame
 import entity
+import surf_rect
 import ui_element
 
 
@@ -9,7 +10,7 @@ class Screen:
         self.bground = bground
         self.renderables = None
         self.active_keys: dict[tuple[int, int], tuple[str, Callable[..., None], dict[str, Any]]] = {}
-        self.clickables: dict[pygame.Surface, tuple[str, Callable[..., None], dict[str, Any]]] = {}
+        self.clickables: dict[surf_rect.Surf_Rect, tuple[str, Callable[..., None], dict[str, Any]]] = {}
         self.entities: list[list[entity.Entity]] = [[]]
         self.ui: list[list[ui_element.UI_Element]] = [[]]
 
@@ -27,12 +28,12 @@ class Screen:
             raise KeyError(f"Keypress listener with name {name} not found. Have you registered it yet?")
         del self.active_keys[combo]
 
-    def register_click_listener(self, target: pygame.Surface, name: str, action: Callable[..., None], *args, **kwargs) -> None:
+    def register_click_listener(self, target: surf_rect.Surf_Rect, name: str, action: Callable[..., None], *args, **kwargs) -> None:
         if target in self.clickables:
             raise KeyError(f"Could not add click listener {name}, because the attached Surface already has a listener.")
         self.clickables[target] = (name, action, {"args": args, "kwargs": kwargs})
 
-    def deregister_click_listener(self, target: pygame.Surface, name: str) -> None:
+    def deregister_click_listener(self, target: surf_rect.Surf_Rect, name: str) -> None:
         if target not in self.clickables:
             raise KeyError(f"Click listener for a Surface, with {name} name, has not been registered. Please register it first.")
         if self.clickables[target][0] != name:

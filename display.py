@@ -21,7 +21,7 @@ class Display(metaclass=singleton.Singleton):
         if new_screen in self.screens:
             self.cur_screen = self.screens[new_screen]
         else:
-            raise KeyError(f"Screen with identifier \"{new_screen}\" not found, either because it does not exist or hasn't been loaded into the Display")
+            raise KeyError(f"Screen with identifier \"{new_screen}\" not found, either because it does not exist or has not been loaded into the Display")
 
     def add_screen(self, name: str, new_screen: screen.Screen) -> bool:
         if name not in self.screens:

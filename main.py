@@ -87,12 +87,12 @@ def create_class_select_menu(width: int, window: display.Display, height: int) -
     for img in images:
         aspect_ratio: float = img.rect.height / img.rect.width
         icon_height: int = min(img.rect.height, height // 4)
-        img.surf = pygame.transform.scale(img, (icon_width, icon_height))
+        img.surf = pygame.transform.scale(img.surf, (icon_width, icon_height))
         class_select_menu.ui[0].append(ui_element.UI_Element(
             img,
             x=total_spacing + ((total_spacing + icon_width) * images.index(img)),
-            y=img.rect.height,
-        )
+            y=img.rect.height
+        ))
     class_select_menu.register_click_listener(class_select_menu.ui[0][0].design, "mage", select_class, "mage")
     class_select_menu.register_click_listener(class_select_menu.ui[0][1].design, "rogue", select_class, "rogue")
     class_select_menu.register_click_listener(class_select_menu.ui[0][2].design, "warrior", select_class, "warrior")

@@ -20,6 +20,6 @@ class UI_Element:
     def draw(self, window: pygame.Surface) -> None:
         if self.center:
             self.design.rect.center = (self.x, self.y)
-            self.design.rect = window.blit(self.design.surf, self.design.rect(center=[self.x, self.y]), self.rect)
+            self.design.rect = window.blit(self.design.surf, self.design.rect, self.rect)
         else:
             self.design.rect = window.blit(self.design.surf, [self.x, self.y], self.rect)

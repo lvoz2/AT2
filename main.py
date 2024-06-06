@@ -37,13 +37,13 @@ def select_class(args, kwargs) -> None:  # pylint: disable=unused-argument
     match (args[0]):
         case "mage":
             pass
-        case "mage":
+        case "rogue":
             pass
-        case "mage":
+        case "warrior":
             pass
-    window: display.Display = display.Display()
+    # window: display.Display = display.Display()
     # window.add_screen("game", create_game_screen())
-    window.set_screen("game")
+    # window.set_screen("game")
 
 
 def create_main_menu(width: int, window: display.Display, font: pygame.font.Font) -> screen.Screen:
@@ -83,15 +83,16 @@ def create_class_select_menu(width: int, window: display.Display, height: int) -
         assets.GAME_ASSETS["warrior_button"]
     ]
     total_spacing = 50
-    scale = min(int(width - total_spacing * (len(images) + 1) // len(images) * images[0].surf.get_height() / images[0].surf.get_width()), height) / images[0].surf.get_height()
-    class_select_menu.ui[0] = [
-        ui_element.UI_Element(
-            images[i],
-            total_spacing + (images[i].surf.get_width() * scale * i),
-            images[i].surf.get_height() * scale,
-            scale
-        ) for i in range(len(images))
-    ]
+    icon_width: int = (width - total_spacing * (len(images) + 1)) // len(images)
+    for img in images:
+        aspect_ratio: float = img.rect.height / img.rect.width
+        icon_height: int = min(img.rect.height, height // 4)
+        img.surf = pygame.transform.scale(img, (icon_width, icon_height))
+        class_select_menu.ui[0].append(ui_element.UI_Element(
+            img,
+            x=total_spacing + ((total_spacing + icon_width) * images.index(img)),
+            y=img.rect.height,
+        ) 
     class_select_menu.register_click_listener(class_select_menu.ui[0][0].design, "mage", select_class, "mage")
     class_select_menu.register_click_listener(class_select_menu.ui[0][1].design, "rogue", select_class, "rogue")
     class_select_menu.register_click_listener(class_select_menu.ui[0][2].design, "warrior", select_class, "warrior")

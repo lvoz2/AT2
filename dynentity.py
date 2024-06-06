@@ -5,14 +5,20 @@ import entity
 
 
 class DynEntity(entity.Entity):
-    def __init__(self, surf: pygame.Surface, x: int, y: int, health: int, health_regen_speed: float = 5, visible: bool = False, scale: int = 1) -> None:
-        super().__init__(surf, x, y, health, health_regen_speed, visible, scale)
+    def __init__(
+        self, surf: pygame.Surface, x: int, y: int, health: int,
+        health_regen_speed: float = 5, visible: bool = False,
+        scale: int = 1
+    ) -> None:
+        super().__init__(
+            surf, x, y, health, health_regen_speed, visible, scale
+        )
 
     def move(self, dir: int, dist: int) -> None:
         """Move the dynamic entity.
 
-        dir (int): A number representing the direction, with 0 being positive y, and 7 being positive y and negative x. It goes around clockwise
-        dist (int): The number of pixels moved in 1d. For diagonal movements, this is not the hypotenuse
+        dir (int): A number representing the direction
+        dist (int): The number of pixels moved laterally
         """
         if dir in [1, 2, 3]:
             self.x += dist
@@ -39,11 +45,17 @@ class DynEntity(entity.Entity):
         else:
             dir[1] = 0
         if None in dir:
-            raise ValueError("Could not determine which eighth the other entity was located in relative to self")
+            raise ValueError("Could not determine which eighth the other entity was"
+                             + " located in relative to self")
         return dir
 
-    def get_dist(self, dir: list[Optional[int]], other: entity.Entity, angle: bool) -> list[Optional[float]]:
-        opp_corner: dict[str, list[int]] = {"self": self.get_opp_corner(), "other": other.get_opp_corner()}
+    def get_dist(
+        self, dir: list[Optional[int]], other: entity.Entity, angle: bool
+    ) -> list[Optional[float]]:
+        opp_corner: dict[str, list[int]] = {
+            "self": self.get_opp_corner(),
+            "other": other.get_opp_corner()
+        }
         angle_val: Optional[float] = None
         lin_dists: list[float] = [
             self.y - opp_corner["other"][1],
@@ -58,45 +70,65 @@ class DynEntity(entity.Entity):
             dist = lin_dists[0]
         elif dir == [1, -1]:
             if angle:
-                angle_val = math.degrees(math.tan(lin_dists[1] / lin_dists[0]))
-            dist = math.sqrt(math.pow(lin_dists[0], 2) + math.pow(lin_dists[1], 2))
+                rad: float = math.tan(lin_dists[1] / lin_dists[0])
+                angle_val = math.degrees(rad)
+            a_squared: float = math.pow(lin_dists[0], 2)
+            b_squared: float = math.pow(lin_dists[1], 2)
+            dist = math.sqrt(a_squared + b_squared)
         elif dir == [1, 0]:
             if angle:
                 angle_val = 90.0
             dist = lin_dists[1]
         elif dir == [1, 1]:
             if angle:
-                angle_val = math.degrees(math.tan(lin_dists[2] / lin_dists[1])) + 90.0
-            dist = math.sqrt(math.pow(lin_dists[1], 2) + math.pow(lin_dists[2], 2))
+                rad: float = math.tan(lin_dists[2] / lin_dists[1])
+                angle_val = math.degrees(rad) + 90.0
+            a_squared: float = math.pow(lin_dists[1], 2)
+            b_squared: float = math.pow(lin_dists[2], 2)
+            dist = math.sqrt(a_squared + b_squared)
         elif dir == [0, 1]:
             if angle:
                 angle_val = 180.0
             dist = lin_dists[2]
         elif dir == [-1, 1]:
             if angle:
-                angle_val = math.degrees(math.tan(lin_dists[3] / lin_dists[2])) + 180.0
-            dist = math.sqrt(math.pow(lin_dists[2], 2) + math.pow(lin_dists[3], 2))
+                rad: float = math.tan(lin_dists[3] / lin_dists[2])
+                angle_val = math.degrees(rad) + 180.0
+            a_squared: float = math.pow(lin_dists[2], 2)
+            b_squared: float = math.pow(lin_dists[3], 2)
+            dist = math.sqrt(a_squared + b_squared)
         elif dir == [-1, 0]:
             if angle:
                 angle_val = 270.0
             dist = lin_dists[3]
         elif dir == [-1, -1]:
             if angle:
-                angle_val = math.degrees(math.tan(lin_dists[0] / lin_dists[3])) + 270.0
-            dist = math.sqrt(math.pow(lin_dists[3], 2) + math.pow(lin_dists[0], 2))
+                rad: float = math.tan(lin_dists[0] / lin_dists[3])
+                angle_val = math.degrees(rad) + 270.0
+            a_squared: float = math.pow(lin_dists[3], 2)
+            b_squared: float = math.pow(lin_dists[0], 2)
+            dist = math.sqrt(a_squared + b_squared)
         if dist is None:
-            raise ValueError("Could not determine distance properly, which may be due to a failure to calculate distance or because other entity overlapped self but not detected")
+            raise ValueError("Could not determine distance properly, which" +
+                             " may be due to a failure to calculate" +
+                             " distance or because other entity overlapped" +
+                             " self but not detected")
         if angle_val is None and angle:
-            raise ValueError("Could not determine angle properly, which may be due to a failure to calculate angle or because other entity overlapped self but not detected")
+            raise ValueError("Could not determine angle properly, which may" +
+                             " be due to a failure to calculate angle or" +
+                             " because other entity overlapped self but not" +
+                             " detected")
         if angle:
             return [dist, angle_val]
         return [dist]
 
-    def collide(self, other: entity.Entity, angle: bool = False) -> list[Optional[float]]:
+    def collide(
+        self, other: entity.Entity, angle: bool = False
+    ) -> list[Optional[float]]:
         """Calculates the distance to another entity
 
         other (entity.Entity): The target entity
-        angle (bool): Whether to calculate the angle, in degrees. Defaults to False
+        angle (bool): Whether to calculate the angle, in degrees
         """
         dir: list[Optional[int]] = self.find_eighth(other)
         if dir == [0, 0] and not angle:

@@ -21,13 +21,17 @@ class Display(metaclass=singleton.Singleton):
         if new_screen in self.screens:
             self.cur_screen = self.screens[new_screen]
         else:
-            raise KeyError(f"Screen with identifier \"{new_screen}\" not found, either because it does not exist or has not been loaded into the Display")
+            raise KeyError(f"Screen with identifier \"{new_screen}\" not"
+                           + " found, either because it does not exist or has"
+                           + " not been loaded into the Display")
 
     def add_screen(self, name: str, new_screen: screen.Screen) -> bool:
         if name not in self.screens:
             self.screens[name] = new_screen
         else:
-            raise KeyError("Screen couldn't be added, becuase another Screen with the same name already loaded. Find a different name and try again.")
+            raise KeyError("Screen couldn't be added, becuase another Screen"
+                           + " with the same name already loaded. Find a"
+                           + " different name and try again.")
         return name in self.screens
 
     def handle_events(self) -> None:
@@ -38,10 +42,17 @@ class Display(metaclass=singleton.Singleton):
                     sys.exit()
                 match (e.type):
                     case pygame.KEYDOWN:
-                        for keys, values in self.cur_screen.active_keys.items():
-                            combo: dict[str, int] = {"key": e.key, "mods": e.mod}
+                        items = self.cur_screen.active_keys.items()
+                        for keys, values in items:
+                            combo: dict[str, int] = {
+                                "key": e.key,
+                                "mods": e.mod
+                            }
                             if combo in keys:
-                                values[1](values[2]["args"], values[2]["kwargs"])
+                                values[1](
+                                    values[2]["args"],
+                                    values[2]["kwargs"]
+                                )
                     case pygame.MOUSEBUTTONDOWN:
                         for el, vals in self.cur_screen.clickables.items():
                             if el.rect.collidepoint(e.pos):

@@ -128,6 +128,21 @@ def create_class_select_menu(
                 y=height // 3 - (height // 4) // 2,
             )
         )
+    class_select_menu.ui.append([
+        ui_element.UI_Element(
+            assets.GAME_ASSETS["white"],
+            50,
+            height - 80,
+            rect=pygame.Rect(50, height - 80, 100, 30),
+        )
+    ])
+    class_select_menu.ui.append(
+        [
+            ui_element.UI_Element(
+                "Back", 100, height - 65, font, True, [0, 0, 0], center=True
+            )
+        ]
+    )
     class_select_menu.register_click_listener(
         class_select_menu.ui[0][0].design, "mage", select_class, "mage"
     )
@@ -136,6 +151,9 @@ def create_class_select_menu(
     )
     class_select_menu.register_click_listener(
         class_select_menu.ui[0][2].design, "warrior", select_class, "warrior"
+    )
+    class_select_menu.register_click_listener(
+        class_select_menu.ui[0][3].design, "back", back, "main_menu"
     )
     return class_select_menu
 

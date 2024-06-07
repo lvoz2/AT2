@@ -4,8 +4,12 @@ import entity
 
 
 class Attack:
-    def __init__(self, dmg: int, cost: int,
-                 effects: Optional[dict[str, effect.Effect]] = None) -> None:
+    def __init__(
+        self,
+        dmg: int,
+        cost: int,
+        effects: Optional[dict[str, effect.Effect]] = None,
+    ) -> None:
         self.dmg = dmg
         self.cost = cost
         self.effects = effects

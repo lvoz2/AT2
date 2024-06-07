@@ -15,7 +15,9 @@ def __iterate_files(directory: Path, image_types: list[str]) -> Any:
         directory (Path): Path to sub-directory
         image_types (list of strings): tuple of valid image file types
     """
-    assets: Any = {}  # I'm not giving this an explicit type hint because it will end up being an n-dimensional dict, where n could be any number
+    # I'm not giving this an explicit type hint because it will end up being an
+    # n-dimensional dict, where n could be any number
+    assets: Any = {}
     for item in Path.iterdir(directory):
         if item.is_file() and item.suffix in image_types:
             surf = image.load(item).convert_alpha()

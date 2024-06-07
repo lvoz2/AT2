@@ -1,12 +1,37 @@
 from typing import Any
 import pygame
 import character
+
 # import screen
 
 
 class Player(character.Character):
-    def __init__(self, surf: pygame.Surface, x: int, y: int, name: str, character_class: str, scale: int = 1, defense: int = 10, mana: int = 10, strength: int = 10, stamina: int = 10, stamina_regen_speed: int = 1, health_regen_speed: float = 1) -> None:
-        super().__init__(surf, x, y, name, health_regen_speed, scale, defense, mana, strength)
+    def __init__(
+        self,
+        surf: pygame.Surface,
+        x: int,
+        y: int,
+        name: str,
+        character_class: str,
+        scale: int = 1,
+        defense: int = 10,
+        mana: int = 10,
+        strength: int = 10,
+        stamina: int = 10,
+        stamina_regen_speed: int = 1,
+        health_regen_speed: float = 1,
+    ) -> None:
+        super().__init__(
+            surf,
+            x,
+            y,
+            name,
+            health_regen_speed,
+            scale,
+            defense,
+            mana,
+            strength,
+        )
         self.character_class = character_class
         self.stamina: int = stamina
         self.stamina_regen_speed = stamina_regen_speed

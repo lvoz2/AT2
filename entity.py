@@ -3,9 +3,24 @@ import effect
 
 
 class Entity:
-    def __init__(self, surf: pygame.Surface, x: int, y: int, health: float = -1.0, health_regen_speed: float = 5, visible: bool = False, scale: int = 1) -> None:
+    def __init__(
+        self,
+        surf: pygame.Surface,
+        x: int,
+        y: int,
+        health: float = -1.0,
+        health_regen_speed: float = 5,
+        visible: bool = False,
+        scale: int = 1,
+    ) -> None:
         self.surf = surf.convert_alpha()
-        self.surf = pygame.transform.scale(self.surf, (int(self.surf.get_width() * scale), int(self.surf.get_height() * scale)))
+        self.surf = pygame.transform.scale(
+            self.surf,
+            (
+                int(self.surf.get_width() * scale),
+                int(self.surf.get_height() * scale),
+            ),
+        )
         self.x = x
         self.y = y
         self.height = self.surf.get_height()
@@ -37,7 +52,9 @@ class Entity:
 
     def draw(self, window: pygame.Surface) -> None:
         if self.visible:
-            if ((0 - self.width) < self.x < window.get_width()) and ((0 - self.height) < self.y < window.get_height()):
+            if ((0 - self.width) < self.x < window.get_width()) and (
+                (0 - self.height) < self.y < window.get_height()
+            ):
                 window.blit(self.surf, [self.x, self.y])
             else:
                 self.visible = False

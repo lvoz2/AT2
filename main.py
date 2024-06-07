@@ -90,10 +90,14 @@ def create_settings_menu(
         )
     ]
     settings_menu.ui.append(
-        [ui_element.UI_Element("Back", 50, height - 80, font, True, [0, 0, 0])]
+        [
+            ui_element.UI_Element(
+                "Back", 100, height - 65, font, True, [0, 0, 0], center=True
+            )
+        ]
     )
     settings_menu.register_click_listener(
-        settings_menu.ui[1][0].design, "back", back, "main_menu"
+        settings_menu.ui[0][0].design, "back", back, "main_menu"
     )
     return settings_menu
 
@@ -111,17 +115,17 @@ def create_class_select_menu(
         assets.GAME_ASSETS["mage_button"],
         assets.GAME_ASSETS["warrior_button"],
     ]
-    total_spacing = 50
-    icon_width: int = (width - total_spacing * (len(images) + 1)) // len(images)
+    total_spacing = 20
+    icon_width: int = ((width - total_spacing) // len(images)) - total_spacing
     for img in images:
-        aspect_ratio: float = img.rect.height / img.rect.width
-        icon_height: int = min(img.rect.height, height // 4)
+        aspect_ratio: float = 0.75
+        icon_height: int = int(icon_width // aspect_ratio)
         img.surf = pygame.transform.scale(img.surf, (icon_width, icon_height))
         class_select_menu.ui[0].append(
             ui_element.UI_Element(
                 img,
                 x=total_spacing + ((total_spacing + icon_width) * images.index(img)),
-                y=img.rect.height,
+                y=height // 3 - (height // 4) // 2,
             )
         )
     class_select_menu.register_click_listener(
@@ -150,7 +154,7 @@ def init() -> None:
     window.add_screen(
         "class_select_menu", create_class_select_menu(width, window, height)
     )
-    window.set_screen("main_menu")
+    window.set_screen("settings_menu")
     while True:
         window.handle_events()
 

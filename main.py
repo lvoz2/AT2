@@ -1,3 +1,4 @@
+import copy
 import sys
 from typing import Optional
 import pygame
@@ -51,21 +52,47 @@ def create_main_menu(
     width: int, window: display.Display, font: pygame.font.Font
 ) -> screen.Screen:
     bground = pygame.transform.scale(
-        assets.GAME_ASSETS["main_menu_background"].surf,
+        assets.get_asset("main_menu_background").surf,
         (window.window.get_width(), window.window.get_height()),
     )
+    half_width: int = width // 2
     main_menu: screen.Screen = screen.Screen(bground)
     main_menu.ui[0] = [
         ui_element.UI_Element(
-            "Start Game", width // 2, 150, font, True, [255, 0, 0], center=True
+            assets.get_asset("white"),
+            half_width,
+            150,
+            rect=pygame.Rect(half_width, 150, 150, 30),
+            center=True,
         ),
         ui_element.UI_Element(
-            "Settings", width // 2, 200, font, True, [255, 0, 0], center=True
+            assets.get_asset("white"),
+            half_width,
+            200,
+            rect=pygame.Rect(half_width, 200, 150, 30),
+            center=True,
         ),
         ui_element.UI_Element(
-            "Exit", width // 2, 250, font, True, [255, 0, 0], center=True
+            assets.get_asset("white"),
+            half_width,
+            250,
+            rect=pygame.Rect(half_width, 250, 150, 30),
+            center=True,
         ),
     ]
+    main_menu.ui.append(
+        [
+            ui_element.UI_Element(
+                "Start Game", width // 2, 150, font, True, [255, 0, 0], center=True
+            ),
+            ui_element.UI_Element(
+                "Settings", width // 2, 200, font, True, [0, 0, 0], center=True
+            ),
+            ui_element.UI_Element(
+                "Exit", width // 2, 250, font, True, [0, 0, 0], center=True
+            ),
+        ]
+    )
     main_menu.register_key("play", pygame.K_RETURN, pygame.KMOD_NONE, play)
     main_menu.register_click_listener(main_menu.ui[0][0].design, "play", play)
     main_menu.register_click_listener(main_menu.ui[0][1].design, "settings", settings)
@@ -77,13 +104,13 @@ def create_settings_menu(
     height: int, window: display.Display, font: pygame.font.Font
 ) -> screen.Screen:
     bground = pygame.transform.scale(
-        assets.GAME_ASSETS["main_menu_background"].surf,
+        assets.get_asset("main_menu_background").surf,
         (window.window.get_width(), window.window.get_height()),
     )
     settings_menu: screen.Screen = screen.Screen(bground)
     settings_menu.ui[0] = [
         ui_element.UI_Element(
-            assets.GAME_ASSETS["white"],
+            assets.get_asset("white"),
             50,
             height - 80,
             rect=pygame.Rect(50, height - 80, 100, 30),
@@ -103,17 +130,17 @@ def create_settings_menu(
 
 
 def create_class_select_menu(
-    width: int, window: display.Display, height: int
+    width: int, window: display.Display, height: int, font: pygame.font.Font
 ) -> screen.Screen:
     bground: pygame.Surface = pygame.transform.scale(
-        assets.GAME_ASSETS["main_menu_background"].surf,
+        assets.get_asset("main_menu_background").surf,
         (window.window.get_width(), window.window.get_height()),
     )
     class_select_menu: screen.Screen = screen.Screen(bground)
     images: list[surf_rect.Surf_Rect] = [
-        assets.GAME_ASSETS["rogue_button"],
-        assets.GAME_ASSETS["mage_button"],
-        assets.GAME_ASSETS["warrior_button"],
+        assets.get_asset("rogue_button"),
+        assets.get_asset("mage_button"),
+        assets.get_asset("warrior_button"),
     ]
     total_spacing = 20
     icon_width: int = ((width - total_spacing) // len(images)) - total_spacing
@@ -128,14 +155,14 @@ def create_class_select_menu(
                 y=height // 3 - (height // 4) // 2,
             )
         )
-    class_select_menu.ui.append([
+    class_select_menu.ui[0].append(
         ui_element.UI_Element(
-            assets.GAME_ASSETS["white"],
+            assets.get_asset("white"),
             50,
             height - 80,
             rect=pygame.Rect(50, height - 80, 100, 30),
         )
-    ])
+    )
     class_select_menu.ui.append(
         [
             ui_element.UI_Element(
@@ -170,9 +197,9 @@ def init() -> None:
     window.add_screen("main_menu", create_main_menu(width, window, font))
     window.add_screen("settings_menu", create_settings_menu(height, window, font))
     window.add_screen(
-        "class_select_menu", create_class_select_menu(width, window, height)
+        "class_select_menu", create_class_select_menu(width, window, height, font)
     )
-    window.set_screen("settings_menu")
+    window.set_screen("main_menu")
     while True:
         window.handle_events()
 

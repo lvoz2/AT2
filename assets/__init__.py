@@ -1,12 +1,13 @@
-from pathlib import Path
-from typing import Any
+import pathlib
+import copy
+from typing import Any, Optional
 
-from pygame import image, display
+import pygame
 
 import surf_rect
 
 
-def __iterate_files(directory: Path, image_types: list[str]) -> Any:
+def __iterate_files(directory: pathlib.Path, image_types: list[str]) -> Any:
     """
         Iterates over files in a directory adding them
         to the game assets. Recursively calls itself when
@@ -18,10 +19,10 @@ def __iterate_files(directory: Path, image_types: list[str]) -> Any:
     # I'm not giving this an explicit type hint because it will end up being an
     # n-dimensional dict, where n could be any number
     assets: Any = {}
-    for item in Path.iterdir(directory):
+    for item in pathlib.Path.iterdir(directory):
         if item.is_file() and item.suffix in image_types:
-            surf = image.load(item).convert_alpha()
-            rect = surf.get_rect()
+            surf: pygame.Surface = pygame.image.load(item).convert_alpha()
+            rect: pygame.Rect = surf.get_rect()
             assets[item.stem] = surf_rect.Surf_Rect(surf, rect)
 
         # if a sub-folder is found
@@ -30,16 +31,16 @@ def __iterate_files(directory: Path, image_types: list[str]) -> Any:
     return assets
 
 
-def load_assets() -> Any:
+def load_assets(assetdir: str) -> Any:
     """
     Searches the local directory for assets
     using current working directory.
     """
-    display.init()
-    display.set_mode([1920, 1080])
+    pygame.display.init()
+    pygame.display.set_mode([1920, 1080])
     # Constants
-    cwd: Path = Path.cwd()
-    assets_folder: Path = Path.joinpath(cwd, "assets")
+    cwd: pathlib.Path = pathlib.Path.cwd()
+    assets_folder: pathlib.Path = pathlib.Path.joinpath(cwd, assetdir)
     image_types: list[str] = [".jpg", ".png"]
     # Verify assets folder exists
     if not assets_folder.exists():
@@ -48,10 +49,17 @@ def load_assets() -> Any:
     #   each image to the dictionary. Images will  \
     #   be added by the file name, sans the suffix
     res: Any = __iterate_files(assets_folder, image_types)
-    display.quit()
+    pygame.display.quit()
     return res
 
 
-GAME_ASSETS = load_assets()
+__GAME_ASSETS = load_assets("assets")
 
-# def create_asset(name: str) -> pygame.Surface:
+
+def get_asset(*args) -> Any:
+    asset: Optional[Any] = None
+    for key in args:
+        asset = __GAME_ASSETS[key]
+    if isinstance(asset, surf_rect.Surf_Rect):
+        return surf_rect.Surf_Rect(asset.surf.copy(), asset.rect.copy())
+    return asset

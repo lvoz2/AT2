@@ -5,7 +5,7 @@ import assets
 class Warrior(player.Player):
     def __init__(self, x: int, y: int, name: str, scale: int = 1):
         super().__init__(
-            assets.GAME_ASSETS["warrior"],
+            assets.get_asset("warrior"),
             x,
             y,
             name,

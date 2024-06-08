@@ -13,7 +13,7 @@ class DynEntity(entity.Entity):
         health: int,
         health_regen_speed: float = 5,
         visible: bool = False,
-        scale: int = 1,
+        scale: float = 1,
     ) -> None:
         super().__init__(surf, x, y, health, health_regen_speed, visible, scale)
 

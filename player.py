@@ -13,7 +13,7 @@ class Player(character.Character):
         y: int,
         name: str,
         character_class: str,
-        scale: int = 1,
+        scale: float = 1,
         defense: int = 10,
         mana: int = 10,
         strength: int = 10,

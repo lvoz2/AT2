@@ -15,7 +15,7 @@ class Character(dynentity.DynEntity):
         y: int,
         name: str,
         health_regen_speed: float = 5,
-        scale: int = 1,
+        scale: float = 1,
         defense: int = 10,
         mana: int = 10,
         strength: int = 10,

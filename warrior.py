@@ -3,7 +3,7 @@ import assets
 
 
 class Warrior(player.Player):
-    def __init__(self, x: int, y: int, name: str, scale: int = 1):
+    def __init__(self, x: int, y: int, name: str, scale: float = 1):
         super().__init__(
             assets.get_asset("warrior"),
             x,

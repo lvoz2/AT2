@@ -12,6 +12,7 @@ class Display(metaclass=singleton.Singleton):
             self.cur_screen: Optional[screen.Screen] = None
             pygame.init()
             self.window = pygame.display.set_mode(dim)
+            pygame.key.set_repeat(500, 50)
             self.clock: pygame.time.Clock = pygame.time.Clock()
             self.delta: list[int] = [0]
             self.game_over: bool = False

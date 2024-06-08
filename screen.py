@@ -39,7 +39,7 @@ class Screen:
         if combo in self.__active_keys:
             raise KeyError(f"Keypress action with keypresses {combo} already exists")
         extras: dict[str, Any] = {"args": args, "kwargs": kwargs}
-        self.__active_keys[combo] = (name, action, extras)
+        self.__active_keys[combo] = (name, type, action, extras)
 
     def deregister_key(self, key: int, mods: int, name: str):
         combo: tuple[int, int] = (key, mods)

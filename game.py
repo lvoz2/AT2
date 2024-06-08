@@ -5,6 +5,7 @@ import pygame
 import assets
 import screen
 import display
+import enemy
 import player
 import mage
 import rogue
@@ -59,8 +60,12 @@ def select_class(args, kwargs) -> None:  # pylint: disable=unused-argument
                 "Player",
                 0.15,
             )
-    # window.add_screen("game", create_game_screen())
-    # window.set_screen("game")
+    window.add_screen("game", create_game_screen(player_class))
+    window.set_screen("game")
+
+
+def move_player(args, kwargs) -> None:  # pylint: disable=unused-argument
+    pass
 
 
 def create_main_menu(
@@ -200,8 +205,24 @@ def create_class_select_menu(
     return class_select_menu
 
 
-def create_game_screen() -> screen.Screen:
-    return
+def create_game_screen(player: player.Player) -> screen.Screen:
+    bground: surf_rect.Surf_Rect = assets.get_asset("dungeon_map")
+    window: display.Display = display.Display()
+    enemies: list[enemy.Enemy] = [
+        zombie.Zombie(50, 50)
+        zombie.Zombie(window.window.get_width() - 120, 50)
+        zombie.Zombie(50, window.window.get_height() - 120)
+        zombie.Zombie(window.window.get_width() - 120, window.window.get_height() - 120)
+    ]
+    game_screen: screen.Screen = screen.Screen(bground.surf)
+    game_screen.entities[0].append(player)
+    for enemy in enemies:
+        game_screen.entities[0].append(enemy)
+    game_screen.register_key("move_w", pygame.w, pygame.KMOD_NONE, game_screen.entities[0][0])
+    game_screen.register_key("move_a", pygame.a, pygame.KMOD_NONE, game_screen.entities[0][0])
+    game_screen.register_key("move_s", pygame.s, pygame.KMOD_NONE, game_screen.entities[0][0])
+    game_screen.register_key("move_d", pygame.d, pygame.KMOD_NONE, game_screen.entities[0][0])
+    return game_screen
 
 
 def init() -> None:

@@ -1,5 +1,7 @@
 # AT2 (WIP, need a good name as well)
 
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 This repo will contain the classes and functionality to produce a 2D RPG game, that has the following:
 
 * A health bar

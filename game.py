@@ -60,8 +60,9 @@ def select_class(args, kwargs) -> None:  # pylint: disable=unused-argument
                 "Player",
                 0.15,
             )
-    window.add_screen("game", create_game_screen(player_class))
-    window.set_screen("game")
+    if player_class is not None:
+        window.add_screen("game", create_game_screen(player_class))
+        window.set_screen("game")
 
 
 def move_player(args, kwargs) -> None:  # pylint: disable=unused-argument
@@ -205,23 +206,28 @@ def create_class_select_menu(
     return class_select_menu
 
 
-def create_game_screen(player: player.Player) -> screen.Screen:
-    bground: surf_rect.Surf_Rect = assets.get_asset("dungeon_map")
+def create_game_screen(player_surf_rect: player.Player) -> screen.Screen:
     window: display.Display = display.Display()
+    bground: surf_rect.Surf_Rect = assets.get_asset("dungeon_map")
+    bground.surf = pygame.transform.scale(
+        bground.surf, (window.window.get_width(), window.window.get_height())
+    )
     enemies: list[enemy.Enemy] = [
-        zombie.Zombie(50, 50)
-        zombie.Zombie(window.window.get_width() - 120, 50)
-        zombie.Zombie(50, window.window.get_height() - 120)
-        zombie.Zombie(window.window.get_width() - 120, window.window.get_height() - 120)
+        zombie.Zombie(50, 50),
+        zombie.Zombie(window.window.get_width() - 120, 50),
+        zombie.Zombie(50, window.window.get_height() - 120),
+        zombie.Zombie(
+            window.window.get_width() - 120, window.window.get_height() - 120
+        ),
     ]
     game_screen: screen.Screen = screen.Screen(bground.surf)
-    game_screen.entities[0].append(player)
-    for enemy in enemies:
-        game_screen.entities[0].append(enemy)
-    game_screen.register_key("move_w", pygame.w, pygame.KMOD_NONE, game_screen.entities[0][0])
-    game_screen.register_key("move_a", pygame.a, pygame.KMOD_NONE, game_screen.entities[0][0])
-    game_screen.register_key("move_s", pygame.s, pygame.KMOD_NONE, game_screen.entities[0][0])
-    game_screen.register_key("move_d", pygame.d, pygame.KMOD_NONE, game_screen.entities[0][0])
+    game_screen.entities[0].append(player_surf_rect)
+    for enemy_inst in enemies:
+        game_screen.entities[0].append(enemy_inst)
+    game_screen.register_key("move_w", pygame.K_w, pygame.KMOD_NONE, move_player)
+    game_screen.register_key("move_a", pygame.K_a, pygame.KMOD_NONE, move_player)
+    game_screen.register_key("move_s", pygame.K_s, pygame.KMOD_NONE, move_player)
+    game_screen.register_key("move_d", pygame.K_d, pygame.KMOD_NONE, move_player)
     return game_screen
 
 

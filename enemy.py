@@ -1,11 +1,12 @@
 import pygame
 import character
+import surf_rect
 
 
 class Enemy(character.Character):
     def __init__(
         self,
-        surf: pygame.Surface,
+        surf: surf_rect.Surf_Rect,
         x: int,
         y: int,
         name: str,

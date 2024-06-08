@@ -5,12 +5,13 @@ import pygame
 import dynentity
 import entity
 import attack
+import surf_rect
 
 
 class Character(dynentity.DynEntity):
     def __init__(
         self,
-        surf: pygame.Surface,
+        surf: surf_rect.Surf_Rect,
         x: int,
         y: int,
         name: str,

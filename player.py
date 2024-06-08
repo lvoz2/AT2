@@ -1,6 +1,7 @@
 from typing import Any
 import pygame
 import character
+import surf_rect
 
 # import screen
 
@@ -8,7 +9,7 @@ import character
 class Player(character.Character):
     def __init__(
         self,
-        surf: pygame.Surface,
+        surf: surf_rect.Surf_Rect,
         x: int,
         y: int,
         name: str,

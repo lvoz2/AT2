@@ -2,12 +2,13 @@ from typing import Optional
 import math
 import pygame
 import entity
+import surf_rect
 
 
 class DynEntity(entity.Entity):
     def __init__(
         self,
-        surf: pygame.Surface,
+        surf: surf_rect.Surf_Rect,
         x: int,
         y: int,
         health: int,

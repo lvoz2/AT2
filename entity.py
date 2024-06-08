@@ -5,7 +5,6 @@ import surf_rect
 
 class Entity:
     def __init__(
-
         self,
         surf: surf_rect.Surf_Rect,
         x: int,

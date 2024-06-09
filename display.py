@@ -1,6 +1,7 @@
 import sys
 from typing import Optional, Sequence
 import pygame
+import events
 import screen
 import singleton
 
@@ -20,6 +21,8 @@ class Display(metaclass=singleton.Singleton):
 
     def set_screen(self, new_screen: str) -> None:
         if new_screen in self.screens:
+            event_processor: events.Events = events.Events()
+            event_processor.cur_screen = self.screens[new_screen]
             self.cur_screen = self.screens[new_screen]
         else:
             raise KeyError(

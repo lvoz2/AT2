@@ -41,43 +41,6 @@ class Events(metaclass=singleton.Singleton):
     def cur_screen(self, new_screen: screen.Screen) -> None:
         self.__cur_screen = new_screen
 
-    def register_listener(
-        self,
-        event_type: int,
-        func: Callable[..., None],
-        options: Optional[dict[str, Any]] = None,
-    ) -> None:
-        if self.__cur_screen is None:
-            raise TypeError(
-                "Current Screen has not been set. Please set this first before "
-                "attempting to add event listeners"
-            )
-        self.__cur_screen.listeners[event_type][func] = options
-
-    def deregister_listener(
-        self,
-        event_type: int,
-        func: Callable[..., None],
-        options: Optional[dict[str, Any]] = None,
-    ) -> None:
-        if self.__cur_screen is None:
-            raise TypeError(
-                "Current Screen has not been set. Please set this first before "
-                "attempting to remove event listeners"
-            )
-        if func not in self.__cur_screen.listeners[event_type]:
-            raise KeyError(
-                "Event Listener does not exist. Event Type: "
-                f"{event_type}, Function: {func}"
-            )
-        if self.__cur_screen.listeners[event_type][func] != options:
-            raise ValueError(
-                "The options argument provided did not match what was expected. "
-                f"Expected {self.__cur_screen.listeners[event_type][func]}, "
-                f"received {options}"
-            )
-        del self.__cur_screen.listeners[event_type][func]
-
     def register_processor(
         self,
         event_type: int,

@@ -27,7 +27,7 @@ class Events(metaclass=singleton.Singleton):
                             Callable[..., None],
                             Optional[dict[str, Any]],
                         ],
-                        None,
+                        bool,
                     ],
                     Optional[dict[str, Any]],
                 ],
@@ -82,11 +82,11 @@ class Events(metaclass=singleton.Singleton):
         self,
         event_type: int,
         func: Callable[
-            [pygame.event.Event, Callable[..., None], Optional[dict[str, Any]]], None
+            [pygame.event.Event, Callable[..., None], Optional[dict[str, Any]]], bool
         ],
         options: Optional[dict[str, Any]] = None,
     ) -> None:
-        if self.__processors[event_type] is not None:
+        if event_type in self.__processors:
             raise ValueError(f"A processor for event type {event_type} already exists.")
         self.__processors[event_type] = (func, options)
 
@@ -94,7 +94,7 @@ class Events(metaclass=singleton.Singleton):
         self,
         event_type: int,
         func: Callable[
-            [pygame.event.Event, Callable[..., None], Optional[dict[str, Any]]], None
+            [pygame.event.Event, Callable[..., None], Optional[dict[str, Any]]], bool
         ],
         options: Optional[dict[str, Any]] = None,
     ) -> None:
@@ -122,5 +122,10 @@ class Events(metaclass=singleton.Singleton):
                 "Current Screen has not been set. Please set this first before "
                 "attempting to use event listeners"
             )
-        for func, options in self.__cur_screen.listeners[event.type].items():
-            self.__processors[event.type][0](event, func, options)
+        if event.type in self.__cur_screen.listeners:
+            for func, options in self.__cur_screen.listeners[event.type].items():
+                if self.__processors[event.type][0](event, func, options):
+                    if options is not None:
+                        if "once" in options:
+                            if options["once"]:
+                                self.deregister_listener(event.type, func, options)

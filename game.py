@@ -114,7 +114,7 @@ def create_main_menu(
             ),
         ]
     )
-    main_menu.register_key("play", pygame.K_RETURN, pygame.KMOD_NONE, play)
+    main_menu.register_listener(pygame.KEYDOWN, play, {"key": pygame.K_RETURN})
     main_menu.register_click_listener(main_menu.ui[0][0].design, "play", play)
     main_menu.register_click_listener(main_menu.ui[0][1].design, "settings", settings)
     main_menu.register_click_listener(main_menu.ui[0][2].design, "exit", leave)

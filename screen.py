@@ -9,7 +9,9 @@ class Screen:
     def __init__(self, bground: pygame.Surface) -> None:
         self.bground = bground
         self.renderables = None
-        self.listeners: dict[int, dict[Callable[..., None], Optional[dict[str, Any]]]]
+        self.listeners: dict[
+            int, dict[Callable[..., None], Optional[dict[str, Any]]]
+        ] = {}
         self.__active_keys: dict[
             tuple[int, int], tuple[str, Callable[..., None], dict[str, Any]]
         ] = {}

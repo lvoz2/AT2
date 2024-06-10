@@ -2,6 +2,7 @@ import sys
 from typing import Optional, Sequence
 import pygame
 import events
+import event_processors
 import screen
 import singleton
 
@@ -17,6 +18,8 @@ class Display(metaclass=singleton.Singleton):
             self.clock: pygame.time.Clock = pygame.time.Clock()
             self.delta: list[int] = [0]
             self.game_over: bool = False
+            self.__events = events.Events()
+            event_processors.load()
             self.created: bool = True
 
     def set_screen(self, new_screen: str) -> None:
@@ -45,24 +48,7 @@ class Display(metaclass=singleton.Singleton):
         if self.cur_screen is not None:
             self.draw()
             for e in pygame.event.get():
-                if e.type == pygame.QUIT:
-                    sys.exit()
-                match (e.type):
-                    case pygame.KEYDOWN:
-                        items = self.cur_screen.active_keys.items()
-                        for keys, values in items:
-                            combo: dict[str, int] = {
-                                "key": e.key,
-                                "mods": e.mod,
-                            }
-                            if combo in keys:
-                                values[1](values[2]["args"], values[2]["kwargs"])
-                    case pygame.MOUSEBUTTONDOWN:
-                        for el, vals in self.cur_screen.clickables.items():
-                            if el.rect.collidepoint(e.pos):
-                                vals[1](vals[2]["args"], vals[2]["kwargs"])
-                    case _:
-                        pass
+                self.__events.notify(e)
 
     def update(self, delta: list[int]) -> None:
         pass

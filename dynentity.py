@@ -18,20 +18,28 @@ class DynEntity(entity.Entity):
     ) -> None:
         super().__init__(surf, x, y, health, health_regen_speed, visible, scale)
 
-    def move(self, direction: int, distance: int) -> None:
+    def move(self, direction: float, distance: float) -> None:
         """Move the dynamic entity.
 
-        direction (int): A number representing the direction
-        distance (int): The number of pixels moved laterally
+        direction (float): The true bearing
+        distance (int): The distance to move
         """
-        if direction in [1, 2, 3]:
-            self.x += distance
-        elif direction in [5, 6, 7]:
-            self.x -= distance
-        if direction in [0, 1, 7]:
-            self.y += distance
-        elif direction in [3, 4, 5]:
-            self.y -= distance
+        while direction > 360.0:
+            direction -= 360.0
+        while direction < 0.0:
+            direction += 360.0
+        horizontal: float = 0.0
+        vertical: float = 0.0
+        if 0.0 <= direction <= 90.0 or 180.0 <= direction <= 270.0:
+            direction = math.radians(direction)
+            horizontal = math.sin(direction) * distance
+            vertical = math.cos(direction) * distance
+        else:
+            direction = math.radians(direction)
+            horizontal = math.cos(direction) * distance
+            vertical = math.sin(direction) * distance
+        self.x += horizontal
+        self.y += vertical
 
     def find_eighth(self, other: entity.Entity) -> list[Optional[int]]:
         direction: list[Optional[int]] = [None, None]

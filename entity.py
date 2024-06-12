@@ -1,9 +1,10 @@
 import pygame
 import effect
+import element
 import surf_rect
 
 
-class Entity:
+class Entity(element.Element):
     def __init__(
         self,
         surf: surf_rect.Surf_Rect,

@@ -1,9 +1,10 @@
 from typing import Optional, Sequence
 import pygame
 import surf_rect
+import element
 
 
-class UI_Element:
+class UI_Element(element.Element):
     def __init__(
         self,
         design: surf_rect.Surf_Rect | str,

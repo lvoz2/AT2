@@ -29,10 +29,10 @@ def process_mouse_button_down(
 
 
 def process_exit(
-    event: pygame.event.Event,
-    func: Callable[[pygame.event.Event, dict[str, Any]], None],
-    options: Optional[dict[str, Any]],
-) -> bool:
+    event: pygame.event.Event,  # pylint: disable=unused-argument
+    func: Callable[[pygame.event.Event, dict[str, Any]], None],  # pylint: disable=unused-argument
+    options: Optional[dict[str, Any]],  # pylint: disable=unused-argument
+) -> bool:  # pylint: disable=unused-argument
     sys.exit()
 
 

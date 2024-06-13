@@ -1,7 +1,7 @@
 from typing import Any, Callable, Optional
 import warnings
 import pygame
-import screen
+import scene
 import singleton
 
 

@@ -34,7 +34,7 @@ class Display(metaclass=singleton.Singleton):
             not been loaded into the Display'
             )
 
-    def add_screen(self, name: str, new_screen: screen.Screen) -> bool:
+    def add_screen(self, name: str, new_screen: scene.Scene) -> bool:
         if name not in self.screens:
             self.screens[name] = new_screen
         else:

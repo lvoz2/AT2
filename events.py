@@ -17,7 +17,7 @@ class Events(metaclass=singleton.Singleton):
     def __init__(self) -> None:
         if not hasattr(self, "created"):
             self.created: bool = True
-            self.__cur_screen: Optional[screen.Screen] = None
+            self.__cur_screen: Optional[scene.Scene] = None
             self.__processors: dict[
                 int,
                 tuple[
@@ -34,11 +34,11 @@ class Events(metaclass=singleton.Singleton):
             ] = {}
 
     @property
-    def cur_screen(self) -> Optional[screen.Screen]:
+    def cur_screen(self) -> Optional[scene.Scene]:
         return self.__cur_screen
 
     @cur_screen.setter
-    def cur_screen(self, new_screen: screen.Screen) -> None:
+    def cur_screen(self, new_screen: scene.Scene) -> None:
         self.__cur_screen = new_screen
 
     def register_processor(

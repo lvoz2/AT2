@@ -3,7 +3,7 @@ import sys
 from typing import Optional
 import pygame
 import assets
-import screen
+import scene
 import display
 import enemy
 import player
@@ -71,13 +71,13 @@ def move_player(args, kwargs) -> None:  # pylint: disable=unused-argument
 
 def create_main_menu(
     width: int, window: display.Display, font: pygame.font.Font
-) -> screen.Screen:
+) -> scene.Scene:
     bground = pygame.transform.scale(
         assets.get_asset("main_menu_background").surf,
         (window.window.get_width(), window.window.get_height()),
     )
     half_width: int = width // 2
-    main_menu: screen.Screen = screen.Screen(bground)
+    main_menu: scene.Scene = scene.Scene(bground)
     main_menu.ui[0] = [
         ui_element.UI_Element(
             assets.get_asset("white"),
@@ -123,12 +123,12 @@ def create_main_menu(
 
 def create_settings_menu(
     height: int, window: display.Display, font: pygame.font.Font
-) -> screen.Screen:
+) -> scene.Scene:
     bground = pygame.transform.scale(
         assets.get_asset("main_menu_background").surf,
         (window.window.get_width(), window.window.get_height()),
     )
-    settings_menu: screen.Screen = screen.Screen(bground)
+    settings_menu: scene.Scene = scene.Scene(bground)
     settings_menu.ui[0] = [
         ui_element.UI_Element(
             assets.get_asset("white"),
@@ -152,12 +152,12 @@ def create_settings_menu(
 
 def create_class_select_menu(
     width: int, window: display.Display, height: int, font: pygame.font.Font
-) -> screen.Screen:
+) -> scene.Scene:
     bground: pygame.Surface = pygame.transform.scale(
         assets.get_asset("main_menu_background").surf,
         (window.window.get_width(), window.window.get_height()),
     )
-    class_select_menu: screen.Screen = screen.Screen(bground)
+    class_select_menu: scene.Scene = scene.Scene(bground)
     images: list[surf_rect.Surf_Rect] = [
         assets.get_asset("rogue_button"),
         assets.get_asset("mage_button"),
@@ -206,7 +206,7 @@ def create_class_select_menu(
     return class_select_menu
 
 
-def create_game_screen(player_surf_rect: player.Player) -> screen.Screen:
+def create_game_screen(player_surf_rect: player.Player) -> scene.Scene:
     window: display.Display = display.Display()
     bground: surf_rect.Surf_Rect = assets.get_asset("dungeon_map")
     bground.surf = pygame.transform.scale(
@@ -220,7 +220,7 @@ def create_game_screen(player_surf_rect: player.Player) -> screen.Screen:
             window.window.get_width() - 120, window.window.get_height() - 120
         ),
     ]
-    game_screen: screen.Screen = screen.Screen(bground.surf)
+    game_screen: scene.Scene = scene.Scene(bground.surf)
     game_screen.entities[0].append(player_surf_rect)
     for enemy_inst in enemies:
         game_screen.entities[0].append(enemy_inst)

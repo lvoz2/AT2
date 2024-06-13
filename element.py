@@ -1,4 +1,4 @@
-from typing import Any, Optional, Sequence
+from typing import Any, Callable, Optional, Sequence
 import pygame
 import surf_rect
 
@@ -12,7 +12,7 @@ class Element:
                 fcolour: str | Sequence[int] = self.__get_val_from_dict(font_options, "fcolour", [0, 0, 0])
                 bcolour: str | Sequence[int] = self.__get_val_from_dict(font_options, "bcolour", [255, 255, 255])
                 surf: pygame.Surface = font.render(design, anti_alias, fcolour, bcolour)
-                self.design: surf_rect.Surf_Rect = surf_rect.surf_rect(surf, surf.get_rect())
+                self.design: surf_rect.Surf_Rect = surf_rect.Surf_Rect(surf, surf.get_rect())
         elif isinstance(design, surf_rect.Surf_Rect):
             self.design = design
         self.mask = mask

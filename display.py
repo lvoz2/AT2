@@ -3,15 +3,15 @@ from typing import Optional, Sequence
 import pygame
 import events
 import event_processors
-import screen
+import scene
 import singleton
 
 
 class Display(metaclass=singleton.Singleton):
     def __init__(self, dim: Sequence[int] = (800, 600)) -> None:
         if not hasattr(self, "created"):
-            self.screens: dict[str, screen.Screen] = {}
-            self.cur_screen: Optional[screen.Screen] = None
+            self.screens: dict[str, scene.Scene] = {}
+            self.cur_screen: Optional[scene.Scene] = None
             pygame.init()
             self.window = pygame.display.set_mode(dim)
             pygame.key.set_repeat(500, 50)

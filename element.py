@@ -3,7 +3,7 @@ import pygame
 import surf_rect
 
 
-class Element(object):
+class Element:
     def __init__(self, design: surf_rect.Surf_Rect | str, mask: Optional[pygame.Rect] = None, rect_options: Optional[dict[str, Any]] = None, font_options: Optional[dict[str, Any]] = None, scale: float = 1.0) -> None:
         if isinstance(design, str):
             if font_options is not None:
@@ -16,6 +16,17 @@ class Element(object):
         elif isinstance(design, surf_rect.Surf_Rect):
             self.design = design
         self.mask = mask
+        self.design.surf = pygame.transform.scale(
+            self.design.surf.convert_alpha(),
+            (
+                int(self.design.rect.width * scale),
+                int(self.design.rect.height * scale),
+            ),
+        )
+        self.listeners: dict[
+            int, dict[Callable[..., None], Optional[dict[str, Any]]]
+        ] = {}
+        self.visible = visible
 
     # def update_design(new_design)
 

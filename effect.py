@@ -1,4 +1,4 @@
-class Effect(object):
+class Effect:
     def __init__(self, name: str, duration: int, dps: int) -> None:
         self.name = name
         self.duration = duration

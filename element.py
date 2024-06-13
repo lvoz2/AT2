@@ -17,7 +17,7 @@ class Element(object):
             self.design = design
         self.mask = mask
 
-    def update_design(new_design)
+    # def update_design(new_design)
 
     def __get_val_from_dict(self, dict, key, default = None) -> Any:
         if key in dict:

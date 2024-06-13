@@ -3,7 +3,7 @@ import effect
 import entity
 
 
-class Attack:
+class Attack(object):
     def __init__(
         self,
         dmg: int,

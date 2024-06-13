@@ -77,7 +77,7 @@ class DynEntity(entity.Entity):
         other (entity.Entity): The target entity
         angle (bool): Whether to calculate the true bearing, in degrees
         """
-        if self.surf.rect.colliderect(other.surf.rect)
+        if self.surf.rect.colliderect(other.surf.rect):
             return [0.0, 0.0]
         distance: float = self.get_distance(other)
         if angle:

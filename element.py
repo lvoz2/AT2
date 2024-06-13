@@ -4,7 +4,7 @@ import surf_rect
 
 
 class Element(object):
-    def __init__(self, design: surf_rect.Surf_Rect | str, mask: Optional[pygame.Rect] = None, rect_options: Optional[dict[str, Any]] = None, font_options: Optional[dict[str, Any]], scale: float = 1.0) -> None:
+    def __init__(self, design: surf_rect.Surf_Rect | str, mask: Optional[pygame.Rect] = None, rect_options: Optional[dict[str, Any]] = None, font_options: Optional[dict[str, Any]] = None, scale: float = 1.0) -> None:
         if isinstance(design, str):
             if font_options is not None:
                 font: pygame.font.Font = self.__get_val_from_dict(font_options, "font", None)
@@ -13,7 +13,7 @@ class Element(object):
                 bcolour: str | Sequence[int] = self.__get_val_from_dict(font_options, "bcolour", [255, 255, 255])
                 surf: pygame.Surface = font.render(design, anti_alias, fcolour, bcolour)
                 self.design: surf_rect.Surf_Rect = surf_rect.surf_rect(surf, surf.get_rect())
-        elif isinstance(design, surf_rect.Surf_Rect)
+        elif isinstance(design, surf_rect.Surf_Rect):
             self.design = design
         self.mask = mask
 

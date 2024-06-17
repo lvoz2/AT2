@@ -1,5 +1,5 @@
-import pathlib
 import copy
+import pathlib
 from typing import Any, Optional
 
 import pygame

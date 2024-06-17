@@ -1,4 +1,7 @@
+from typing import Any, Optional
+
 import pygame
+
 import effect
 import element
 import surf_rect
@@ -7,13 +10,23 @@ import surf_rect
 class Entity(element.Element):
     def __init__(
         self,
-        surf: surf_rect.Surf_Rect,
+        design: surf_rect.Surf_Rect,
+        mask: Optional[pygame.Rect] = None,
+        rect_options: Optional[dict[str, Any]] = None,
+        font_options: Optional[dict[str, Any]] = None,
         health: float = -1.0,
         health_regen_speed: float = 5,
         visible: bool = False,
         scale: float = 1,
     ) -> None:
-        super().__init__(surf, scale=scale, visible=visible)
+        super().__init__(
+            design,
+            rect_options=rect_options,
+            mask=mask,
+            font_options=font_options,
+            scale=scale,
+            visible=visible,
+        )
         self.health = health
         self.max_health = health
         self.health_regen_speed = health_regen_speed

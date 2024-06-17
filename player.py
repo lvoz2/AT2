@@ -1,5 +1,7 @@
-from typing import Any
+from typing import Any, Optional
+
 import pygame
+
 import character
 import surf_rect
 
@@ -9,9 +11,12 @@ import surf_rect
 class Player(character.Character):
     def __init__(
         self,
-        surf: surf_rect.Surf_Rect,
+        design: surf_rect.Surf_Rect,
         name: str,
         character_class: str,
+        mask: Optional[pygame.Rect] = None,
+        rect_options: Optional[dict[str, Any]] = None,
+        font_options: Optional[dict[str, Any]] = None,
         scale: float = 1,
         defense: int = 10,
         mana: int = 10,
@@ -21,13 +26,16 @@ class Player(character.Character):
         health_regen_speed: float = 1,
     ) -> None:
         super().__init__(
-            surf,
+            design,
             name,
-            health_regen_speed,
-            scale,
-            defense,
-            mana,
-            strength,
+            health_regen_speed=health_regen_speed,
+            scale=scale,
+            defense=defense,
+            mana=mana,
+            strength=strength,
+            mask=mask,
+            rect_options=rect_options,
+            font_options=font_options,
         )
         self.character_class = character_class
         self.stamina: int = stamina

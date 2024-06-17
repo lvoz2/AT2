@@ -1,8 +1,10 @@
 import sys
 from typing import Optional, Sequence
+
 import pygame
-import events
+
 import event_processors
+import events
 import scene
 import singleton
 

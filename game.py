@@ -1,17 +1,19 @@
 import copy
 import sys
 from typing import Optional
+
 import pygame
+
 import assets
-import scene
 import display
 import enemy
-import player
 import mage
+import player
 import rogue
+import scene
 import surf_rect
-import warrior
 import ui_element
+import warrior
 import zombie
 
 
@@ -41,24 +43,30 @@ def select_class(args, kwargs) -> None:  # pylint: disable=unused-argument
     match (args[0]):
         case "mage":
             player_class = mage.Mage(
-                window.window.get_width() // 2,
-                window.window.get_height() // 2,
-                "Player",
-                0.15,
+                rect_options={
+                    "x": window.window.get_width() // 2,
+                    "y": window.window.get_height() // 2,
+                },
+                name="Player",
+                scale=0.15,
             )
         case "rogue":
             player_class = rogue.Rogue(
-                window.window.get_width() // 2,
-                window.window.get_height() // 2,
-                "Player",
-                0.15,
+                rect_options={
+                    "x": window.window.get_width() // 2,
+                    "y": window.window.get_height() // 2,
+                },
+                name="Player",
+                scale=0.15,
             )
         case "warrior":
             player_class = warrior.Warrior(
-                window.window.get_width() // 2,
-                window.window.get_height() // 2,
-                "Player",
-                0.15,
+                rect_options={
+                    "x": window.window.get_width() // 2,
+                    "y": window.window.get_height() // 2,
+                },
+                name="Player",
+                scale=0.15,
             )
     if player_class is not None:
         window.add_screen("game", create_game_screen(player_class))
@@ -218,11 +226,14 @@ def create_game_screen(player_surf_rect: player.Player) -> scene.Scene:
         bground.surf, (window.window.get_width(), window.window.get_height())
     )
     enemies: list[enemy.Enemy] = [
-        zombie.Zombie(50, 50),
-        zombie.Zombie(window.window.get_width() - 120, 50),
-        zombie.Zombie(50, window.window.get_height() - 120),
+        zombie.Zombie(rect_options={"x": 50, "y": 50}),
+        zombie.Zombie(rect_options={"x": window.window.get_width() - 120, "y": 50}),
+        zombie.Zombie(rect_options={"x": 50, "y": window.window.get_height() - 120}),
         zombie.Zombie(
-            window.window.get_width() - 120, window.window.get_height() - 120
+            rect_options={
+                "x": window.window.get_width() - 120,
+                "y": window.window.get_height() - 120,
+            }
         ),
     ]
     game_screen: scene.Scene = scene.Scene(bground)

@@ -1,10 +1,10 @@
-from typing import Any
+from typing import Any, Optional
 
 import pygame
 
+import attack
 import dynentity
 import entity
-import attack
 import surf_rect
 
 
@@ -13,13 +13,25 @@ class Character(dynentity.DynEntity):
         self,
         surf: surf_rect.Surf_Rect,
         name: str,
+        mask: Optional[pygame.Rect] = None,
+        rect_options: Optional[dict[str, Any]] = None,
+        font_options: Optional[dict[str, Any]] = None,
         health_regen_speed: float = 5,
         scale: float = 1,
         defense: int = 10,
         mana: int = 10,
         strength: int = 10,
     ) -> None:
-        super().__init__(surf, 100, health_regen_speed, True, scale)
+        super().__init__(
+            surf,
+            health=100,
+            health_regen_speed=health_regen_speed,
+            visible=True,
+            scale=scale,
+            mask=mask,
+            rect_options=rect_options,
+            font_options=font_options,
+        )
         self.name = name
         self.lvl: int = 0
         self.skills: dict[str, Any] = {}

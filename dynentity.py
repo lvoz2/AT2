@@ -1,6 +1,8 @@
-from typing import Optional
 import math
+from typing import Any, Optional
+
 import pygame
+
 import entity
 import surf_rect
 
@@ -8,13 +10,25 @@ import surf_rect
 class DynEntity(entity.Entity):
     def __init__(
         self,
-        surf: surf_rect.Surf_Rect,
+        design: surf_rect.Surf_Rect,
         health: int,
+        mask: Optional[pygame.Rect] = None,
+        rect_options: Optional[dict[str, Any]] = None,
+        font_options: Optional[dict[str, Any]] = None,
         health_regen_speed: float = 5,
         visible: bool = False,
         scale: float = 1,
     ) -> None:
-        super().__init__(surf, health, health_regen_speed, visible, scale)
+        super().__init__(
+            design,
+            mask=mask,
+            health=health,
+            health_regen_speed=health_regen_speed,
+            visible=visible,
+            scale=scale,
+            rect_options=rect_options,
+            font_options=font_options,
+        )
 
     def move(self, direction: float, distance: float) -> None:
         """Move the dynamic entity.

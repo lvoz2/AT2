@@ -1,7 +1,9 @@
 from typing import Any, Optional
+
 import pygame
-import surf_rect
+
 import element
+import surf_rect
 
 
 class UI_Element(element.Element):

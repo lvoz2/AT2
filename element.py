@@ -1,5 +1,7 @@
 from typing import Any, Callable, Optional, Sequence
+
 import pygame
+
 import surf_rect
 
 

@@ -1,9 +1,10 @@
-from typing import Any, Callable, Optional
 import warnings
+from typing import Any, Callable, Optional
+
 import pygame
+
 import scene
 import singleton
-
 
 # The way events will be handled is heavily influenced by JavaScript, especially
 # addEventListener and removeEventListener. The interface for it should share its state
@@ -87,8 +88,9 @@ class Events(metaclass=singleton.Singleton):
             )
         if event.type in self.__cur_screen.listeners:
             for func, options in self.__cur_screen.listeners[event.type].items():
-                result: tuple[bool] = self.__processors[event.type][0](event, func, options)
-                if result[0] and options is not None:
+                result: bool = self.__processors[event.type][0](event, func, options)
+                if result and options is not None:
                     if "once" in options:
                         if options["once"]:
+                            pass
                             # deregister_listener(event.type, func, options)

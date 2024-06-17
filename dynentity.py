@@ -38,8 +38,8 @@ class DynEntity(entity.Entity):
             direction = math.radians(direction)
             horizontal = math.cos(direction) * distance
             vertical = math.sin(direction) * distance
-        self.x += horizontal
-        self.y += vertical
+        self.x += int(round(horizontal))
+        self.y += int(round(vertical))
 
     def get_distance(self, other: entity.Entity) -> float:
         opp_corner: dict[str, list[int]] = {

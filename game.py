@@ -72,13 +72,13 @@ def move_player(args, kwargs) -> None:  # pylint: disable=unused-argument
 def create_main_menu(
     width: int, window: display.Display, font: pygame.font.Font
 ) -> scene.Scene:
-    bground = pygame.transform.scale(
-        assets.get_asset("main_menu_background").surf,
-        (window.window.get_width(), window.window.get_height()),
+    bground: surf_rect.Surf_Rect = assets.get_asset("main_menu_background")
+    bground.surf = pygame.transform.scale(
+        bground.surf, (window.window.get_width(), window.window.get_height())
     )
     half_width: int = width // 2
     main_menu: scene.Scene = scene.Scene(bground)
-    main_menu.ui[0] = [
+    main_menu.elements[0] = [
         ui_element.UI_Element(
             assets.get_asset("white"),
             half_width,
@@ -101,7 +101,7 @@ def create_main_menu(
             center=True,
         ),
     ]
-    main_menu.ui.append(
+    main_menu.elements.append(
         [
             ui_element.UI_Element(
                 "Start Game", width // 2, 150, font, True, [255, 0, 0], center=True
@@ -115,21 +115,21 @@ def create_main_menu(
         ]
     )
     main_menu.register_listener(pygame.KEYDOWN, play, {"key": pygame.K_RETURN})
-    main_menu.register_click_listener(main_menu.ui[0][0].design, "play", play)
-    main_menu.register_click_listener(main_menu.ui[0][1].design, "settings", settings)
-    main_menu.register_click_listener(main_menu.ui[0][2].design, "exit", leave)
+    main_menu.elements[0][0].register_listener(pygame.MOUSEBUTTONDOWN, play)
+    main_menu.elements[0][1].register_listener(pygame.MOUSEBUTTONDOWN, settings)
+    main_menu.elements[0][2].register_listener(pygame.MOUSEBUTTONDOWN, leave)
     return main_menu
 
 
 def create_settings_menu(
     height: int, window: display.Display, font: pygame.font.Font
 ) -> scene.Scene:
-    bground = pygame.transform.scale(
-        assets.get_asset("main_menu_background").surf,
-        (window.window.get_width(), window.window.get_height()),
+    bground: surf_rect.Surf_Rect = assets.get_asset("main_menu_background")
+    bground.surf = pygame.transform.scale(
+        bground.surf, (window.window.get_width(), window.window.get_height())
     )
     settings_menu: scene.Scene = scene.Scene(bground)
-    settings_menu.ui[0] = [
+    settings_menu.elements[0] = [
         ui_element.UI_Element(
             assets.get_asset("white"),
             50,
@@ -137,15 +137,15 @@ def create_settings_menu(
             rect=pygame.Rect(50, height - 80, 100, 30),
         )
     ]
-    settings_menu.ui.append(
+    settings_menu.elements.append(
         [
             ui_element.UI_Element(
                 "Back", 100, height - 65, font, True, [0, 0, 0], center=True
             )
         ]
     )
-    settings_menu.register_click_listener(
-        settings_menu.ui[0][0].design, "back", back, "main_menu"
+    settings_menu.elements[0][0].register_listener(
+        pygame.MOUSEBUTTONDOWN, back, {"args": "main_menu"}
     )
     return settings_menu
 
@@ -153,9 +153,9 @@ def create_settings_menu(
 def create_class_select_menu(
     width: int, window: display.Display, height: int, font: pygame.font.Font
 ) -> scene.Scene:
-    bground: pygame.Surface = pygame.transform.scale(
-        assets.get_asset("main_menu_background").surf,
-        (window.window.get_width(), window.window.get_height()),
+    bground: surf_rect.Surf_Rect = assets.get_asset("main_menu_background")
+    bground.surf = pygame.transform.scale(
+        bground.surf, (window.window.get_width(), window.window.get_height())
     )
     class_select_menu: scene.Scene = scene.Scene(bground)
     images: list[surf_rect.Surf_Rect] = [
@@ -169,14 +169,14 @@ def create_class_select_menu(
         aspect_ratio: float = 0.75
         icon_height: int = int(icon_width // aspect_ratio)
         img.surf = pygame.transform.scale(img.surf, (icon_width, icon_height))
-        class_select_menu.ui[0].append(
+        class_select_menu.elements[0].append(
             ui_element.UI_Element(
                 img,
                 x=total_spacing + ((total_spacing + icon_width) * images.index(img)),
                 y=height // 3 - (height // 4) // 2,
             )
         )
-    class_select_menu.ui[0].append(
+    class_select_menu.elements[0].append(
         ui_element.UI_Element(
             assets.get_asset("white"),
             50,
@@ -184,24 +184,24 @@ def create_class_select_menu(
             rect=pygame.Rect(50, height - 80, 100, 30),
         )
     )
-    class_select_menu.ui.append(
+    class_select_menu.elements.append(
         [
             ui_element.UI_Element(
                 "Back", 100, height - 65, font, True, [0, 0, 0], center=True
             )
         ]
     )
-    class_select_menu.register_click_listener(
-        class_select_menu.ui[0][0].design, "mage", select_class, "mage"
+    class_select_menu.elements[0][0].register_listener(
+        pygame.MOUSEBUTTONDOWN, select_class, {"args": "mage"}
     )
-    class_select_menu.register_click_listener(
-        class_select_menu.ui[0][1].design, "rogue", select_class, "rogue"
+    class_select_menu.elements[0][0].register_listener(
+        pygame.MOUSEBUTTONDOWN, select_class, {"args": "rogue"}
     )
-    class_select_menu.register_click_listener(
-        class_select_menu.ui[0][2].design, "warrior", select_class, "warrior"
+    class_select_menu.elements[0][0].register_listener(
+        pygame.MOUSEBUTTONDOWN, select_class, {"args": "warrior"}
     )
-    class_select_menu.register_click_listener(
-        class_select_menu.ui[0][3].design, "back", back, "main_menu"
+    class_select_menu.elements[0][0].register_listener(
+        pygame.MOUSEBUTTONDOWN, back, {"args": "main_menu"}
     )
     return class_select_menu
 
@@ -221,9 +221,9 @@ def create_game_screen(player_surf_rect: player.Player) -> scene.Scene:
         ),
     ]
     game_screen: scene.Scene = scene.Scene(bground.surf)
-    game_screen.entities[0].append(player_surf_rect)
+    game_screen.elements[0].append(player_surf_rect)
     for enemy_inst in enemies:
-        game_screen.entities[0].append(enemy_inst)
+        game_screen.elements[0].append(enemy_inst)
     game_screen.register_key("move_w", pygame.K_w, pygame.KMOD_NONE, move_player)
     game_screen.register_key("move_a", pygame.K_a, pygame.KMOD_NONE, move_player)
     game_screen.register_key("move_s", pygame.K_s, pygame.KMOD_NONE, move_player)

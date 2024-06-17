@@ -62,7 +62,7 @@ class Element:
         if self.listeners[event_type][func] != options:
             raise ValueError(
                 "The options argument provided did not match what was expected. "
-                f"Expected {self.__cur_screen.listeners[event_type][func]}, "
+                f"Expected {self.listeners[event_type][func]}, "
                 f"received {options}"
             )
         del self.listeners[event_type][func]

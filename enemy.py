@@ -7,8 +7,6 @@ class Enemy(character.Character):
     def __init__(
         self,
         surf: surf_rect.Surf_Rect,
-        x: int,
-        y: int,
         name: str,
         health_regen_speed: float = 1,
         scale: int = 1,
@@ -18,8 +16,6 @@ class Enemy(character.Character):
     ):
         super().__init__(
             surf,
-            x,
-            y,
             name,
             health_regen_speed,
             scale,

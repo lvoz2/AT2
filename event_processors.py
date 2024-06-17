@@ -8,24 +8,24 @@ def process_keydown(
     event: pygame.event.Event,
     func: Callable[[pygame.event.Event, dict[str, Any]], None],
     options: Optional[dict[str, Any]],
-) -> bool:
+) -> tuple[bool]:
     if options is not None:
         if options["key"] == event.key and options["mods"] == event.mod:
             func(event, options)
-            return True
-    return False
+            return (True)
+    return (False)
 
 
 def process_mouse_button_down(
     event: pygame.event.Event,
     func: Callable[[pygame.event.Event, dict[str, Any]], None],
     options: Optional[dict[str, Any]],
-) -> bool:
+) -> tuple[bool]:
     if options is not None:
         if options["target"].rect.collidepoint(event.pos):
             func(event, options)
-            return True
-    return False
+            return (True)
+    return (False)
 
 
 def process_exit(  # pylint: disable=unused-argument
@@ -34,7 +34,7 @@ def process_exit(  # pylint: disable=unused-argument
         [pygame.event.Event, dict[str, Any]], None
     ],  # pylint: disable=unused-argument
     options: Optional[dict[str, Any]],  # pylint: disable=unused-argument
-) -> bool:  # pylint: disable=unused-argument
+) -> tuple[bool]:  # pylint: disable=unused-argument
     sys.exit()
 
 

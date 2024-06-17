@@ -87,8 +87,8 @@ class Events(metaclass=singleton.Singleton):
             )
         if event.type in self.__cur_screen.listeners:
             for func, options in self.__cur_screen.listeners[event.type].items():
-                if self.__processors[event.type][0](event, func, options):
-                    if options is not None:
-                        if "once" in options:
-                            if options["once"]:
-                                self.deregister_listener(event.type, func, options)
+                result: tuple[bool] = self.__processors[event.type][0](event, func, options)
+                if result[0] and options is not None:
+                    if "once" in options:
+                        if options["once"]:
+                            # deregister_listener(event.type, func, options)

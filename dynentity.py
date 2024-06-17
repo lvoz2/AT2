@@ -9,8 +9,6 @@ class DynEntity(entity.Entity):
     def __init__(
         self,
         surf: surf_rect.Surf_Rect,
-        x: int,
-        y: int,
         health: int,
         health_regen_speed: float = 5,
         visible: bool = False,

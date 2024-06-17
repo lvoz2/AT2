@@ -10,8 +10,6 @@ class Player(character.Character):
     def __init__(
         self,
         surf: surf_rect.Surf_Rect,
-        x: int,
-        y: int,
         name: str,
         character_class: str,
         scale: float = 1,
@@ -24,8 +22,6 @@ class Player(character.Character):
     ) -> None:
         super().__init__(
             surf,
-            x,
-            y,
             name,
             health_regen_speed,
             scale,

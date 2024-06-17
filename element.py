@@ -51,9 +51,9 @@ class Element:
 
     # def update_design(new_design)
 
-    def __get_val_from_dict(self, dict, key, default=None) -> Any:
-        if key in dict:
-            return dict[key]
+    def __get_val_from_dict(self, dictionary, key, default=None) -> Any:
+        if key in dictionary:
+            return dictionary[key]
         return default
 
     def register_listener(

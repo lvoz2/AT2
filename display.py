@@ -59,10 +59,10 @@ class Display(metaclass=singleton.Singleton):
             if len(self.delta) > 10:
                 self.delta = self.delta[(len(self.delta) - 10) :]
             self.window.fill([0, 0, 0])
-            self.window.blit(self.cur_screen.design, [0, 0])
+            self.cur_screen.design.rect = self.window.blit(self.cur_screen.design.surf, [0, 0])
             if self.cur_screen.elements != [None]:
                 for element_layer in self.cur_screen.elements:
-                    for element in element_layerr:
+                    for element in element_layer:
                         element.draw(self.window)
             self.update(self.delta)
             pygame.display.flip()

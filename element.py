@@ -27,6 +27,7 @@ class Element:
             int, dict[Callable[..., None], Optional[dict[str, Any]]]
         ] = {}
         self.visible = visible
+        self.rect_options = rect_options
 
     # def update_design(new_design)
 
@@ -66,3 +67,14 @@ class Element:
                 f"received {options}"
             )
         del self.listeners[event_type][func]
+
+    def draw(self, window: pygame.Surface) -> None:
+        if self.__get_val_from_dict(self.rect_options, "center", False):
+            self.design.rect.center = (self.x, self.y)
+            self.design.rect = window.blit(
+                self.design.surf, self.design.rect, self.rect
+            )
+        else:
+            self.design.rect = window.blit(
+                self.design.surf, [self.x, self.y], self.rect
+            )

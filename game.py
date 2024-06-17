@@ -220,14 +220,14 @@ def create_game_screen(player_surf_rect: player.Player) -> scene.Scene:
             window.window.get_width() - 120, window.window.get_height() - 120
         ),
     ]
-    game_screen: scene.Scene = scene.Scene(bground.surf)
+    game_screen: scene.Scene = scene.Scene(bground)
     game_screen.elements[0].append(player_surf_rect)
     for enemy_inst in enemies:
         game_screen.elements[0].append(enemy_inst)
-    game_screen.register_key("move_w", pygame.K_w, pygame.KMOD_NONE, move_player)
-    game_screen.register_key("move_a", pygame.K_a, pygame.KMOD_NONE, move_player)
-    game_screen.register_key("move_s", pygame.K_s, pygame.KMOD_NONE, move_player)
-    game_screen.register_key("move_d", pygame.K_d, pygame.KMOD_NONE, move_player)
+    game_screen.register_listener(pygame.KEYDOWN, move_player, {"key": pygame.K_w, "mods": pygame.KMOD_NONE})
+    game_screen.register_listener(pygame.KEYDOWN, move_player, {"key": pygame.K_a, "mods": pygame.KMOD_NONE})
+    game_screen.register_listener(pygame.KEYDOWN, move_player, {"key": pygame.K_s, "mods": pygame.KMOD_NONE})
+    game_screen.register_listener(pygame.KEYDOWN, move_player, {"key": pygame.K_d, "mods": pygame.KMOD_NONE})
     return game_screen
 
 

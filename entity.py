@@ -8,27 +8,12 @@ class Entity(element.Element):
     def __init__(
         self,
         surf: surf_rect.Surf_Rect,
-        x: int,
-        y: int,
         health: float = -1.0,
         health_regen_speed: float = 5,
         visible: bool = False,
         scale: float = 1,
     ) -> None:
-        self.surf = surf
-        self.surf.surf = self.surf.surf.convert_alpha()
-        self.surf.surf = pygame.transform.scale(
-            self.surf.surf,
-            (
-                int(self.surf.rect.width * scale),
-                int(self.surf.rect.height * scale),
-            ),
-        )
-        self.x = x
-        self.y = y
-        self.height = self.surf.rect.height
-        self.width = self.surf.rect.width
-        self.visible = visible
+        super().__init__(surf, scale=scale, visible=visible)
         self.health = health
         self.max_health = health
         self.health_regen_speed = health_regen_speed

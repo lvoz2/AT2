@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from typing import Optional
 import pygame
 import surf_rect
 import element
@@ -7,44 +7,6 @@ import element
 class UI_Element(element.Element):
     def __init__(
         self,
-        design: surf_rect.Surf_Rect | str,
-        x: Optional[int] = None,
-        y: Optional[int] = None,
-        font: Optional[pygame.font.Font] = None,
-        anti_alias: Optional[bool] = None,
-        fcolour: Optional[Sequence[int]] = None,
-        bcolour: Optional[Sequence[int]] = None,
-        center: bool = False,
-        rect: Optional[pygame.Rect] = None,
-        scale: int = 1,
+        design: surf_rect.Surf_Rect | str, mask: Optional[pygame.Rect] = None, rect_options: Optional[dict[str, Any]] = None, font_options: Optional[dict[str, Any]] = None, scale: float = 1.0
     ) -> None:
-        if isinstance(design, str):
-            if font is not None and anti_alias is not None and fcolour is not None:
-                surf = font.render(design, anti_alias, fcolour, bcolour)
-                self.design: surf_rect.Surf_Rect = surf_rect.Surf_Rect(
-                    surf, surf.get_rect()
-                )
-        else:
-            self.design: surf_rect.Surf_Rect = design  # type: ignore
-        self.design.surf = pygame.transform.scale(
-            self.design.surf,
-            (
-                int(self.design.surf.get_width() * scale),
-                int(self.design.surf.get_height() * scale),
-            ),
-        )
-        self.x = x if x is not None else self.design.rect.x
-        self.y = y if y is not None else self.design.rect.y
-        self.center = center
-        self.rect = rect
-
-    def draw(self, window: pygame.Surface) -> None:
-        if self.center:
-            self.design.rect.center = (self.x, self.y)
-            self.design.rect = window.blit(
-                self.design.surf, self.design.rect, self.rect
-            )
-        else:
-            self.design.rect = window.blit(
-                self.design.surf, [self.x, self.y], self.rect
-            )
+        super().__init__(design, mask, rect_options, font_options, scale)

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Optional
 import pygame
 import surf_rect
 import element

@@ -26,6 +26,8 @@ class Element:
         self.listeners: dict[
             int, dict[Callable[..., None], Optional[dict[str, Any]]]
         ] = {}
+        self.x = __get_val_from_dict(rect_options, "x", self.design.rect.x)
+        self.y = __get_val_from_dict(rect_options, "y", self.design.rect.y)
         self.visible = visible
         self.rect_options = rect_options
 
@@ -72,9 +74,9 @@ class Element:
         if self.__get_val_from_dict(self.rect_options, "center", False):
             self.design.rect.center = (self.x, self.y)
             self.design.rect = window.blit(
-                self.design.surf, self.design.rect, self.rect
+                self.design.surf, self.design.rect, self.mask
             )
         else:
             self.design.rect = window.blit(
-                self.design.surf, [self.x, self.y], self.rect
+                self.design.surf, [self.x, self.y], self.mask
             )

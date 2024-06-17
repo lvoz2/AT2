@@ -83,21 +83,21 @@ def create_main_menu(
             assets.get_asset("white"),
             half_width,
             150,
-            rect=pygame.Rect(half_width, 150, 150, 30),
+            mask=pygame.Rect(half_width, 150, 150, 30),
             center=True,
         ),
         ui_element.UI_Element(
             assets.get_asset("white"),
             half_width,
             200,
-            rect=pygame.Rect(half_width, 200, 150, 30),
+            mask=pygame.Rect(half_width, 200, 150, 30),
             center=True,
         ),
         ui_element.UI_Element(
             assets.get_asset("white"),
             half_width,
             250,
-            rect=pygame.Rect(half_width, 250, 150, 30),
+            mask=pygame.Rect(half_width, 250, 150, 30),
             center=True,
         ),
     ]
@@ -134,7 +134,7 @@ def create_settings_menu(
             assets.get_asset("white"),
             50,
             height - 80,
-            rect=pygame.Rect(50, height - 80, 100, 30),
+            mask=pygame.Rect(50, height - 80, 100, 30),
         )
     ]
     settings_menu.elements.append(
@@ -181,7 +181,7 @@ def create_class_select_menu(
             assets.get_asset("white"),
             50,
             height - 80,
-            rect=pygame.Rect(50, height - 80, 100, 30),
+            mask=pygame.Rect(50, height - 80, 100, 30),
         )
     )
     class_select_menu.elements.append(

@@ -20,7 +20,7 @@ class Entity(element.Element):
         self.effects: dict[str, effect.Effect] = {}
 
     def get_opp_corner(self) -> list[int]:
-        return [self.x + self.width, self.y + self.height]
+        return [self.x + self.design.rect.width, self.y + self.design.rect.height]
 
     def is_alive(self) -> bool:
         return self.health == 0
@@ -40,9 +40,9 @@ class Entity(element.Element):
 
     def draw(self, window: pygame.Surface) -> None:
         if self.visible:
-            if ((0 - self.width) < self.x < window.get_width()) and (
-                (0 - self.height) < self.y < window.get_height()
+            if ((0 - self.design.rect.width) < self.x < window.get_width()) and (
+                (0 - self.design.rect.height) < self.y < window.get_height()
             ):
-                self.surf.rect = window.blit(self.surf.surf, [self.x, self.y])
+                self.design.rect = window.blit(self.design.surf, [self.x, self.y])
             else:
                 self.visible = False

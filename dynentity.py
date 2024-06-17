@@ -16,7 +16,7 @@ class DynEntity(entity.Entity):
         visible: bool = False,
         scale: float = 1,
     ) -> None:
-        super().__init__(surf, x, y, health, health_regen_speed, visible, scale)
+        super().__init__(surf, health, health_regen_speed, visible, scale)
 
     def move(self, direction: float, distance: float) -> None:
         """Move the dynamic entity.
@@ -47,10 +47,10 @@ class DynEntity(entity.Entity):
             "other": other.get_opp_corner(),
         }
         linear_distances: list[float] = [
-            abs(self.y - opp_corner["other"][1]),
-            abs(other.x - opp_corner["self"][0]),
-            abs(other.y - opp_corner["self"][1]),
-            abs(self.x - opp_corner["other"][0]),
+            abs(self.design.rect.y - opp_corner["other"][1]),
+            abs(other.design.rect.x - opp_corner["self"][0]),
+            abs(other.design.rect.y - opp_corner["self"][1]),
+            abs(self.design.rect.x - opp_corner["other"][0]),
         ]
         horizontal: float = min(linear_distances[1], linear_distances[3])
         vertical: float = min(linear_distances[0], linear_distances[2])
@@ -62,8 +62,8 @@ class DynEntity(entity.Entity):
         
         other: (entity.Entity)
         """
-        horizontal: float = self.surf.rect.center[0] - other.surf.rect.center[0]
-        vertical: float = self.surf.rect.center[1] - other.surf.rect.center[1]
+        horizontal: float = self.design.rect.center[0] - other.design.rect.center[0]
+        vertical: float = self.surf.design.center[1] - other.design.rect.center[1]
         angle: float = math.atan2(vertical, horizontal)
         if angle < 0:
             return math.degrees(angle + math.pi + math.pi)
@@ -77,7 +77,7 @@ class DynEntity(entity.Entity):
         other (entity.Entity): The target entity
         angle (bool): Whether to calculate the true bearing, in degrees
         """
-        if self.surf.rect.colliderect(other.surf.rect):
+        if self.design.rect.colliderect(other.design.rect):
             return [0.0, 0.0]
         distance: float = self.get_distance(other)
         if angle:

@@ -1,8 +1,8 @@
 #!/bin/bash
 
 source .venv/bin/activate
-black *.py
-black */*.py
+#black *.py
+#black */*.py
 dmypy run -- *.py */*.py
 # stop the build if there are Python syntax errors or undefined names
 flake8 . --extend-exclude=".venv" --count --select=E9,F63,F7,F82 --show-source --statistics

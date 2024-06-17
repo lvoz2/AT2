@@ -4,15 +4,33 @@ import surf_rect
 
 
 class Element:
-    def __init__(self, design: surf_rect.Surf_Rect | str, mask: Optional[pygame.Rect] = None, rect_options: Optional[dict[str, Any]] = None, font_options: Optional[dict[str, Any]] = None, scale: float = 1.0, visible: bool = False) -> None:
+    def __init__(
+        self,
+        design: surf_rect.Surf_Rect | str,
+        mask: Optional[pygame.Rect] = None,
+        rect_options: Optional[dict[str, Any]] = None,
+        font_options: Optional[dict[str, Any]] = None,
+        scale: float = 1.0,
+        visible: bool = False,
+    ) -> None:
         if isinstance(design, str):
             if font_options is not None:
-                font: pygame.font.Font = self.__get_val_from_dict(font_options, "font", None)
-                anti_alias: bool = self.__get_val_from_dict(font_options, "anti_alias", True)
-                fcolour: str | Sequence[int] = self.__get_val_from_dict(font_options, "fcolour", [0, 0, 0])
-                bcolour: str | Sequence[int] = self.__get_val_from_dict(font_options, "bcolour", [255, 255, 255])
+                font: pygame.font.Font = self.__get_val_from_dict(
+                    font_options, "font", None
+                )
+                anti_alias: bool = self.__get_val_from_dict(
+                    font_options, "anti_alias", True
+                )
+                fcolour: str | Sequence[int] = self.__get_val_from_dict(
+                    font_options, "fcolour", [0, 0, 0]
+                )
+                bcolour: str | Sequence[int] = self.__get_val_from_dict(
+                    font_options, "bcolour", [255, 255, 255]
+                )
                 surf: pygame.Surface = font.render(design, anti_alias, fcolour, bcolour)
-                self.design: surf_rect.Surf_Rect = surf_rect.Surf_Rect(surf, surf.get_rect())
+                self.design: surf_rect.Surf_Rect = surf_rect.Surf_Rect(
+                    surf, surf.get_rect()
+                )
         elif isinstance(design, surf_rect.Surf_Rect):
             self.design = design
         self.mask = mask
@@ -26,14 +44,14 @@ class Element:
         self.listeners: dict[
             int, dict[Callable[..., None], Optional[dict[str, Any]]]
         ] = {}
-        self.x = __get_val_from_dict(rect_options, "x", self.design.rect.x)
-        self.y = __get_val_from_dict(rect_options, "y", self.design.rect.y)
+        self.x = self.__get_val_from_dict(rect_options, "x", self.design.rect.x)
+        self.y = self.__get_val_from_dict(rect_options, "y", self.design.rect.y)
         self.visible = visible
         self.rect_options = rect_options
 
     # def update_design(new_design)
 
-    def __get_val_from_dict(self, dict, key, default = None) -> Any:
+    def __get_val_from_dict(self, dict, key, default=None) -> Any:
         if key in dict:
             return dict[key]
         return default

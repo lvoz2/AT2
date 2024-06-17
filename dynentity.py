@@ -59,19 +59,17 @@ class DynEntity(entity.Entity):
 
     def get_angle(self, other: entity.Entity) -> float:
         """Calculates the true bearing from self to other
-        
+
         other: (entity.Entity)
         """
         horizontal: float = self.design.rect.center[0] - other.design.rect.center[0]
-        vertical: float = self.surf.design.center[1] - other.design.rect.center[1]
+        vertical: float = self.design.rect.center[1] - other.design.rect.center[1]
         angle: float = math.atan2(vertical, horizontal)
         if angle < 0:
             return math.degrees(angle + math.pi + math.pi)
         return math.degrees(angle)
 
-    def collide(
-        self, other: entity.Entity, angle: bool = False
-    ) -> list[float]:
+    def collide(self, other: entity.Entity, angle: bool = False) -> list[float]:
         """Returns the distance to another entity, and optionally, the bearing
 
         other (entity.Entity): The target entity

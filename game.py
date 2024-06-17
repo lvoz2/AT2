@@ -81,36 +81,36 @@ def create_main_menu(
     main_menu.elements[0] = [
         ui_element.UI_Element(
             assets.get_asset("white"),
-            half_width,
-            150,
+            rect_options={"center": True, "x": half_width, "y": 150},
             mask=pygame.Rect(half_width, 150, 150, 30),
-            center=True,
         ),
         ui_element.UI_Element(
             assets.get_asset("white"),
-            half_width,
-            200,
+            rect_options={"center": True, "x": half_width, "y": 200},
             mask=pygame.Rect(half_width, 200, 150, 30),
-            center=True,
         ),
         ui_element.UI_Element(
             assets.get_asset("white"),
-            half_width,
-            250,
+            rect_options={"center": True, "x": half_width, "y": 250},
             mask=pygame.Rect(half_width, 250, 150, 30),
-            center=True,
         ),
     ]
     main_menu.elements.append(
         [
             ui_element.UI_Element(
-                "Start Game", width // 2, 150, font, True, [255, 0, 0], center=True
+                "Start Game",
+                rect_options={"center": True, "x": half_width, "y": 150},
+                font_options={"font": font, "fcolour": [255, 0, 0]},
             ),
             ui_element.UI_Element(
-                "Settings", width // 2, 200, font, True, [0, 0, 0], center=True
+                "Settings",
+                rect_options={"center": True, "x": half_width, "y": 200},
+                font_options={"font": font},
             ),
             ui_element.UI_Element(
-                "Exit", width // 2, 250, font, True, [0, 0, 0], center=True
+                "Exit",
+                rect_options={"center": True, "x": half_width, "y": 250},
+                font_options={"font": font},
             ),
         ]
     )
@@ -132,15 +132,16 @@ def create_settings_menu(
     settings_menu.elements[0] = [
         ui_element.UI_Element(
             assets.get_asset("white"),
-            50,
-            height - 80,
+            rect_options={"x": 50, "y": height - 80},
             mask=pygame.Rect(50, height - 80, 100, 30),
         )
     ]
     settings_menu.elements.append(
         [
             ui_element.UI_Element(
-                "Back", 100, height - 65, font, True, [0, 0, 0], center=True
+                "Back",
+                rect_options={"x": 100, "y": height - 65, "center": True},
+                font_options={"font": font},
             )
         ]
     )
@@ -172,22 +173,26 @@ def create_class_select_menu(
         class_select_menu.elements[0].append(
             ui_element.UI_Element(
                 img,
-                x=total_spacing + ((total_spacing + icon_width) * images.index(img)),
-                y=height // 3 - (height // 4) // 2,
+                rect_options={
+                    "x": total_spacing
+                    + ((total_spacing + icon_width) * images.index(img)),
+                    "y": height // 3 - (height // 4) // 2,
+                },
             )
         )
     class_select_menu.elements[0].append(
         ui_element.UI_Element(
             assets.get_asset("white"),
-            50,
-            height - 80,
+            rect_options={"x": 50, "y": height - 80},
             mask=pygame.Rect(50, height - 80, 100, 30),
         )
     )
     class_select_menu.elements.append(
         [
             ui_element.UI_Element(
-                "Back", 100, height - 65, font, True, [0, 0, 0], center=True
+                "Back",
+                rect_options={"x": 100, "y": height - 65},
+                font_options={"font": font},
             )
         ]
     )
@@ -224,10 +229,18 @@ def create_game_screen(player_surf_rect: player.Player) -> scene.Scene:
     game_screen.elements[0].append(player_surf_rect)
     for enemy_inst in enemies:
         game_screen.elements[0].append(enemy_inst)
-    game_screen.register_listener(pygame.KEYDOWN, move_player, {"key": pygame.K_w, "mods": pygame.KMOD_NONE})
-    game_screen.register_listener(pygame.KEYDOWN, move_player, {"key": pygame.K_a, "mods": pygame.KMOD_NONE})
-    game_screen.register_listener(pygame.KEYDOWN, move_player, {"key": pygame.K_s, "mods": pygame.KMOD_NONE})
-    game_screen.register_listener(pygame.KEYDOWN, move_player, {"key": pygame.K_d, "mods": pygame.KMOD_NONE})
+    game_screen.register_listener(
+        pygame.KEYDOWN, move_player, {"key": pygame.K_w, "mods": pygame.KMOD_NONE}
+    )
+    game_screen.register_listener(
+        pygame.KEYDOWN, move_player, {"key": pygame.K_a, "mods": pygame.KMOD_NONE}
+    )
+    game_screen.register_listener(
+        pygame.KEYDOWN, move_player, {"key": pygame.K_s, "mods": pygame.KMOD_NONE}
+    )
+    game_screen.register_listener(
+        pygame.KEYDOWN, move_player, {"key": pygame.K_d, "mods": pygame.KMOD_NONE}
+    )
     return game_screen
 
 

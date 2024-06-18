@@ -24,7 +24,7 @@ def process_mouse_button_down(
     options: Optional[dict[str, Any]],
 ) -> bool:
     if options is not None:
-        if options["target"].rect.collidepoint(event.pos):
+        if options["target"].design.rect.collidepoint(event.pos):
             func(event, options)
             return True
     return False

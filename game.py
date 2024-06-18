@@ -32,15 +32,18 @@ def leave(args, kwargs) -> None:  # pylint: disable=unused-argument
         sys.exit()
 
 
-def back(args, kwargs) -> None:  # pylint: disable=unused-argument
+def back(event, options) -> None:  # pylint: disable=unused-argument
     window: display.Display = display.Display()
-    window.set_screen(args[0])
+    if isinstance(options["args"], str):
+        window.set_screen(options["args"])
+    else:
+        window.set_screen(options["args"][0])
 
 
-def select_class(args, kwargs) -> None:  # pylint: disable=unused-argument
+def select_class(event, options) -> None:  # pylint: disable=unused-argument
     player_class: Optional[player.Player] = None
     window: display.Display = display.Display()
-    match (args[0]):
+    match (options["args"][0]):
         case "mage":
             player_class = mage.Mage(
                 rect_options={

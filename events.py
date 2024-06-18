@@ -1,3 +1,4 @@
+import sys
 import warnings
 from typing import Any, Callable, Optional
 
@@ -42,6 +43,9 @@ class Events(metaclass=singleton.Singleton):
     def cur_screen(self, new_screen: scene.Scene) -> None:
         self.__cur_screen = new_screen
 
+    def quit(self) -> None:
+        sys.exit()
+
     def register_processor(
         self,
         event_type: int,
@@ -81,13 +85,22 @@ class Events(metaclass=singleton.Singleton):
         del self.__processors[event_type]
 
     def notify(self, event: pygame.event.Event) -> None:
+        if event.type == pygame.QUIT:
+            self.quit()
         if self.__cur_screen is None:
             raise TypeError(
                 "Current Screen has not been set. Please set this first before "
                 "attempting to use event listeners"
             )
+        listeners: list[dict[Callable[..., None], Optional[dict[str, Any]]]] = []
         if event.type in self.__cur_screen.listeners:
-            for func, options in self.__cur_screen.listeners[event.type].items():
+            listeners.append(self.__cur_screen.listeners[event.type])
+        for layer in self.__cur_screen.elements:
+            for e in layer:
+                if event.type in e.listeners:
+                    listeners.append(e.listeners[event.type])
+        for listener in listeners:
+            for func, options in listener.items():
                 result: bool = self.__processors[event.type][0](event, func, options)
                 if result and options is not None:
                     if "once" in options:

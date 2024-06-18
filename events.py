@@ -105,5 +105,6 @@ class Events(metaclass=singleton.Singleton):
                 if result and options is not None:
                     if "once" in options:
                         if options["once"]:
-                            pass
-                            # deregister_listener(event.type, func, options)
+                            options["target"].deregister_listener(
+                                event.type, func, options
+                            )

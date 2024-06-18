@@ -53,7 +53,9 @@ class Element:
 
     # def update_design(new_design)
 
-    def __get_val_from_dict(self, dictionary, key, default=None) -> Any:
+    def __get_val_from_dict(self, dictionary: Optional[dict[Any, Any]], key: Any, default=None) -> Any:
+        if dictionary is None:
+            return default
         if key in dictionary:
             return dictionary[key]
         return default
@@ -64,6 +66,8 @@ class Element:
         func: Callable[..., None],
         options: Optional[dict[str, Any]] = None,
     ) -> None:
+        if event_type not in self.listeners:
+            self.listeners[event_type] = {}
         self.listeners[event_type][func] = options
 
     def deregister_listener(

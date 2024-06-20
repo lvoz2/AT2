@@ -22,7 +22,7 @@ class Attack:
     def has_effects(self) -> bool:
         return self.effects is not None and len(self.effects) != 0
 
-    def damage(self, target: entity.Entity):
+    def damage(self, target: entity.Entity) -> None:
         target.damage(self.dmg)
 
     def apply_effects(self, target: entity.Entity, delta: int) -> None:

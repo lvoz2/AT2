@@ -54,7 +54,7 @@ class Element:
     # def update_design(new_design)
 
     def __get_val_from_dict(
-        self, dictionary: Optional[dict[Any, Any]], key: Any, default=None
+        self, dictionary: Optional[dict[Any, Any]], key: Any, default: Any = None
     ) -> Any:
         if dictionary is None:
             return default

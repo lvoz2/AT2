@@ -1,6 +1,6 @@
 import copy
 import sys
-from typing import Optional
+from typing import Any, Optional
 
 import pygame
 
@@ -16,22 +16,34 @@ import warrior
 import zombie
 
 
-def play(args, kwargs) -> None:  # pylint: disable=unused-argument
+def play(
+    event: pygame.event.Event,  # pylint: disable=unused-argument
+    options: dict[str, Any],  # pylint: disable=unused-argument
+) -> None:  # pylint: disable=unused-argument
     window: display.Display = display.Display()
     window.set_screen("class_select_menu")
 
 
-def settings(args, kwargs) -> None:  # pylint: disable=unused-argument
+def settings(
+    event: pygame.event.Event,  # pylint: disable=unused-argument
+    options: dict[str, Any],  # pylint: disable=unused-argument
+) -> None:  # pylint: disable=unused-argument
     window: display.Display = display.Display()
     window.set_screen("settings_menu")
 
 
-def leave(args, kwargs) -> None:  # pylint: disable=unused-argument
+def leave(
+    event: pygame.event.Event,  # pylint: disable=unused-argument
+    options: dict[str, Any],  # pylint: disable=unused-argument
+) -> None:  # pylint: disable=unused-argument
     if not pygame.event.post(pygame.event.Event(pygame.QUIT)):
         sys.exit()
 
 
-def back(event, options) -> None:  # pylint: disable=unused-argument
+def back(
+    event: pygame.event.Event,  # pylint: disable=unused-argument
+    options: dict[str, Any],  # pylint: disable=unused-argument
+) -> None:  # pylint: disable=unused-argument
     window: display.Display = display.Display()
     if isinstance(options["args"], str):
         window.set_screen(options["args"])
@@ -39,7 +51,10 @@ def back(event, options) -> None:  # pylint: disable=unused-argument
         window.set_screen(options["args"][0])
 
 
-def select_class(event, options) -> None:  # pylint: disable=unused-argument
+def select_class(
+    event: pygame.event.Event,  # pylint: disable=unused-argument
+    options: dict[str, Any],  # pylint: disable=unused-argument
+) -> None:  # pylint: disable=unused-argument
     player_class: Optional[player.Player] = None
     window: display.Display = display.Display()
     match (options["args"][0]):
@@ -75,7 +90,10 @@ def select_class(event, options) -> None:  # pylint: disable=unused-argument
         window.set_screen("game")
 
 
-def move_player(args, kwargs) -> None:  # pylint: disable=unused-argument
+def move_player(
+    event: pygame.event.Event,  # pylint: disable=unused-argument
+    options: dict[str, Any],  # pylint: disable=unused-argument
+) -> None:  # pylint: disable=unused-argument
     pass
 
 

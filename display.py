@@ -40,7 +40,7 @@ class Display(metaclass=singleton.Singleton):
             return surf_rect.Surf_Rect(asset.surf.copy(), asset.rect.copy())
         surf: pygame.Surface = pygame.image.load(absolute_path).convert_alpha()
         rect: pygame.Rect = surf.get_rect()
-        design: surf_rect.Surf_Rect = surf_rect.Surf_Rect(surf, path)
+        design: surf_rect.Surf_Rect = surf_rect.Surf_Rect(surf, rect)
         self.__assets[posix_path] = design
         return design
 

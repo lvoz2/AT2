@@ -4,7 +4,6 @@ from typing import Optional
 
 import pygame
 
-import assets
 import display
 import enemy
 import mage
@@ -83,7 +82,7 @@ def move_player(args, kwargs) -> None:  # pylint: disable=unused-argument
 def create_main_menu(
     width: int, window: display.Display, font: pygame.font.Font
 ) -> scene.Scene:
-    bground: surf_rect.Surf_Rect = assets.get_asset("main_menu_background")
+    bground: surf_rect.Surf_Rect = window.get_asset("assets/main_menu_background.png")
     bground.surf = pygame.transform.scale(
         bground.surf, (window.window.get_width(), window.window.get_height())
     )
@@ -91,17 +90,17 @@ def create_main_menu(
     main_menu: scene.Scene = scene.Scene(bground)
     main_menu.elements[0] = [
         ui_element.UI_Element(
-            assets.get_asset("white"),
+            window.get_asset("assets/white.png"),
             rect_options={"center": True, "x": half_width, "y": 150},
             mask=pygame.Rect(half_width, 150, 150, 30),
         ),
         ui_element.UI_Element(
-            assets.get_asset("white"),
+            window.get_asset("assets/white.png"),
             rect_options={"center": True, "x": half_width, "y": 200},
             mask=pygame.Rect(half_width, 200, 150, 30),
         ),
         ui_element.UI_Element(
-            assets.get_asset("white"),
+            window.get_asset("assets/white.png"),
             rect_options={"center": True, "x": half_width, "y": 250},
             mask=pygame.Rect(half_width, 250, 150, 30),
         ),
@@ -135,14 +134,14 @@ def create_main_menu(
 def create_settings_menu(
     height: int, window: display.Display, font: pygame.font.Font
 ) -> scene.Scene:
-    bground: surf_rect.Surf_Rect = assets.get_asset("main_menu_background")
+    bground: surf_rect.Surf_Rect = window.get_asset("assets/main_menu_background.png")
     bground.surf = pygame.transform.scale(
         bground.surf, (window.window.get_width(), window.window.get_height())
     )
     settings_menu: scene.Scene = scene.Scene(bground)
     settings_menu.elements[0] = [
         ui_element.UI_Element(
-            assets.get_asset("white"),
+            window.get_asset("assets/white.png"),
             rect_options={"x": 50, "y": height - 80},
             mask=pygame.Rect(50, height - 80, 100, 30),
         )
@@ -165,15 +164,15 @@ def create_settings_menu(
 def create_class_select_menu(
     width: int, window: display.Display, height: int, font: pygame.font.Font
 ) -> scene.Scene:
-    bground: surf_rect.Surf_Rect = assets.get_asset("main_menu_background")
+    bground: surf_rect.Surf_Rect = window.get_asset("assets/main_menu_background.png")
     bground.surf = pygame.transform.scale(
         bground.surf, (window.window.get_width(), window.window.get_height())
     )
     class_select_menu: scene.Scene = scene.Scene(bground)
     images: list[surf_rect.Surf_Rect] = [
-        assets.get_asset("rogue_button"),
-        assets.get_asset("mage_button"),
-        assets.get_asset("warrior_button"),
+        window.get_asset("assets/rogue_button.png"),
+        window.get_asset("assets/mage_button.png"),
+        window.get_asset("assets/warrior_button.png"),
     ]
     total_spacing = 20
     icon_width: int = ((width - total_spacing) // len(images)) - total_spacing
@@ -193,7 +192,7 @@ def create_class_select_menu(
         )
     class_select_menu.elements[0].append(
         ui_element.UI_Element(
-            assets.get_asset("white"),
+            window.get_asset("assets/white.png"),
             rect_options={"x": 50, "y": height - 80},
             mask=pygame.Rect(50, height - 80, 100, 30),
         )
@@ -224,7 +223,7 @@ def create_class_select_menu(
 
 def create_game_screen(player_surf_rect: player.Player) -> scene.Scene:
     window: display.Display = display.Display()
-    bground: surf_rect.Surf_Rect = assets.get_asset("dungeon_map")
+    bground: surf_rect.Surf_Rect = window.get_asset("assets/dungeon_map.png")
     bground.surf = pygame.transform.scale(
         bground.surf, (window.window.get_width(), window.window.get_height())
     )

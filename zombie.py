@@ -2,7 +2,7 @@ from typing import Any, Optional
 
 import pygame
 
-import assets
+import display
 import enemy
 
 
@@ -14,8 +14,9 @@ class Zombie(enemy.Enemy):
         font_options: Optional[dict[str, Any]] = None,
         scale: int = 1,
     ):
+        window: display.Display = display.Display()
         super().__init__(
-            assets.get_asset("skeleton"),
+            window.get_asset("assets/skeleton.png"),
             "Zombie",
             health_regen_speed=0.1,
             mask=mask,

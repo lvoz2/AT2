@@ -2,7 +2,7 @@ from typing import Any, Optional
 
 import pygame
 
-import assets
+import display
 import player
 
 
@@ -15,8 +15,9 @@ class Mage(player.Player):
         font_options: Optional[dict[str, Any]] = None,
         scale: float = 1,
     ) -> None:
+        window: display.Display = display.Display()
         super().__init__(
-            assets.get_asset("mage"),
+            window.get_asset("assets/mage.png"),
             name,
             "mage",
             mask=mask,

@@ -1,5 +1,6 @@
+import pathlib
 import sys
-from typing import Optional, Sequence
+from typing import Any, Optional, Sequence
 
 import pygame
 
@@ -7,10 +8,11 @@ import event_processors
 import events
 import scene
 import singleton
+import surf_rect
 
 
 class Display(metaclass=singleton.Singleton):
-    def __init__(self, dim: Sequence[int] = (800, 600)) -> None:
+    def __init__(self, dim: Sequence[int] = (0, 0)) -> None:
         if not hasattr(self, "created"):
             self.screens: dict[str, scene.Scene] = {}
             self.cur_screen: Optional[scene.Scene] = None
@@ -23,6 +25,24 @@ class Display(metaclass=singleton.Singleton):
             self.__events = events.Events()
             event_processors.load()
             self.created: bool = True
+            self.__assets: dict[str, surf_rect.Surf_Rect] = {}
+
+    def get_asset(self, asset_location: str) -> surf_rect.Surf_Rect:
+        absolute_path: pathlib.Path = pathlib.Path.joinpath(pathlib.Path.cwd(), asset_location)
+        if not absolute_path.exists() or absolute_path.is_file():
+            raise FileNotFoundError(f"Image file not found: {absolute_path}")
+        valid_types: list[str] = [".bmp", ".gif", ".jpeg", ".jpg", ".lbm", ".pbm", ".pgm", ".ppm", ".pcx", ".png", ".pnm", ".svg", ".tga", ".tiff", ".tif", ".webp", ".xpm"]
+        if absolute_path.suffix not in valid_types:
+            raise RuntimeError(f"The file {absolute_path} does not have an appropriate extension or type")
+        posix_path: str = absolute_path.as_posix()
+        if posix_path in self.__assets:
+            asset: surf_rect.Surf_Rect = self.__assets[posix_path]
+            return surf_rect.Surf_Rect(asset.surf.copy(), asset.rect.copy())
+        surf: pygame.Surface = pygame.image.load(absolute_path).convert_alpha()
+        rect: pygame.Rect = surf.get_rect()
+        design: surf_rect.Surf_Rect = surf_rect.Surf_Rect(surf, path)
+        self.__assets[posix_path] = design
+        return design
 
     def set_screen(self, new_screen: str) -> None:
         if new_screen in self.screens:

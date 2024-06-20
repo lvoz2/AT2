@@ -28,12 +28,34 @@ class Display(metaclass=singleton.Singleton):
             self.__assets: dict[str, surf_rect.Surf_Rect] = {}
 
     def get_asset(self, asset_location: str) -> surf_rect.Surf_Rect:
-        absolute_path: pathlib.Path = pathlib.Path.joinpath(pathlib.Path.cwd(), asset_location)
-        if not absolute_path.exists() or absolute_path.is_file():
+        absolute_path: pathlib.Path = pathlib.Path.joinpath(
+            pathlib.Path.cwd(), asset_location
+        )
+        if not absolute_path.exists() or not absolute_path.is_file():
             raise FileNotFoundError(f"Image file not found: {absolute_path}")
-        valid_types: list[str] = [".bmp", ".gif", ".jpeg", ".jpg", ".lbm", ".pbm", ".pgm", ".ppm", ".pcx", ".png", ".pnm", ".svg", ".tga", ".tiff", ".tif", ".webp", ".xpm"]
+        valid_types: list[str] = [
+            ".bmp",
+            ".gif",
+            ".jpeg",
+            ".jpg",
+            ".lbm",
+            ".pbm",
+            ".pgm",
+            ".ppm",
+            ".pcx",
+            ".png",
+            ".pnm",
+            ".svg",
+            ".tga",
+            ".tiff",
+            ".tif",
+            ".webp",
+            ".xpm",
+        ]
         if absolute_path.suffix not in valid_types:
-            raise RuntimeError(f"The file {absolute_path} does not have an appropriate extension or type")
+            raise RuntimeError(
+                f"The file {absolute_path} does not have an appropriate extension/type"
+            )
         posix_path: str = absolute_path.as_posix()
         if posix_path in self.__assets:
             asset: surf_rect.Surf_Rect = self.__assets[posix_path]

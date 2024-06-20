@@ -86,6 +86,8 @@ def create_main_menu(
     bground.surf = pygame.transform.scale(
         bground.surf, (window.window.get_width(), window.window.get_height())
     )
+    bground.rect.width = window.window.get_width()
+    bground.rect.height = window.window.get_height()
     half_width: int = width // 2
     main_menu: scene.Scene = scene.Scene(bground)
     main_menu.elements[0] = [

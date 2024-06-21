@@ -3,13 +3,13 @@ from typing import Any, Optional
 import pygame
 
 import element
-import surf_rect
+import sprite
 
 
 class UI_Element(element.Element):
     def __init__(
         self,
-        design: surf_rect.Surf_Rect | str,
+        design: sprite.Sprite | str,
         mask: Optional[pygame.Rect] = None,
         rect_options: Optional[dict[str, Any]] = None,
         font_options: Optional[dict[str, Any]] = None,

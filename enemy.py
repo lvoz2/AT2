@@ -3,13 +3,13 @@ from typing import Any, Optional
 import pygame
 
 import character
-import surf_rect
+import sprite
 
 
 class Enemy(character.Character):
     def __init__(
         self,
-        surf: surf_rect.Surf_Rect,
+        surf: sprite.Sprite,
         name: str,
         mask: Optional[pygame.Rect] = None,
         rect_options: Optional[dict[str, Any]] = None,

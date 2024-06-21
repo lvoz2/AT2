@@ -2,13 +2,13 @@ from typing import Any, Callable, Optional, Sequence
 
 import pygame
 
-import surf_rect
+import sprite
 
 
 class Element:
     def __init__(
         self,
-        design: surf_rect.Surf_Rect | str,
+        design: sprite.Sprite | str,
         mask: Optional[pygame.Rect] = None,
         rect_options: Optional[dict[str, Any]] = None,
         font_options: Optional[dict[str, Any]] = None,
@@ -30,10 +30,10 @@ class Element:
                     font_options, "bcolour", [255, 255, 255]
                 )
                 surf: pygame.Surface = font.render(design, anti_alias, fcolour, bcolour)
-                self.design: surf_rect.Surf_Rect = surf_rect.Surf_Rect(
+                self.design: sprite.Sprite = sprite.Sprite(
                     surf, surf.get_rect()
                 )
-        elif isinstance(design, surf_rect.Surf_Rect):
+        elif isinstance(design, sprite.Sprite):
             self.design = design
         self.mask = mask
         self.design.surf = pygame.transform.scale(

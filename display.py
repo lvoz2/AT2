@@ -8,7 +8,7 @@ import event_processors
 import events
 import scene
 import singleton
-import surf_rect
+import sprite
 
 
 class Display(metaclass=singleton.Singleton):
@@ -25,9 +25,9 @@ class Display(metaclass=singleton.Singleton):
             self.__events = events.Events()
             event_processors.load()
             self.created: bool = True
-            self.__assets: dict[str, surf_rect.Surf_Rect] = {}
+            self.__assets: dict[str, sprite.Sprite] = {}
 
-    def get_asset(self, asset_location: str) -> surf_rect.Surf_Rect:
+    def get_asset(self, asset_location: str) -> sprite.Sprite:
         absolute_path: pathlib.Path = pathlib.Path.joinpath(
             pathlib.Path.cwd(), asset_location
         )
@@ -58,11 +58,11 @@ class Display(metaclass=singleton.Singleton):
             )
         posix_path: str = absolute_path.as_posix()
         if posix_path in self.__assets:
-            asset: surf_rect.Surf_Rect = self.__assets[posix_path]
-            return surf_rect.Surf_Rect(asset.surf.copy(), asset.rect.copy())
+            asset: sprite.Sprite = self.__assets[posix_path]
+            return sprite.Sprite(asset.surf.copy(), asset.rect.copy())
         surf: pygame.Surface = pygame.image.load(absolute_path).convert_alpha()
         rect: pygame.Rect = surf.get_rect()
-        design: surf_rect.Surf_Rect = surf_rect.Surf_Rect(surf, rect)
+        design: sprite.Sprite = sprite.Sprite(surf, rect)
         self.__assets[posix_path] = design
         return design
 

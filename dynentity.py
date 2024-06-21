@@ -4,13 +4,13 @@ from typing import Any, Optional
 import pygame
 
 import entity
-import surf_rect
+import sprite
 
 
 class DynEntity(entity.Entity):
     def __init__(
         self,
-        design: surf_rect.Surf_Rect,
+        design: sprite.Sprite,
         health: int,
         mask: Optional[pygame.Rect] = None,
         rect_options: Optional[dict[str, Any]] = None,

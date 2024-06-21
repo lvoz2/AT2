@@ -4,7 +4,7 @@ from typing import Any, Optional
 import pygame
 
 
-class Surf_Rect:
+class Sprite:
     def __init__(
         self,
         surf: pygame.Surface,
@@ -16,8 +16,8 @@ class Surf_Rect:
         self.surf = surf
         self.rect = rect
 
-    def clone(self) -> "Surf_Rect":
-        cloned: "Surf_Rect" = copy.deepcopy(self)
+    def clone(self) -> "Sprite":
+        cloned: "Sprite" = copy.deepcopy(self)
         cloned.surf = self.surf.copy()
         cloned.rect = self.rect.copy()
         return cloned

@@ -10,7 +10,7 @@ import mage
 import player
 import rogue
 import scene
-import surf_rect
+import sprite
 import ui_element
 import warrior
 import zombie
@@ -100,7 +100,7 @@ def move_player(
 def create_main_menu(
     width: int, window: display.Display, font: pygame.font.Font
 ) -> scene.Scene:
-    bground: surf_rect.Surf_Rect = window.get_asset("assets/main_menu_background.png")
+    bground: sprite.Sprite = window.get_asset("assets/main_menu_background.png")
     bground.surf = pygame.transform.scale(
         bground.surf, (window.window.get_width(), window.window.get_height())
     )
@@ -154,7 +154,7 @@ def create_main_menu(
 def create_settings_menu(
     height: int, window: display.Display, font: pygame.font.Font
 ) -> scene.Scene:
-    bground: surf_rect.Surf_Rect = window.get_asset("assets/main_menu_background.png")
+    bground: sprite.Sprite = window.get_asset("assets/main_menu_background.png")
     bground.surf = pygame.transform.scale(
         bground.surf, (window.window.get_width(), window.window.get_height())
     )
@@ -184,12 +184,12 @@ def create_settings_menu(
 def create_class_select_menu(
     width: int, window: display.Display, height: int, font: pygame.font.Font
 ) -> scene.Scene:
-    bground: surf_rect.Surf_Rect = window.get_asset("assets/main_menu_background.png")
+    bground: sprite.Sprite = window.get_asset("assets/main_menu_background.png")
     bground.surf = pygame.transform.scale(
         bground.surf, (window.window.get_width(), window.window.get_height())
     )
     class_select_menu: scene.Scene = scene.Scene(bground)
-    images: list[surf_rect.Surf_Rect] = [
+    images: list[sprite.Sprite] = [
         window.get_asset("assets/rogue_button.png"),
         window.get_asset("assets/mage_button.png"),
         window.get_asset("assets/warrior_button.png"),
@@ -241,9 +241,9 @@ def create_class_select_menu(
     return class_select_menu
 
 
-def create_game_screen(player_surf_rect: player.Player) -> scene.Scene:
+def create_game_screen(player_sprite: player.Player) -> scene.Scene:
     window: display.Display = display.Display()
-    bground: surf_rect.Surf_Rect = window.get_asset("assets/dungeon_map.png")
+    bground: sprite.Sprite = window.get_asset("assets/dungeon_map.png")
     bground.surf = pygame.transform.scale(
         bground.surf, (window.window.get_width(), window.window.get_height())
     )
@@ -259,7 +259,7 @@ def create_game_screen(player_surf_rect: player.Player) -> scene.Scene:
         ),
     ]
     game_screen: scene.Scene = scene.Scene(bground)
-    game_screen.elements[0].append(player_surf_rect)
+    game_screen.elements[0].append(player_sprite)
     for enemy_inst in enemies:
         game_screen.elements[0].append(enemy_inst)
     game_screen.register_listener(

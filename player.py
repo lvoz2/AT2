@@ -3,7 +3,7 @@ from typing import Any, Optional
 import pygame
 
 import character
-import surf_rect
+import sprite
 
 # import screen
 
@@ -11,7 +11,7 @@ import surf_rect
 class Player(character.Character):
     def __init__(
         self,
-        design: surf_rect.Surf_Rect,
+        design: sprite.Sprite,
         name: str,
         character_class: str,
         mask: Optional[pygame.Rect] = None,

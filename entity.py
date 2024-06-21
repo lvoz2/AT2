@@ -4,13 +4,13 @@ import pygame
 
 import effect
 import element
-import surf_rect
+import sprite
 
 
 class Entity(element.Element):
     def __init__(
         self,
-        design: surf_rect.Surf_Rect,
+        design: sprite.Sprite,
         mask: Optional[pygame.Rect] = None,
         rect_options: Optional[dict[str, Any]] = None,
         font_options: Optional[dict[str, Any]] = None,

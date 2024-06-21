@@ -15,9 +15,6 @@ class Player(character.Character):
         name: str,
         character_class: str,
         mask: Optional[pygame.Rect] = None,
-        rect_options: Optional[dict[str, Any]] = None,
-        font_options: Optional[dict[str, Any]] = None,
-        scale: float = 1,
         defense: int = 10,
         mana: int = 10,
         strength: int = 10,
@@ -29,13 +26,10 @@ class Player(character.Character):
             design,
             name,
             health_regen_speed=health_regen_speed,
-            scale=scale,
             defense=defense,
             mana=mana,
             strength=strength,
             mask=mask,
-            rect_options=rect_options,
-            font_options=font_options,
         )
         self.character_class = character_class
         self.stamina: int = stamina

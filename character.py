@@ -11,26 +11,20 @@ import sprite
 class Character(dynentity.DynEntity):
     def __init__(
         self,
-        surf: sprite.Sprite,
+        design: sprite.Sprite,
         name: str,
         mask: Optional[pygame.Rect] = None,
-        rect_options: Optional[dict[str, Any]] = None,
-        font_options: Optional[dict[str, Any]] = None,
         health_regen_speed: float = 5,
-        scale: float = 1,
         defense: int = 10,
         mana: int = 10,
         strength: int = 10,
     ) -> None:
         super().__init__(
-            surf,
+            design,
             health=100,
             health_regen_speed=health_regen_speed,
             visible=True,
-            scale=scale,
             mask=mask,
-            rect_options=rect_options,
-            font_options=font_options,
         )
         self.name = name
         self.lvl: int = 0

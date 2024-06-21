@@ -9,6 +9,7 @@ class Sprite:
         self,
         surf: Optional[pygame.Surface],
         rect: pygame.Rect,
+        scale: float = 1.0,
         rect_options: Optional[
             dict[str, Any]
         ] = None,
@@ -16,7 +17,7 @@ class Sprite:
             dict[str, Any]
         ] = None,
     ) -> None:
-        self.change_design(surf, rect, rect_options, font_options)
+        self.change_design(surf, rect, scale, rect_options, font_options)
 
     def clone(self) -> "Sprite":
         cloned: "Sprite" = copy.deepcopy(self)
@@ -36,6 +37,7 @@ class Sprite:
     def change_design(self,
         surf: Optional[pygame.Surface],
         rect: pygame.Rect,
+        scale: float,
         rect_options: Optional[
             dict[str, Any]
         ] = None,
@@ -61,3 +63,10 @@ class Sprite:
             self.colour = self.colour if self.colour is not None else self.__get_val_from_dict(font_options, "color")
             self.color = self.colour
             self.background = self.__get_val_from_dict(font_options, "background")
+        self.surf = pygame.transform.scale(
+            self.surf.convert_alpha(),
+            (
+                int(self.rect.width * scale),
+                int(self.rect.height * scale),
+            ),
+        )

@@ -13,11 +13,8 @@ class DynEntity(entity.Entity):
         design: sprite.Sprite,
         health: int,
         mask: Optional[pygame.Rect] = None,
-        rect_options: Optional[dict[str, Any]] = None,
-        font_options: Optional[dict[str, Any]] = None,
         health_regen_speed: float = 5,
         visible: bool = False,
-        scale: float = 1,
     ) -> None:
         super().__init__(
             design,
@@ -25,9 +22,6 @@ class DynEntity(entity.Entity):
             health=health,
             health_regen_speed=health_regen_speed,
             visible=visible,
-            scale=scale,
-            rect_options=rect_options,
-            font_options=font_options,
         )
 
     def move(self, direction: float, distance: float) -> None:

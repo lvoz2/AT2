@@ -12,19 +12,13 @@ class Entity(element.Element):
         self,
         design: sprite.Sprite,
         mask: Optional[pygame.Rect] = None,
-        rect_options: Optional[dict[str, Any]] = None,
-        font_options: Optional[dict[str, Any]] = None,
         health: float = -1.0,
         health_regen_speed: float = 5,
         visible: bool = False,
-        scale: float = 1,
     ) -> None:
         super().__init__(
             design,
-            rect_options=rect_options,
             mask=mask,
-            font_options=font_options,
-            scale=scale,
             visible=visible,
         )
         self.health = health

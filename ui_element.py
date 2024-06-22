@@ -9,7 +9,7 @@ import sprite
 class UI_Element(element.Element):
     def __init__(
         self,
-        design: sprite.Sprite | str,
+        design: sprite.Sprite,
         mask: Optional[pygame.Rect] = None,
     ) -> None:
         super().__init__(design, mask)

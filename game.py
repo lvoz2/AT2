@@ -106,41 +106,53 @@ def create_main_menu(
     )
     bground.rect.width = window.window.get_width()
     bground.rect.height = window.window.get_height()
-    half_width: int = width // 2
+    half_width: float = width / 2
     main_menu: scene.Scene = scene.Scene(bground)
     main_menu.elements[0] = [
         ui_element.UI_Element(
-            window.get_asset("assets/white.png"),
-            rect_options={"center": True, "x": half_width, "y": 150},
+            window.get_asset(
+                "assets/white.png",
+                rect_options={"center": True, "x": half_width, "y": 150},
+            ),
             mask=pygame.Rect(half_width, 150, 150, 30),
         ),
         ui_element.UI_Element(
-            window.get_asset("assets/white.png"),
-            rect_options={"center": True, "x": half_width, "y": 200},
+            window.get_asset(
+                "assets/white.png",
+                rect_options={"center": True, "x": half_width, "y": 200},
+            ),
             mask=pygame.Rect(half_width, 200, 150, 30),
         ),
         ui_element.UI_Element(
-            window.get_asset("assets/white.png"),
-            rect_options={"center": True, "x": half_width, "y": 250},
+            window.get_asset(
+                "assets/white.png",
+                rect_options={"center": True, "x": half_width, "y": 250},
+            ),
             mask=pygame.Rect(half_width, 250, 150, 30),
         ),
     ]
     main_menu.elements.append(
         [
             ui_element.UI_Element(
-                "Start Game",
-                rect_options={"center": True, "x": half_width, "y": 150},
-                font_options={"font": font, "fcolour": [255, 0, 0]},
+                sprite.Sprite(
+                    None,
+                    rect=pygame.Rect(center=(half_width, 150.0)),
+                    font_options={"text": "Start Game", "font": font, "fcolour": [255, 0, 0]},
+                )
             ),
             ui_element.UI_Element(
-                "Settings",
-                rect_options={"center": True, "x": half_width, "y": 200},
-                font_options={"font": font},
+                sprite.Sprite(
+                    None,
+                    rect=pygame.Rect(center=(half_width, 200.0)),
+                    font_options={"text": "Settings", "font": font},
+                ),
             ),
             ui_element.UI_Element(
-                "Exit",
-                rect_options={"center": True, "x": half_width, "y": 250},
-                font_options={"font": font},
+                sprite.Sprite(
+                    None,
+                    rect=pygame.Rect(center=(half_width, 250.0)),
+                    font_options={"text": "Exit", "font": font},
+                ),
             ),
         ]
     )
@@ -161,17 +173,20 @@ def create_settings_menu(
     settings_menu: scene.Scene = scene.Scene(bground)
     settings_menu.elements[0] = [
         ui_element.UI_Element(
-            window.get_asset("assets/white.png"),
-            rect_options={"x": 50, "y": height - 80},
+            window.get_asset(
+                "assets/white.png", rect_options={"x": 50, "y": height - 80}
+            ),
             mask=pygame.Rect(50, height - 80, 100, 30),
         )
     ]
     settings_menu.elements.append(
         [
             ui_element.UI_Element(
-                "Back",
-                rect_options={"x": 100, "y": height - 65, "center": True},
-                font_options={"font": font},
+                sprite.Sprite(
+                    None,
+                    rect=pygame.Rect(center=(100, height - 65)),
+                    font_options={"text": "Back", "font": font},
+                ),
             )
         ]
     )
@@ -189,40 +204,42 @@ def create_class_select_menu(
         bground.surf, (window.window.get_width(), window.window.get_height())
     )
     class_select_menu: scene.Scene = scene.Scene(bground)
-    images: list[sprite.Sprite] = [
-        window.get_asset("assets/rogue_button.png"),
-        window.get_asset("assets/mage_button.png"),
-        window.get_asset("assets/warrior_button.png"),
+    images: list[str] = [
+        "assets/rogue_button.png",
+        "assets/mage_button.png",
+        "assets/warrior_button.png",
     ]
     total_spacing = 20
     icon_width: int = ((width - total_spacing) // len(images)) - total_spacing
-    for img in images:
+    for img_path in images:
         aspect_ratio: float = 0.75
         icon_height: int = int(icon_width // aspect_ratio)
-        img.surf = pygame.transform.scale(img.surf, (icon_width, icon_height))
-        class_select_menu.elements[0].append(
-            ui_element.UI_Element(
-                img,
-                rect_options={
-                    "x": total_spacing
-                    + ((total_spacing + icon_width) * images.index(img)),
-                    "y": height // 3 - (height // 4) // 2,
-                },
-            )
+        img: sprite.Sprite = window.get_asset(
+            img_path,
+            rect_options={
+                "x": total_spacing
+                + ((total_spacing + icon_width) * images.index(img_path)),
+                "y": height // 3 - (height // 4) // 2,
+            },
         )
+        img.surf = pygame.transform.scale(img.surf, (icon_width, icon_height))
+        class_select_menu.elements[0].append(ui_element.UI_Element(img))
     class_select_menu.elements[0].append(
         ui_element.UI_Element(
-            window.get_asset("assets/white.png"),
-            rect_options={"x": 50, "y": height - 80},
+            window.get_asset(
+                "assets/white.png", rect_options={"x": 50, "y": height - 80}
+            ),
             mask=pygame.Rect(50, height - 80, 100, 30),
         )
     )
     class_select_menu.elements.append(
         [
             ui_element.UI_Element(
-                "Back",
-                rect_options={"x": 100, "y": height - 65},
-                font_options={"font": font},
+                sprite.Sprite(
+                    None,
+                    rect_options={"x": 100, "y": height - 65},
+                    font_options={"text": "Back", "font": font},
+                ),
             )
         ]
     )

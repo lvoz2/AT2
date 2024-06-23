@@ -12,12 +12,13 @@ import sprite
 
 
 class Display(metaclass=singleton.Singleton):
-    def __init__(self, dim: Sequence[int] = (0, 0)) -> None:
+    def __init__(self, title: str = "", dim: Sequence[int] = (0, 0)) -> None:
         if not hasattr(self, "created"):
             self.screens: dict[str, scene.Scene] = {}
             self.cur_screen: Optional[scene.Scene] = None
             pygame.init()
             self.window = pygame.display.set_mode(dim)
+            pygame.display.set_caption(title)
             pygame.key.set_repeat(25)
             self.clock: pygame.time.Clock = pygame.time.Clock()
             self.delta: list[int] = [0]
@@ -110,7 +111,7 @@ class Display(metaclass=singleton.Singleton):
 
     def draw(self) -> None:
         if self.cur_screen is not None:
-            self.delta.append(self.clock.tick())
+            self.delta.append(self.clock.tick_busy_loop(25))
             if len(self.delta) > 10:
                 self.delta = self.delta[(len(self.delta) - 10) :]
             self.window.fill([0, 0, 0])

@@ -32,11 +32,10 @@ class Entity(element.Element):
     def is_alive(self) -> bool:
         return self.health == 0
 
-    def damage(self, dmg: int) -> None:
-        if dmg >= self.health:
-            self.health = 0
-        else:
-            self.health -= dmg
+    def damage(self, dmg: int, event_id: int) -> None:
+        self.health -= min(dmg, self.health)
+        dmg_event: pygame.event.Event = pygame.event.Event(event_id, target=self)
+        pygame.event.post(dmg_event)
 
     def regen_health(self) -> None:
         if self.health > 0:

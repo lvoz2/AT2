@@ -46,6 +46,17 @@ class Events(metaclass=singleton.Singleton):
     def quit(self) -> None:
         sys.exit()
 
+    def default_processor(
+        self,
+        event: pygame.event.Event,
+        func: Callable[[pygame.event.Event, dict[str, Any]], None],
+        options: Optional[dict[str, Any]],
+    ) -> bool:
+        if options is not None:
+            func(event, options)
+            return True
+        return False
+
     def register_processor(
         self,
         event_type: int,
@@ -99,7 +110,11 @@ class Events(metaclass=singleton.Singleton):
                     listeners.append(e.listeners[event.type])
         for listener in listeners:
             for func, options in listener.items():
-                result: bool = self.__processors[event.type][0](event, func, options)
+                result: bool = False
+                if event.type in self.__processors:
+                    result = self.__processors[event.type][0](event, func, options)
+                else:
+                    result = self.default_processor(event, func, options)
                 if result and options is not None:
                     if "once" in options:
                         if options["once"]:

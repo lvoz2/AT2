@@ -6,13 +6,14 @@ from typing import Any, Optional
 import pygame
 
 import display
+import element
 import enemy
+import healthbar
 import mage
 import player
 import rogue
 import scene
 import sprite
-import ui_element
 import warrior
 import zombie
 
@@ -157,7 +158,7 @@ def create_main_menu(
     half_width: float = width / 2
     main_menu: scene.Scene = scene.Scene(bground)
     main_menu.elements[0] = [
-        ui_element.UI_Element(
+        element.Element(
             sprite.Sprite(
                 rect=pygame.Rect(half_width, 150, 150, 30),
                 rect_options={
@@ -168,7 +169,7 @@ def create_main_menu(
                 },
             ),
         ),
-        ui_element.UI_Element(
+        element.Element(
             sprite.Sprite(
                 rect=pygame.Rect(half_width, 200, 150, 30),
                 rect_options={
@@ -179,7 +180,7 @@ def create_main_menu(
                 },
             ),
         ),
-        ui_element.UI_Element(
+        element.Element(
             sprite.Sprite(
                 rect=pygame.Rect(half_width, 250, 150, 30),
                 rect_options={
@@ -193,7 +194,7 @@ def create_main_menu(
     ]
     main_menu.elements.append(
         [
-            ui_element.UI_Element(
+            element.Element(
                 sprite.Sprite(
                     rect_options={"x": half_width, "y": 150.0, "center": True},
                     font_options={
@@ -203,13 +204,13 @@ def create_main_menu(
                     },
                 )
             ),
-            ui_element.UI_Element(
+            element.Element(
                 sprite.Sprite(
                     rect_options={"center": True, "x": half_width, "y": 200.0},
                     font_options={"text": "Settings", "font": font},
                 ),
             ),
-            ui_element.UI_Element(
+            element.Element(
                 sprite.Sprite(
                     rect_options={"center": True, "x": half_width, "y": 250.0},
                     font_options={"text": "Exit", "font": font},
@@ -233,7 +234,7 @@ def create_settings_menu(
     )
     settings_menu: scene.Scene = scene.Scene(bground)
     settings_menu.elements[0] = [
-        ui_element.UI_Element(
+        element.Element(
             sprite.Sprite(
                 rect=pygame.Rect(50, height - 80, 100, 30),
                 rect_options={"x": 50, "y": height - 80, "colour": [255, 255, 255]},
@@ -242,7 +243,7 @@ def create_settings_menu(
     ]
     settings_menu.elements.append(
         [
-            ui_element.UI_Element(
+            element.Element(
                 sprite.Sprite(
                     rect_options={"center": True, "x": 100, "y": height - 65},
                     font_options={"text": "Back", "font": font},
@@ -283,9 +284,9 @@ def create_class_select_menu(
             },
         )
         img.surf = pygame.transform.scale(img.surf, (icon_width, icon_height))
-        class_select_menu.elements[0].append(ui_element.UI_Element(img))
+        class_select_menu.elements[0].append(element.Element(img))
     class_select_menu.elements[0].append(
-        ui_element.UI_Element(
+        element.Element(
             sprite.Sprite(
                 rect=pygame.Rect(50, height - 80, 100, 30),
                 rect_options={"x": 50, "y": height - 80, "colour": [255, 255, 255]},
@@ -294,7 +295,7 @@ def create_class_select_menu(
     )
     class_select_menu.elements.append(
         [
-            ui_element.UI_Element(
+            element.Element(
                 sprite.Sprite(
                     rect_options={"x": 100, "y": height - 65, "center": True},
                     font_options={"text": "Back", "font": font},
@@ -339,6 +340,19 @@ def create_game_screen(player_sprite: player.Player) -> scene.Scene:
     game_screen.elements[0].append(player_sprite)
     for enemy_inst in enemies:
         game_screen.elements[0].append(enemy_inst)
+    player_hp_bar_bground = element.Element(
+        sprite.Sprite(
+            rect=pygame.Rect(10, 10, 260, 30),
+            rect_options={"x": 10, "y": 10, "colour": [64, 64, 64]},
+        )
+    )
+    player_hp_bar = healthbar.HealthBar(
+        player_sprite.health,
+        pygame.Rect(15, 15, 250, 20),
+        {"x": 15, "y": 15, "colour": [255, 0, 0]},
+    )
+    game_screen.elements[0].append(player_hp_bar_bground)
+    game_screen.elements.append([player_hp_bar])
     game_screen.register_listener(
         pygame.KEYDOWN,
         lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
@@ -433,7 +447,7 @@ def create_game_screen(player_sprite: player.Player) -> scene.Scene:
 def init() -> None:
     width: int = 800
     height: int = 600
-    window: display.Display = display.Display([width, height])
+    window: display.Display = display.Display("Kings Quest", [width, height])
     font = pygame.font.Font(None, 36)
     window.add_screen("main_menu", create_main_menu(width, window, font))
     window.add_screen("settings_menu", create_settings_menu(height, window, font))

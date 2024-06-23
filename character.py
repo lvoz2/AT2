@@ -35,5 +35,5 @@ class Character(dynentity.DynEntity):
         self.strength: int = strength
         self.MAX_LVL: int = 50
 
-    def attack(self, category: int, target: entity.Entity) -> None:
-        self.attacks[category].damage(target)
+    def attack(self, category: int, target: entity.Entity, event_id: int) -> None:
+        self.attacks[category].damage(target, event_id)

@@ -23,7 +23,7 @@ class Display(metaclass=singleton.Singleton):
             self.clock: pygame.time.Clock = pygame.time.Clock()
             self.delta: list[int] = [0]
             self.game_over: bool = False
-            self.__events = events.Events()
+            self.events = events.Events()
             event_processors.load()
             self.created: bool = True
             self.__assets: dict[str, sprite.Sprite] = {}
@@ -104,7 +104,7 @@ class Display(metaclass=singleton.Singleton):
         if self.cur_screen is not None:
             self.draw()
             for e in pygame.event.get():
-                self.__events.notify(e)
+                self.events.notify(e)
 
     def update(self, delta: list[int]) -> None:
         pass

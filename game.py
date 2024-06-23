@@ -59,34 +59,27 @@ def select_class(
 ) -> None:  # pylint: disable=unused-argument
     player_class: Optional[player.Player] = None
     window: display.Display = display.Display()
+    rect_options: dict[str, Any] = {
+        "x": window.window.get_width() // 2,
+        "y": window.window.get_height() // 2,
+        "center": True,
+    }
     match (options["args"]):
         case "mage":
             player_class = mage.Mage(
-                rect_options={
-                    "x": window.window.get_width() // 2,
-                    "y": window.window.get_height() // 2,
-                    "center": True,
-                },
+                rect_options=rect_options,
                 name="Player",
                 scale=0.3,
             )
         case "rogue":
             player_class = rogue.Rogue(
-                rect_options={
-                    "x": window.window.get_width() // 2,
-                    "y": window.window.get_height() // 2,
-                    "center": True,
-                },
+                rect_options=rect_options,
                 name="Player",
                 scale=0.3,
             )
         case "warrior":
             player_class = warrior.Warrior(
-                rect_options={
-                    "x": window.window.get_width() // 2,
-                    "y": window.window.get_height() // 2,
-                    "center": True,
-                },
+                rect_options=rect_options,
                 name="Player",
                 scale=0.3,
             )
@@ -157,41 +150,21 @@ def create_main_menu(
     bground.rect.height = window.window.get_height()
     half_width: float = width / 2
     main_menu: scene.Scene = scene.Scene(bground)
-    main_menu.elements[0] = [
-        element.Element(
-            sprite.Sprite(
-                rect=pygame.Rect(half_width, 150, 150, 30),
-                rect_options={
-                    "center": True,
-                    "x": half_width,
-                    "y": 150,
-                    "colour": [255, 255, 255],
-                },
-            ),
-        ),
-        element.Element(
-            sprite.Sprite(
-                rect=pygame.Rect(half_width, 200, 150, 30),
-                rect_options={
-                    "center": True,
-                    "x": half_width,
-                    "y": 200,
-                    "colour": [255, 255, 255],
-                },
-            ),
-        ),
-        element.Element(
-            sprite.Sprite(
-                rect=pygame.Rect(half_width, 250, 150, 30),
-                rect_options={
-                    "center": True,
-                    "x": half_width,
-                    "y": 250,
-                    "colour": [255, 255, 255],
-                },
-            ),
-        ),
-    ]
+    y_vals: list[int] = [150, 200, 250]
+    for y_val in y_vals:
+        main_menu.elements[0].append(
+            element.Element(
+                sprite.Sprite(
+                    rect=pygame.Rect(half_width, y_val, 150, 30),
+                    rect_options={
+                        "center": True,
+                        "x": half_width,
+                        "y": y_val,
+                        "colour": [255, 255, 255],
+                    },
+                ),
+            )
+        )
     main_menu.elements.append(
         [
             element.Element(
@@ -303,15 +276,10 @@ def create_class_select_menu(
             )
         ]
     )
-    class_select_menu.elements[0][0].register_listener(
-        pygame.MOUSEBUTTONDOWN, select_class, {"args": "mage"}
-    )
-    class_select_menu.elements[0][1].register_listener(
-        pygame.MOUSEBUTTONDOWN, select_class, {"args": "rogue"}
-    )
-    class_select_menu.elements[0][2].register_listener(
-        pygame.MOUSEBUTTONDOWN, select_class, {"args": "warrior"}
-    )
+    for i, player_class in enumerate(["mage", "rogue", "warrior"]):
+        class_select_menu.elements[0][i].register_listener(
+            pygame.MOUSEBUTTONDOWN, select_class, {"args": player_class}
+        )
     class_select_menu.elements[0][3].register_listener(
         pygame.MOUSEBUTTONDOWN, back, {"args": "main_menu"}
     )
@@ -351,103 +319,47 @@ def create_game_screen(player_sprite: player.Player) -> scene.Scene:
         pygame.Rect(15, 15, 250, 20),
         {"x": 15, "y": 15, "colour": [255, 0, 0]},
     )
+    player_sprite.register_listener(custom_events["dmg_event"], lambda event, options: player_hp_bar.update(event.target.health))
     game_screen.elements[0].append(player_hp_bar_bground)
     game_screen.elements.append([player_hp_bar])
-    game_screen.register_listener(
-        pygame.KEYDOWN,
-        lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
-            event, options  # pylint: disable=unnecessary-lambda
-        ),  # pylint: disable=unnecessary-lambda
-        {
-            "key": pygame.K_w,
-            "mods": pygame.KMOD_NONE,
-            "args": ["down", player_sprite],
-        },
-    )
-    game_screen.register_listener(
-        pygame.KEYDOWN,
-        lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
-            event, options  # pylint: disable=unnecessary-lambda
-        ),  # pylint: disable=unnecessary-lambda
-        {
-            "key": pygame.K_a,
-            "mods": pygame.KMOD_NONE,
-            "args": ["down", player_sprite],
-        },
-    )
-    game_screen.register_listener(
-        pygame.KEYDOWN,
-        lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
-            event, options  # pylint: disable=unnecessary-lambda
-        ),  # pylint: disable=unnecessary-lambda
-        {
-            "key": pygame.K_s,
-            "mods": pygame.KMOD_NONE,
-            "args": ["down", player_sprite],
-        },
-    )
-    game_screen.register_listener(
-        pygame.KEYDOWN,
-        lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
-            event, options  # pylint: disable=unnecessary-lambda
-        ),  # pylint: disable=unnecessary-lambda
-        {
-            "key": pygame.K_d,
-            "mods": pygame.KMOD_NONE,
-            "args": ["down", player_sprite],
-        },
-    )
-    game_screen.register_listener(
-        pygame.KEYUP,
-        lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
-            event, options  # pylint: disable=unnecessary-lambda
-        ),  # pylint: disable=unnecessary-lambda
-        {
-            "key": pygame.K_w,
-            "mods": pygame.KMOD_NONE,
-            "args": ["up", player_sprite],
-        },
-    )
-    game_screen.register_listener(
-        pygame.KEYUP,
-        lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
-            event, options  # pylint: disable=unnecessary-lambda
-        ),  # pylint: disable=unnecessary-lambda
-        {
-            "key": pygame.K_a,
-            "mods": pygame.KMOD_NONE,
-            "args": ["up", player_sprite],
-        },
-    )
-    game_screen.register_listener(
-        pygame.KEYUP,
-        lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
-            event, options  # pylint: disable=unnecessary-lambda
-        ),  # pylint: disable=unnecessary-lambda
-        {
-            "key": pygame.K_s,
-            "mods": pygame.KMOD_NONE,
-            "args": ["up", player_sprite],
-        },
-    )
-    game_screen.register_listener(
-        pygame.KEYUP,
-        lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
-            event, options  # pylint: disable=unnecessary-lambda
-        ),  # pylint: disable=unnecessary-lambda
-        {
-            "key": pygame.K_d,
-            "mods": pygame.KMOD_NONE,
-            "args": ["up", player_sprite],
-        },
-    )
+    keys: list[int] = [pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d]
+    for press_type in ["down", "up"]:
+        for key in keys:
+            game_screen.register_listener(
+                pygame.KEYDOWN,
+                lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
+                    event, options  # pylint: disable=unnecessary-lambda
+                ),  # pylint: disable=unnecessary-lambda
+                {
+                    "key": key,
+                    "mods": pygame.KMOD_NONE,
+                    "args": [press_type, player_sprite],
+                },
+            )
     return game_screen
 
 
+custom_events: dict[str, int] = {}
+
+
+def process_dmg(
+    event: pygame.event.Event,
+    func: Callable[[pygame.event.Event, dict[str, Any]], None],
+    options: Optional[dict[str, Any]],
+) -> bool:
+    if options is not None:
+        if options["target"] == event.target:
+            func(event, options)
+            return True
+    return False
+
+
 def init() -> None:
+    custom_events["dmg_event"] = pygame.event.custom_type()
     width: int = 800
     height: int = 600
     window: display.Display = display.Display("Kings Quest", [width, height])
+    window.events.register_processor(custom_events["dmg_event"], process_dmg)
     font = pygame.font.Font(None, 36)
     window.add_screen("main_menu", create_main_menu(width, window, font))
     window.add_screen("settings_menu", create_settings_menu(height, window, font))

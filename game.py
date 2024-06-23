@@ -1,4 +1,5 @@
 import copy
+import math
 import sys
 from typing import Any, Optional
 
@@ -97,7 +98,51 @@ def move_player(
     event: pygame.event.Event,  # pylint: disable=unused-argument
     options: dict[str, Any],  # pylint: disable=unused-argument
 ) -> None:  # pylint: disable=unused-argument
-    pass
+    speed: float = 2.0
+    updated_state: Optional[bool] = None
+    match (options["args"][0]):
+        case "up":
+            updated_state = False
+        case "down":
+            updated_state = True
+        case _:
+            raise ValueError('The arguments given in options were not "up" or "down"')
+    move_key_state[event.key] = updated_state
+    direction: list[int] = [0, 0]
+    if move_key_state[pygame.K_w] and not move_key_state[pygame.K_s]:
+        direction[1] = -1
+    elif not move_key_state[pygame.K_w] and move_key_state[pygame.K_s]:
+        direction[1] = 1
+    if move_key_state[pygame.K_a] and not move_key_state[pygame.K_d]:
+        direction[0] = -1
+    elif not move_key_state[pygame.K_a] and move_key_state[pygame.K_d]:
+        direction[0] = 1
+    distance: float = math.sqrt((speed**2) * 2)
+    match (direction):
+        case [0, -1]:
+            options["args"][1].move(0.0, distance)
+        case [1, -1]:
+            options["args"][1].move(45.0, distance)
+        case [1, 0]:
+            options["args"][1].move(90.0, distance)
+        case [1, 1]:
+            options["args"][1].move(135.0, distance)
+        case [0, 1]:
+            options["args"][1].move(180.0, distance)
+        case [-1, 1]:
+            options["args"][1].move(225.0, distance)
+        case [-1, 0]:
+            options["args"][1].move(270.0, distance)
+        case [-1, -1]:
+            options["args"][1].move(315.0, distance)
+
+
+move_key_state: dict[int, bool] = {
+    pygame.K_w: False,
+    pygame.K_a: False,
+    pygame.K_s: False,
+    pygame.K_d: False,
+}
 
 
 def create_main_menu(
@@ -292,19 +337,95 @@ def create_game_screen(player_sprite: player.Player) -> scene.Scene:
     ]
     game_screen: scene.Scene = scene.Scene(bground)
     game_screen.elements[0].append(player_sprite)
-    for enemy in enemies:
-        game_screen.elements[0].append(enemy)
+    for enemy_inst in enemies:
+        game_screen.elements[0].append(enemy_inst)
     game_screen.register_listener(
-        pygame.KEYDOWN, move_player, {"key": pygame.K_w, "mods": pygame.KMOD_NONE}
+        pygame.KEYDOWN,
+        lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
+            event, options  # pylint: disable=unnecessary-lambda
+        ),  # pylint: disable=unnecessary-lambda
+        {
+            "key": pygame.K_w,
+            "mods": pygame.KMOD_NONE,
+            "args": ["down", player_sprite],
+        },
     )
     game_screen.register_listener(
-        pygame.KEYDOWN, move_player, {"key": pygame.K_a, "mods": pygame.KMOD_NONE}
+        pygame.KEYDOWN,
+        lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
+            event, options  # pylint: disable=unnecessary-lambda
+        ),  # pylint: disable=unnecessary-lambda
+        {
+            "key": pygame.K_a,
+            "mods": pygame.KMOD_NONE,
+            "args": ["down", player_sprite],
+        },
     )
     game_screen.register_listener(
-        pygame.KEYDOWN, move_player, {"key": pygame.K_s, "mods": pygame.KMOD_NONE}
+        pygame.KEYDOWN,
+        lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
+            event, options  # pylint: disable=unnecessary-lambda
+        ),  # pylint: disable=unnecessary-lambda
+        {
+            "key": pygame.K_s,
+            "mods": pygame.KMOD_NONE,
+            "args": ["down", player_sprite],
+        },
     )
     game_screen.register_listener(
-        pygame.KEYDOWN, move_player, {"key": pygame.K_d, "mods": pygame.KMOD_NONE}
+        pygame.KEYDOWN,
+        lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
+            event, options  # pylint: disable=unnecessary-lambda
+        ),  # pylint: disable=unnecessary-lambda
+        {
+            "key": pygame.K_d,
+            "mods": pygame.KMOD_NONE,
+            "args": ["down", player_sprite],
+        },
+    )
+    game_screen.register_listener(
+        pygame.KEYUP,
+        lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
+            event, options  # pylint: disable=unnecessary-lambda
+        ),  # pylint: disable=unnecessary-lambda
+        {
+            "key": pygame.K_w,
+            "mods": pygame.KMOD_NONE,
+            "args": ["up", player_sprite],
+        },
+    )
+    game_screen.register_listener(
+        pygame.KEYUP,
+        lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
+            event, options  # pylint: disable=unnecessary-lambda
+        ),  # pylint: disable=unnecessary-lambda
+        {
+            "key": pygame.K_a,
+            "mods": pygame.KMOD_NONE,
+            "args": ["up", player_sprite],
+        },
+    )
+    game_screen.register_listener(
+        pygame.KEYUP,
+        lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
+            event, options  # pylint: disable=unnecessary-lambda
+        ),  # pylint: disable=unnecessary-lambda
+        {
+            "key": pygame.K_s,
+            "mods": pygame.KMOD_NONE,
+            "args": ["up", player_sprite],
+        },
+    )
+    game_screen.register_listener(
+        pygame.KEYUP,
+        lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
+            event, options  # pylint: disable=unnecessary-lambda
+        ),  # pylint: disable=unnecessary-lambda
+        {
+            "key": pygame.K_d,
+            "mods": pygame.KMOD_NONE,
+            "args": ["up", player_sprite],
+        },
     )
     return game_screen
 

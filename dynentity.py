@@ -36,14 +36,22 @@ class DynEntity(entity.Entity):
             direction += 360.0
         horizontal: float = 0.0
         vertical: float = 0.0
-        if 0.0 <= direction <= 90.0 or 180.0 <= direction <= 270.0:
+        if 0.0 <= direction <= 90.0:
             direction = math.radians(direction)
             horizontal = math.sin(direction) * distance
+            vertical = -(math.cos(direction) * distance)
+        elif 90.0 <= direction <= 180.0:
+            direction = math.radians(180 - direction)
+            horizontal = math.sin(direction) * distance
+            vertical = math.cos(direction) * distance
+        elif 180.0 <= direction <= 270.0:
+            direction = math.radians(direction - 180)
+            horizontal = -(math.sin(direction) * distance)
             vertical = math.cos(direction) * distance
         else:
-            direction = math.radians(direction)
-            horizontal = math.cos(direction) * distance
-            vertical = math.sin(direction) * distance
+            direction = math.radians(360 - direction)
+            horizontal = -(math.sin(direction) * distance)
+            vertical = -(math.cos(direction) * distance)
         self.x += int(round(horizontal))
         self.y += int(round(vertical))
 

@@ -61,9 +61,7 @@ class Events(metaclass=singleton.Singleton):
     def deregister_processor(
         self,
         event_type: int,
-        func: Callable[
-            [pygame.event.Event, Callable[..., None], Optional[dict[str, Any]]], bool
-        ],
+        func: Callable[[pygame.event.Event, Callable[..., None], dict[str, Any]], bool],
         options: Optional[dict[str, Any]] = None,
     ) -> None:
         warnings.warn(

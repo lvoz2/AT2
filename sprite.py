@@ -117,6 +117,7 @@ class Sprite:
         else:
             self.rect.left = x
             self.rect.top = y
+
     def scale(self, scale: float) -> pygame.Surface:
         return pygame.transform.scale(
             self.surf.convert_alpha(),

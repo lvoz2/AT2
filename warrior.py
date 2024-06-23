@@ -18,7 +18,7 @@ class Warrior(player.Player):
         window: display.Display = display.Display()
         super().__init__(
             window.get_asset(
-                "assets/warrior.png", rect_options=rect_options, scale=scale
+                "assets/warrior.png", rect=rect, rect_options=rect_options, scale=scale
             ),
             name,
             "warrior",

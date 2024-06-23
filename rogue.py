@@ -18,7 +18,7 @@ class Rogue(player.Player):
         window: display.Display = display.Display()
         super().__init__(
             window.get_asset(
-                "assets/rogue.png", rect_options=rect_options, scale=scale
+                "assets/rogue.png", rect=rect, rect_options=rect_options, scale=scale
             ),
             name,
             "rogue",

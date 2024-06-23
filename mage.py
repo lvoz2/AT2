@@ -17,7 +17,9 @@ class Mage(player.Player):
     ) -> None:
         window: display.Display = display.Display()
         super().__init__(
-            window.get_asset("assets/mage.png", rect_options=rect_options, scale=scale),
+            window.get_asset(
+                "assets/mage.png", rect=rect, rect_options=rect_options, scale=scale
+            ),
             name,
             "mage",
             mask=mask,

@@ -17,8 +17,8 @@ class Element:
         self.listeners: dict[
             int, dict[Callable[..., None], Optional[dict[str, Any]]]
         ] = {}
-        self.x = self.design.x
-        self.y = self.design.y
+        self.x = self.design.rect.x
+        self.y = self.design.rect.y
         self.visible = visible
 
     def register_listener(

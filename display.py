@@ -30,6 +30,7 @@ class Display(metaclass=singleton.Singleton):
     def get_asset(
         self,
         asset_location: str,
+        rect: Optional[pygame.Rect] = None,
         rect_options: Optional[dict[str, Any]] = None,
         scale: float = 1.0,
     ) -> sprite.Sprite:
@@ -63,9 +64,13 @@ class Display(metaclass=singleton.Singleton):
             )
         posix_path: str = absolute_path.as_posix()
         if posix_path in self.__assets:
-            return self.__assets[posix_path].clone()
+            return sprite.Sprite(
+                self.__assets[posix_path].clone(),
+                rect,
+                rect_options=rect_options,
+                scale=scale,
+            )
         surf: pygame.Surface = pygame.image.load(absolute_path).convert_alpha()
-        rect: pygame.Rect = surf.get_rect()
         design: sprite.Sprite = sprite.Sprite(
             surf, rect, rect_options=rect_options, scale=scale
         )

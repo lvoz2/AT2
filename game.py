@@ -57,33 +57,36 @@ def select_class(
 ) -> None:  # pylint: disable=unused-argument
     player_class: Optional[player.Player] = None
     window: display.Display = display.Display()
-    match (options["args"][0]):
+    match (options["args"]):
         case "mage":
             player_class = mage.Mage(
                 rect_options={
                     "x": window.window.get_width() // 2,
                     "y": window.window.get_height() // 2,
+                    "center": True,
                 },
                 name="Player",
-                scale=0.15,
+                scale=0.3,
             )
         case "rogue":
             player_class = rogue.Rogue(
                 rect_options={
                     "x": window.window.get_width() // 2,
                     "y": window.window.get_height() // 2,
+                    "center": True,
                 },
                 name="Player",
-                scale=0.15,
+                scale=0.3,
             )
         case "warrior":
             player_class = warrior.Warrior(
                 rect_options={
                     "x": window.window.get_width() // 2,
                     "y": window.window.get_height() // 2,
+                    "center": True,
                 },
                 name="Player",
-                scale=0.15,
+                scale=0.3,
             )
     if player_class is not None:
         window.add_screen("game", create_game_screen(player_class))
@@ -110,47 +113,60 @@ def create_main_menu(
     main_menu: scene.Scene = scene.Scene(bground)
     main_menu.elements[0] = [
         ui_element.UI_Element(
-            window.get_asset(
-                "assets/white.png",
-                rect_options={"center": True, "x": half_width, "y": 150},
+            sprite.Sprite(
+                rect=pygame.Rect(half_width, 150, 150, 30),
+                rect_options={
+                    "center": True,
+                    "x": half_width,
+                    "y": 150,
+                    "colour": [255, 255, 255],
+                },
             ),
-            mask=pygame.Rect(half_width, 150, 150, 30),
         ),
         ui_element.UI_Element(
-            window.get_asset(
-                "assets/white.png",
-                rect_options={"center": True, "x": half_width, "y": 200},
+            sprite.Sprite(
+                rect=pygame.Rect(half_width, 200, 150, 30),
+                rect_options={
+                    "center": True,
+                    "x": half_width,
+                    "y": 200,
+                    "colour": [255, 255, 255],
+                },
             ),
-            mask=pygame.Rect(half_width, 200, 150, 30),
         ),
         ui_element.UI_Element(
-            window.get_asset(
-                "assets/white.png",
-                rect_options={"center": True, "x": half_width, "y": 250},
+            sprite.Sprite(
+                rect=pygame.Rect(half_width, 250, 150, 30),
+                rect_options={
+                    "center": True,
+                    "x": half_width,
+                    "y": 250,
+                    "colour": [255, 255, 255],
+                },
             ),
-            mask=pygame.Rect(half_width, 250, 150, 30),
         ),
     ]
     main_menu.elements.append(
         [
             ui_element.UI_Element(
                 sprite.Sprite(
-                    None,
-                    rect=pygame.Rect(center=(half_width, 150.0)),
-                    font_options={"text": "Start Game", "font": font, "fcolour": [255, 0, 0]},
+                    rect_options={"x": half_width, "y": 150.0, "center": True},
+                    font_options={
+                        "text": "Start Game",
+                        "font": font,
+                        "colour": [255, 0, 0],
+                    },
                 )
             ),
             ui_element.UI_Element(
                 sprite.Sprite(
-                    None,
-                    rect=pygame.Rect(center=(half_width, 200.0)),
+                    rect_options={"center": True, "x": half_width, "y": 200.0},
                     font_options={"text": "Settings", "font": font},
                 ),
             ),
             ui_element.UI_Element(
                 sprite.Sprite(
-                    None,
-                    rect=pygame.Rect(center=(half_width, 250.0)),
+                    rect_options={"center": True, "x": half_width, "y": 250.0},
                     font_options={"text": "Exit", "font": font},
                 ),
             ),
@@ -173,18 +189,17 @@ def create_settings_menu(
     settings_menu: scene.Scene = scene.Scene(bground)
     settings_menu.elements[0] = [
         ui_element.UI_Element(
-            window.get_asset(
-                "assets/white.png", rect_options={"x": 50, "y": height - 80}
+            sprite.Sprite(
+                rect=pygame.Rect(50, height - 80, 100, 30),
+                rect_options={"x": 50, "y": height - 80, "colour": [255, 255, 255]},
             ),
-            mask=pygame.Rect(50, height - 80, 100, 30),
         )
     ]
     settings_menu.elements.append(
         [
             ui_element.UI_Element(
                 sprite.Sprite(
-                    None,
-                    rect=pygame.Rect(center=(100, height - 65)),
+                    rect_options={"center": True, "x": 100, "y": height - 65},
                     font_options={"text": "Back", "font": font},
                 ),
             )
@@ -226,18 +241,17 @@ def create_class_select_menu(
         class_select_menu.elements[0].append(ui_element.UI_Element(img))
     class_select_menu.elements[0].append(
         ui_element.UI_Element(
-            window.get_asset(
-                "assets/white.png", rect_options={"x": 50, "y": height - 80}
+            sprite.Sprite(
+                rect=pygame.Rect(50, height - 80, 100, 30),
+                rect_options={"x": 50, "y": height - 80, "colour": [255, 255, 255]},
             ),
-            mask=pygame.Rect(50, height - 80, 100, 30),
         )
     )
     class_select_menu.elements.append(
         [
             ui_element.UI_Element(
                 sprite.Sprite(
-                    None,
-                    rect_options={"x": 100, "y": height - 65},
+                    rect_options={"x": 100, "y": height - 65, "center": True},
                     font_options={"text": "Back", "font": font},
                 ),
             )
@@ -246,13 +260,13 @@ def create_class_select_menu(
     class_select_menu.elements[0][0].register_listener(
         pygame.MOUSEBUTTONDOWN, select_class, {"args": "mage"}
     )
-    class_select_menu.elements[0][0].register_listener(
+    class_select_menu.elements[0][1].register_listener(
         pygame.MOUSEBUTTONDOWN, select_class, {"args": "rogue"}
     )
-    class_select_menu.elements[0][0].register_listener(
+    class_select_menu.elements[0][2].register_listener(
         pygame.MOUSEBUTTONDOWN, select_class, {"args": "warrior"}
     )
-    class_select_menu.elements[0][0].register_listener(
+    class_select_menu.elements[0][3].register_listener(
         pygame.MOUSEBUTTONDOWN, back, {"args": "main_menu"}
     )
     return class_select_menu
@@ -264,21 +278,22 @@ def create_game_screen(player_sprite: player.Player) -> scene.Scene:
     bground.surf = pygame.transform.scale(
         bground.surf, (window.window.get_width(), window.window.get_height())
     )
+    enemy_rect_options: list[dict[str, int]] = [
+        {"x": 50, "y": 50},
+        {"x": window.window.get_width() - 120, "y": 50},
+        {"x": 50, "y": window.window.get_height() - 120},
+        {
+            "x": window.window.get_width() - 120,
+            "y": window.window.get_height() - 120,
+        },
+    ]
     enemies: list[enemy.Enemy] = [
-        zombie.Zombie(rect_options={"x": 50, "y": 50}),
-        zombie.Zombie(rect_options={"x": window.window.get_width() - 120, "y": 50}),
-        zombie.Zombie(rect_options={"x": 50, "y": window.window.get_height() - 120}),
-        zombie.Zombie(
-            rect_options={
-                "x": window.window.get_width() - 120,
-                "y": window.window.get_height() - 120,
-            }
-        ),
+        zombie.Zombie(rect_options=rect_options) for rect_options in enemy_rect_options
     ]
     game_screen: scene.Scene = scene.Scene(bground)
     game_screen.elements[0].append(player_sprite)
-    for enemy_inst in enemies:
-        game_screen.elements[0].append(enemy_inst)
+    for enemy in enemies:
+        game_screen.elements[0].append(enemy)
     game_screen.register_listener(
         pygame.KEYDOWN, move_player, {"key": pygame.K_w, "mods": pygame.KMOD_NONE}
     )

@@ -1,8 +1,11 @@
-from typing import Any, Callable, Optional, Sequence
+from typing import TYPE_CHECKING, Any, Callable, Optional, Sequence
 
 import pygame
 
 import sprite
+
+if TYPE_CHECKING:
+    import display
 
 
 class Element:
@@ -58,12 +61,12 @@ class Element:
             )
         del self.listeners[event_type][func]
 
-    def draw(self, window: pygame.Surface) -> None:
+    def draw(self, window: "display.Display") -> None:
         if self.visible:
-            if ((0 - self.design.rect.width) < self.x < window.get_width()) and (
-                (0 - self.design.rect.height) < self.y < window.get_height()
+            if ((0 - self.design.rect.width) < self.x < window.dimensions[0]) and (
+                (0 - self.design.rect.height) < self.y < window.dimensions[1]
             ):
-                self.design.rect = window.blit(
+                self.design.rect = window.window.blit(
                     self.design.surf, self.design.rect, self.mask
                 )
             else:

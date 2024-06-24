@@ -14,6 +14,7 @@ import sprite
 class Display(metaclass=singleton.Singleton):
     def __init__(self, title: str = "", dim: Sequence[int] = (0, 0)) -> None:
         if not hasattr(self, "created"):
+            self.dimensions = dim
             self.screens: dict[str, scene.Scene] = {}
             self.cur_screen: Optional[scene.Scene] = None
             pygame.init()
@@ -116,11 +117,12 @@ class Display(metaclass=singleton.Singleton):
                 self.delta = self.delta[(len(self.delta) - 10) :]
             self.window.fill([0, 0, 0])
             self.cur_screen.design.rect = self.window.blit(
-                self.cur_screen.design.surf, [0, 0]
+                self.cur_screen.design.surf,
+                pygame.Rect(0, 0, self.dimensions[0], self.dimensions[1]),
             )
             if self.cur_screen.elements != [None]:
                 for element_layer in self.cur_screen.elements:
                     for element in element_layer:
-                        element.draw(self.window)
+                        element.draw(self)
             self.update(self.delta)
             pygame.display.flip()

@@ -26,7 +26,7 @@ class Sprite:
 
     @surf.setter
     def surf(self, new_surf: pygame.Surface) -> None:
-        self.__surf = new_surf
+        self.__surf = new_surf.convert_alpha()
 
     @property
     def rect(self) -> pygame.Rect:
@@ -120,7 +120,7 @@ class Sprite:
 
     def scale(self, scale: float) -> pygame.Surface:
         return pygame.transform.scale(
-            self.surf.convert_alpha(),
+            self.surf,
             (
                 int(self.rect.width * scale),
                 int(self.rect.height * scale),

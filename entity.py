@@ -43,12 +43,3 @@ class Entity(element.Element):
                 self.health += self.health_regen_speed
             else:
                 self.health = self.max_health
-
-    def draw(self, window: pygame.Surface) -> None:
-        if self.visible:
-            if ((0 - self.design.rect.width) < self.x < window.get_width()) and (
-                (0 - self.design.rect.height) < self.y < window.get_height()
-            ):
-                self.design.rect = window.blit(self.design.surf, [self.x, self.y])
-            else:
-                self.visible = False

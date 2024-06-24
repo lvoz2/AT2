@@ -20,6 +20,7 @@ class Element:
         self.x = self.design.rect.x
         self.y = self.design.rect.y
         self.visible = visible
+        self.updated = False
 
     def register_listener(
         self,
@@ -59,4 +60,12 @@ class Element:
         del self.listeners[event_type][func]
 
     def draw(self, window: pygame.Surface) -> None:
-        self.design.rect = window.blit(self.design.surf, self.design.rect, self.mask)
+        if self.visible:
+            if ((0 - self.design.rect.width) < self.x < window.get_width()) and (
+                (0 - self.design.rect.height) < self.y < window.get_height()
+            ):
+                old_rect: pygame.Rect = self.design.rect.copy()
+                self.design.rect = window.blit(self.design.surf, self.design.rect, self.mask)
+                self.updated = old_rect != self.design.rect
+            else:
+                self.visible = False

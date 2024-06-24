@@ -18,4 +18,4 @@ I do have inspiration for what it might look like, but implementation details ar
 
 Currently, the list is:
 
-* Nothing. I haven't actually built a working framework yet (but I am close)
+* A health bar, but I haven't finished of attacking yet so it will always be 100%

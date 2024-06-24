@@ -111,7 +111,6 @@ class Display(metaclass=singleton.Singleton):
 
     def draw(self) -> None:
         if self.cur_screen is not None:
-            updated_rects: list[pygame.Rect] = []
             self.delta.append(self.clock.tick_busy_loop(25))
             if len(self.delta) > 10:
                 self.delta = self.delta[(len(self.delta) - 10) :]
@@ -123,8 +122,5 @@ class Display(metaclass=singleton.Singleton):
                 for element_layer in self.cur_screen.elements:
                     for element in element_layer:
                         element.draw(self.window)
-                        if element.updated:
-                            updated_rects.append(element.design.rect)
-                        element.updated = False
             self.update(self.delta)
-            pygame.display.update(updated_rects)
+            pygame.display.flip()

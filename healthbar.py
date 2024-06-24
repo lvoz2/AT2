@@ -9,12 +9,18 @@ import sprite
 
 class HealthBar(element.Element):
     def __init__(
-        self, max_health: float, rect: pygame.Rect, rect_options: dict[str, Any]
+        self,
+        max_health: float,
+        rect: pygame.Rect,
+        rect_options: dict[str, Any],
+        visible: bool = True,
     ) -> None:
         self.max_width = rect.width
         self.max_health = max_health
         design = sprite.Sprite(rect=rect, rect_options=rect_options)
-        super().__init__(design, mask=pygame.Rect(0, 0, rect.width, rect.height))
+        super().__init__(
+            design, mask=pygame.Rect(0, 0, rect.width, rect.height), visible=visible
+        )
 
     def update(self, new_health: int) -> None:
         if self.mask is not None:

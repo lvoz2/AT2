@@ -163,6 +163,7 @@ def create_main_menu(
                         "colour": [255, 255, 255],
                     },
                 ),
+                visible=True,
             )
         )
     main_menu.elements.append(
@@ -175,19 +176,22 @@ def create_main_menu(
                         "font": font,
                         "colour": [255, 0, 0],
                     },
-                )
+                ),
+                visible=True,
             ),
             element.Element(
                 sprite.Sprite(
                     rect_options={"center": True, "x": half_width, "y": 200.0},
                     font_options={"text": "Settings", "font": font},
                 ),
+                visible=True,
             ),
             element.Element(
                 sprite.Sprite(
                     rect_options={"center": True, "x": half_width, "y": 250.0},
                     font_options={"text": "Exit", "font": font},
                 ),
+                visible=True,
             ),
         ]
     )
@@ -212,6 +216,7 @@ def create_settings_menu(
                 rect=pygame.Rect(50, height - 80, 100, 30),
                 rect_options={"x": 50, "y": height - 80, "colour": [255, 255, 255]},
             ),
+            visible=True,
         )
     ]
     settings_menu.elements.append(
@@ -221,6 +226,7 @@ def create_settings_menu(
                     rect_options={"center": True, "x": 100, "y": height - 65},
                     font_options={"text": "Back", "font": font},
                 ),
+                visible=True,
             )
         ]
     )
@@ -257,13 +263,14 @@ def create_class_select_menu(
             },
         )
         img.surf = pygame.transform.scale(img.surf, (icon_width, icon_height))
-        class_select_menu.elements[0].append(element.Element(img))
+        class_select_menu.elements[0].append(element.Element(img, visible=True))
     class_select_menu.elements[0].append(
         element.Element(
             sprite.Sprite(
                 rect=pygame.Rect(50, height - 80, 100, 30),
                 rect_options={"x": 50, "y": height - 80, "colour": [255, 255, 255]},
             ),
+            visible=True,
         )
     )
     class_select_menu.elements.append(
@@ -273,6 +280,7 @@ def create_class_select_menu(
                     rect_options={"x": 100, "y": height - 65, "center": True},
                     font_options={"text": "Back", "font": font},
                 ),
+                visible=True,
             )
         ]
     )
@@ -312,7 +320,8 @@ def create_game_screen(player_sprite: player.Player) -> scene.Scene:
         sprite.Sprite(
             rect=pygame.Rect(10, 10, 260, 30),
             rect_options={"x": 10, "y": 10, "colour": [192, 192, 192]},
-        )
+        ),
+        visible=True,
     )
     player_hp_bar = healthbar.HealthBar(
         player_sprite.health,

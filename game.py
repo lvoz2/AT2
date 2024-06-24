@@ -1,7 +1,7 @@
 import copy
 import math
 import sys
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 import pygame
 
@@ -311,7 +311,7 @@ def create_game_screen(player_sprite: player.Player) -> scene.Scene:
     player_hp_bar_bground = element.Element(
         sprite.Sprite(
             rect=pygame.Rect(10, 10, 260, 30),
-            rect_options={"x": 10, "y": 10, "colour": [64, 64, 64]},
+            rect_options={"x": 10, "y": 10, "colour": [192, 192, 192]},
         )
     )
     player_hp_bar = healthbar.HealthBar(
@@ -319,7 +319,10 @@ def create_game_screen(player_sprite: player.Player) -> scene.Scene:
         pygame.Rect(15, 15, 250, 20),
         {"x": 15, "y": 15, "colour": [255, 0, 0]},
     )
-    player_sprite.register_listener(custom_events["dmg_event"], lambda event, options: player_hp_bar.update(event.target.health))
+    player_sprite.register_listener(
+        custom_events["dmg_event"],
+        lambda event, options: player_hp_bar.update(event.target.health),
+    )
     game_screen.elements[0].append(player_hp_bar_bground)
     game_screen.elements.append([player_hp_bar])
     keys: list[int] = [pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d]

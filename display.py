@@ -111,7 +111,7 @@ class Display(metaclass=singleton.Singleton):
 
     def draw(self) -> None:
         if self.cur_screen is not None:
-            self.delta.append(self.clock.tick_busy_loop(25))
+            self.delta.append(self.clock.tick(25))
             if len(self.delta) > 10:
                 self.delta = self.delta[(len(self.delta) - 10) :]
             self.window.fill([0, 0, 0])

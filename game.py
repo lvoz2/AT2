@@ -8,6 +8,7 @@ import pygame
 import display
 import element
 import enemy
+import entity
 import healthbar
 import mage
 import player
@@ -94,10 +95,10 @@ def move_player(
 ) -> None:  # pylint: disable=unused-argument
     speed: float = 2.0
     updated_state: Optional[bool] = None
-    match (options["args"][0]):
-        case "up":
+    match (event.type):
+        case pygame.KEYUP:
             updated_state = False
-        case "down":
+        case pygame.KEYDOWN:
             updated_state = True
         case _:
             raise ValueError('The arguments given in options were not "up" or "down"')
@@ -114,21 +115,22 @@ def move_player(
     distance: list[float] = [speed, math.sqrt((speed**2) * 2)]
     match (direction):
         case [0, -1]:
-            options["args"][1].move(0.0, distance[0])
+            options["args"].move(0.0, distance[0])
         case [1, -1]:
-            options["args"][1].move(45.0, distance[1])
+            options["args"].move(45.0, distance[1])
         case [1, 0]:
-            options["args"][1].move(90.0, distance[0])
+            options["args"].move(90.0, distance[0])
         case [1, 1]:
-            options["args"][1].move(135.0, distance[1])
+            options["args"].move(135.0, distance[1])
         case [0, 1]:
-            options["args"][1].move(180.0, distance[0])
+            options["args"].move(180.0, distance[0])
         case [-1, 1]:
-            options["args"][1].move(225.0, distance[1])
+            options["args"].move(225.0, distance[1])
         case [-1, 0]:
-            options["args"][1].move(270.0, distance[0])
+            options["args"].move(270.0, distance[0])
         case [-1, -1]:
-            options["args"][1].move(315.0, distance[1])
+            options["args"].move(315.0, distance[1])
+    check_dists(options["args"])
 
 
 move_key_state: dict[int, bool] = {
@@ -137,6 +139,16 @@ move_key_state: dict[int, bool] = {
     pygame.K_s: False,
     pygame.K_d: False,
 }
+
+
+def check_dists(player_entity: player.Player) -> None:
+    window: display.Display = display.Display()
+    for e in window.screens["game"].visible_elements:
+        if isinstance(e, entity.Entity):
+            distance: float = player_entity.get_distance(e)
+            if isinstance(e, enemy.Enemy) and distance <= 50.0:
+                player_entity.attack(0, e, custom_events["dmg_event"])
+                e.attack(0, player_entity, custom_events["dmg_event"])
 
 
 def create_main_menu(
@@ -284,7 +296,7 @@ def create_class_select_menu(
             )
         ]
     )
-    for i, player_class in enumerate(["mage", "rogue", "warrior"]):
+    for i, player_class in enumerate(["rogue", "mage", "warrior"]):
         class_select_menu.elements[0][i].register_listener(
             pygame.MOUSEBUTTONDOWN, select_class, {"args": player_class}
         )
@@ -335,17 +347,17 @@ def create_game_screen(player_sprite: player.Player) -> scene.Scene:
     game_screen.elements[0].append(player_hp_bar_bground)
     game_screen.elements.append([player_hp_bar])
     keys: list[int] = [pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d]
-    for press_type in ["down", "up"]:
+    for press_type in [pygame.KEYDOWN, pygame.KEYUP]:
         for key in keys:
             game_screen.register_listener(
-                pygame.KEYDOWN,
+                press_type,
                 lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
                     event, options  # pylint: disable=unnecessary-lambda
                 ),  # pylint: disable=unnecessary-lambda
                 {
                     "key": key,
                     "mods": pygame.KMOD_NONE,
-                    "args": [press_type, player_sprite],
+                    "args": player_sprite,
                 },
             )
     return game_screen

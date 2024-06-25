@@ -56,6 +56,8 @@ class DynEntity(entity.Entity):
         self.design.rect.y += int(round(vertical))
 
     def get_distance(self, other: entity.Entity) -> float:
+        if self.design.rect.colliderect(other.design.rect):
+            return -1.0
         opp_corner: dict[str, list[int]] = {
             "self": self.get_opp_corner(),
             "other": other.get_opp_corner(),

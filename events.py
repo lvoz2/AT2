@@ -1,6 +1,7 @@
 import sys
 import warnings
 from typing import Any, Callable, Optional
+from functools import cache
 
 import pygame
 
@@ -94,6 +95,27 @@ class Events(metaclass=singleton.Singleton):
             )
         del self.__processors[event_type]
 
+    @cache
+    def get_listeners(self, cur_scene: scene.Scene) -> dict[int, dict[Callable[..., None], dict[str, Any]]]:
+        if cur_scene is None:
+            raise TypeError(
+                "Current Scene has not been set. Please set this first before "
+                "attempting to use event listeners"
+            )
+        listeners: dict[int, dict[Callable[..., None], dict[str, Any]]] = cur_scene.listeners
+        for layer in cur_scene.elements:
+            for e in layer:
+                for event_type, listeners_dict in e.listeners.items():
+                    if listeners[event_type] is None:
+                        listeners[event_type] = {}
+                    for callback, options in listeners_dict.items():
+                        listeners[event_type][callback] = options
+        return listeners
+
+    @property
+    def active_listeners(self) -> dict[int, dict[Callable[..., None], dict[str, Any]]]:
+        return self.get_listeners(self.__cur_screen)
+
     def notify(self, event: pygame.event.Event) -> None:
         if event.type == pygame.QUIT:
             self.quit()
@@ -101,19 +123,7 @@ class Events(metaclass=singleton.Singleton):
             self.pressed_keys.append(event.key)
         elif event.type == pygame.KEYUP:
             self.pressed_keys.remove(event.key)
-        if self.__cur_screen is None:
-            raise TypeError(
-                "Current Screen has not been set. Please set this first before "
-                "attempting to use event listeners"
-            )
-        listeners: list[dict[Callable[..., None], dict[str, Any]]] = []
-        if event.type in self.__cur_screen.listeners:
-            listeners.append(self.__cur_screen.listeners[event.type])
-        for layer in self.__cur_screen.elements:
-            for e in layer:
-                if event.type in e.listeners:
-                    listeners.append(e.listeners[event.type])
-        for listener in listeners:
+        for listener in get_listeners(self.__cur_screen)[event.type]:
             for func, options in listener.items():
                 result: bool = False
                 if event.type in self.__processors:

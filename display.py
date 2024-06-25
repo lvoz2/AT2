@@ -28,6 +28,10 @@ class Display(metaclass=singleton.Singleton):
             event_processors.load()
             self.created: bool = True
             self.__assets: dict[str, sprite.Sprite] = {}
+            self.custom_events: dict[str, int] = {
+                "dmg_event": pygame.event.custom_type(),
+                "keypress": pygame.event.custom_type(),
+            }
 
     def get_asset(
         self,
@@ -74,7 +78,7 @@ class Display(metaclass=singleton.Singleton):
             )
         surf: pygame.Surface = pygame.image.load(absolute_path).convert_alpha()
         design: sprite.Sprite = sprite.Sprite(
-            surf, rect, rect_options=rect_options, scale=scale
+            surf, rect, rect_options=rect_options, scale=scale, path=absolute_path
         )
         self.__assets[posix_path] = design
         return design
@@ -96,8 +100,8 @@ class Display(metaclass=singleton.Singleton):
             self.screens[name] = new_screen
         else:
             raise KeyError(
-                "Screen couldn't be added, becuase another Screen with the "
-                "same name already loaded. Find a different name and try again"
+                "Scene couldn't be added, becuase another Scene with the same name "
+                f"already loaded. Find a different name and try again. Name: {name}"
             )
         return name in self.screens
 

@@ -17,9 +17,7 @@ class Element:
     ) -> None:
         self.design = design
         self.mask = mask
-        self.listeners: dict[
-            int, dict[Callable[..., None], Optional[dict[str, Any]]]
-        ] = {}
+        self.listeners: dict[int, dict[Callable[..., None], dict[str, Any]]] = {}
         self.visible = visible
 
     def register_listener(
@@ -60,16 +58,13 @@ class Element:
         del self.listeners[event_type][func]
 
     def draw(self, window: "display.Display") -> None:
+        self.visible = (
+            (0 - self.design.rect.width) < self.design.rect.x < window.dimensions[0]
+        ) and (
+            (0 - self.design.rect.height) < self.design.rect.y < window.dimensions[1]
+        )
         if self.visible:
-            if (
-                (0 - self.design.rect.width) < self.design.rect.x < window.dimensions[0]
-            ) and (
-                (0 - self.design.rect.height)
-                < self.design.rect.y
-                < window.dimensions[1]
-            ):
-                self.design.rect = window.window.blit(
-                    self.design.surf, self.design.rect, self.mask
-                )
-            else:
-                self.visible = False
+            new_rect: pygame.Rect = window.window.blit(
+                self.design.surf, self.design.rect, self.mask
+            )
+            self.design.rect.x, self.design.rect.y = new_rect.x, new_rect.y

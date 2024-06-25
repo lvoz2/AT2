@@ -19,6 +19,7 @@ class Events(metaclass=singleton.Singleton):
     def __init__(self) -> None:
         if not hasattr(self, "created"):
             self.created: bool = True
+            self.pressed_keys: list[int] = []
             self.__cur_screen: Optional[scene.Scene] = None
             self.__processors: dict[
                 int,
@@ -26,8 +27,8 @@ class Events(metaclass=singleton.Singleton):
                     Callable[
                         [
                             pygame.event.Event,
-                            Callable[..., None],
-                            Optional[dict[str, Any]],
+                            Callable[[pygame.event.Event, dict[str, Any]], None],
+                            dict[str, Any],
                         ],
                         bool,
                     ],
@@ -96,12 +97,16 @@ class Events(metaclass=singleton.Singleton):
     def notify(self, event: pygame.event.Event) -> None:
         if event.type == pygame.QUIT:
             self.quit()
+        elif event.type == pygame.KEYDOWN:
+            self.pressed_keys.append(event.key)
+        elif event.type == pygame.KEYUP:
+            self.pressed_keys.remove(event.key)
         if self.__cur_screen is None:
             raise TypeError(
                 "Current Screen has not been set. Please set this first before "
                 "attempting to use event listeners"
             )
-        listeners: list[dict[Callable[..., None], Optional[dict[str, Any]]]] = []
+        listeners: list[dict[Callable[..., None], dict[str, Any]]] = []
         if event.type in self.__cur_screen.listeners:
             listeners.append(self.__cur_screen.listeners[event.type])
         for layer in self.__cur_screen.elements:

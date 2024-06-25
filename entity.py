@@ -2,6 +2,7 @@ from typing import Any, Optional
 
 import pygame
 
+import display
 import effect
 import element
 import sprite
@@ -39,6 +40,12 @@ class Entity(element.Element):
         self.health -= min(dmg, self.health)
         dmg_event: pygame.event.Event = pygame.event.Event(event_id, target=self)
         pygame.event.post(dmg_event)
+        if self.health == 0:
+            window: display.Display = display.Display()
+            for screen in window.screens.values():
+                for element_layer in screen.elements:
+                    if self in element_layer:
+                        element_layer.remove(self)
 
     def regen_health(self) -> None:
         if self.health > 0:

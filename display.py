@@ -28,6 +28,7 @@ class Display(metaclass=singleton.Singleton):
             event_processors.load()
             self.created: bool = True
             self.__assets: dict[str, sprite.Sprite] = {}
+            self.custom_events: dict[str, int] = {"dmg_event": pygame.event.custom_type(), "keypress": pygame.event.custom_type()}
 
     def get_asset(
         self,

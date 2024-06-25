@@ -147,8 +147,8 @@ def check_dists(player_entity: player.Player) -> None:
         if isinstance(e, entity.Entity):
             distance: float = player_entity.get_distance(e)
             if isinstance(e, enemy.Enemy) and distance <= 50.0:
-                player_entity.attack(0, e, custom_events["dmg_event"])
-                e.attack(0, player_entity, custom_events["dmg_event"])
+                player_entity.attack(0, e, window.custom_events["dmg_event"])
+                e.attack(0, player_entity, window.custom_events["dmg_event"])
 
 
 def create_main_menu(
@@ -342,7 +342,7 @@ def create_game_screen(player_sprite: player.Player) -> scene.Scene:
         {"x": 15, "y": 15, "colour": [255, 0, 0]},
     )
     player_sprite.register_listener(
-        custom_events["dmg_event"],
+        window.custom_events["dmg_event"],
         lambda event, options: player_hp_bar.update(event.target.health),
     )
     game_screen.elements[0].append(player_hp_bar_bground)
@@ -364,9 +364,6 @@ def create_game_screen(player_sprite: player.Player) -> scene.Scene:
     return game_screen
 
 
-custom_events: dict[str, int] = {}
-
-
 def process_dmg(
     event: pygame.event.Event,
     func: Callable[[pygame.event.Event, dict[str, Any]], None],
@@ -380,11 +377,10 @@ def process_dmg(
 
 
 def init() -> None:
-    custom_events["dmg_event"] = pygame.event.custom_type()
     width: int = 800
     height: int = 600
     window: display.Display = display.Display("Kings Quest", [width, height])
-    window.events.register_processor(custom_events["dmg_event"], process_dmg)
+    window.events.register_processor(window.custom_events["dmg_event"], process_dmg)
     font = pygame.font.Font(None, 36)
     window.add_screen("main_menu", create_main_menu(width, window, font))
     window.add_screen("settings_menu", create_settings_menu(height, window, font))

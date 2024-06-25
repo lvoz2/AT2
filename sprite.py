@@ -1,6 +1,6 @@
 import copy
-from typing import Any, Optional
 import pathlib
+from typing import Any, Optional
 
 import pygame
 
@@ -13,7 +13,7 @@ class Sprite:
         scale: float = 1.0,
         rect_options: Optional[dict[str, Any]] = None,
         font_options: Optional[dict[str, Any]] = None,
-        path: Optional[pathlib.Path] = None
+        path: Optional[pathlib.Path] = None,
     ) -> None:
         self.__surf = surf
         self.__rect = rect
@@ -126,9 +126,9 @@ class Sprite:
         )
         self.rect.update(self.rect.x, self.rect.y, new_dimensions[0], new_dimensions[1])
         return pygame.transform.scale(
-                self.surf,
-                (
-                    new_dimensions[0],
-                    new_dimensions[1],
-                ),
-            )
+            self.surf,
+            (
+                new_dimensions[0],
+                new_dimensions[1],
+            ),
+        )

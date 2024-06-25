@@ -19,7 +19,7 @@ class Events(metaclass=singleton.Singleton):
     def __init__(self) -> None:
         if not hasattr(self, "created"):
             self.created: bool = True
-            self.pressed_keys: list[int]: {}
+            self.pressed_keys: list[int] = []
             self.__cur_screen: Optional[scene.Scene] = None
             self.__processors: dict[
                 int,
@@ -106,7 +106,7 @@ class Events(metaclass=singleton.Singleton):
                 "Current Screen has not been set. Please set this first before "
                 "attempting to use event listeners"
             )
-        listeners: list[dict[Callable[..., None], Optional[dict[str, Any]]]] = []
+        listeners: list[dict[Callable[..., None], dict[str, Any]]] = []
         if event.type in self.__cur_screen.listeners:
             listeners.append(self.__cur_screen.listeners[event.type])
         for layer in self.__cur_screen.elements:

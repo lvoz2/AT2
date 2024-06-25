@@ -1,5 +1,6 @@
 import copy
 from typing import Any, Optional
+import pathlib
 
 import pygame
 
@@ -12,10 +13,12 @@ class Sprite:
         scale: float = 1.0,
         rect_options: Optional[dict[str, Any]] = None,
         font_options: Optional[dict[str, Any]] = None,
+        path: Optional[pathlib.Path] = None
     ) -> None:
         self.__surf = surf
         self.__rect = rect
         self.rect_options = rect_options
+        self.path = path
         self.change_design(surf, rect, scale, rect_options, font_options)
 
     @property
@@ -103,10 +106,8 @@ class Sprite:
             if rect is None:
                 self.rect = self.surf.get_rect()
                 self.surf = self.scale(scale)
-                self.rect = self.surf.get_rect()
             else:
-                self.rect = rect
-                self.surf = self.scale(scale)
+                self.surf, self.rect = self.scale(scale), rect
         else:
             raise TypeError("No argument given to create a Surface")
         self.center = self.__get_val_from_dict(rect_options, "center", False)
@@ -119,10 +120,15 @@ class Sprite:
             self.rect.top = y
 
     def scale(self, scale: float) -> pygame.Surface:
-        return pygame.transform.scale(
-            self.surf,
-            (
-                int(self.rect.width * scale),
-                int(self.rect.height * scale),
-            ),
+        new_dimensions: tuple[int, int] = (
+            int(self.rect.width * scale),
+            int(self.rect.height * scale),
         )
+        self.rect.update(self.rect.x, self.rect.y, new_dimensions[0], new_dimensions[1])
+        return pygame.transform.scale(
+                self.surf,
+                (
+                    new_dimensions[0],
+                    new_dimensions[1],
+                ),
+            )

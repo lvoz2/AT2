@@ -74,7 +74,7 @@ class Display(metaclass=singleton.Singleton):
             )
         surf: pygame.Surface = pygame.image.load(absolute_path).convert_alpha()
         design: sprite.Sprite = sprite.Sprite(
-            surf, rect, rect_options=rect_options, scale=scale
+            surf, rect, rect_options=rect_options, scale=scale, path=absolute_path
         )
         self.__assets[posix_path] = design
         return design
@@ -96,8 +96,8 @@ class Display(metaclass=singleton.Singleton):
             self.screens[name] = new_screen
         else:
             raise KeyError(
-                "Screen couldn't be added, becuase another Screen with the "
-                "same name already loaded. Find a different name and try again"
+                "Scene couldn't be added, becuase another Scene with the "
+                f"same name already loaded. Find a different name and try again. Name: {name}"
             )
         return name in self.screens
 

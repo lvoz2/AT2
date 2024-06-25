@@ -275,6 +275,7 @@ def create_class_select_menu(
             },
         )
         img.surf = pygame.transform.scale(img.surf, (icon_width, icon_height))
+        img.rect.width, img.rect.height = icon_width, icon_height
         class_select_menu.elements[0].append(element.Element(img, visible=True))
     class_select_menu.elements[0].append(
         element.Element(

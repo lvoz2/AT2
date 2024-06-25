@@ -92,6 +92,7 @@ def move_player(
     event: pygame.event.Event,  # pylint: disable=unused-argument
     options: dict[str, Any],  # pylint: disable=unused-argument
 ) -> None:  # pylint: disable=unused-argument
+    print(move_key_state)
     speed: float = 2.0
     updated_state: Optional[bool] = None
     match (options["args"][0]):
@@ -111,24 +112,27 @@ def move_player(
         direction[0] = -1
     elif not move_key_state[pygame.K_a] and move_key_state[pygame.K_d]:
         direction[0] = 1
-    distance: float = math.sqrt((speed**2) * 2)
+    distance: list[float] = [speed, math.sqrt((speed**2) * 2)]
+    print(direction)
+    print(distance)
     match (direction):
         case [0, -1]:
-            options["args"][1].move(0.0, distance)
+            options["args"][1].move(0.0, distance[0])
         case [1, -1]:
-            options["args"][1].move(45.0, distance)
+            options["args"][1].move(45.0, distance[1])
         case [1, 0]:
-            options["args"][1].move(90.0, distance)
+            options["args"][1].move(90.0, distance[0])
         case [1, 1]:
-            options["args"][1].move(135.0, distance)
+            options["args"][1].move(135.0, distance[1])
         case [0, 1]:
-            options["args"][1].move(180.0, distance)
+            options["args"][1].move(180.0, distance[0])
         case [-1, 1]:
-            options["args"][1].move(225.0, distance)
+            options["args"][1].move(225.0, distance[1])
         case [-1, 0]:
-            options["args"][1].move(270.0, distance)
+            options["args"][1].move(270.0, distance[0])
         case [-1, -1]:
-            options["args"][1].move(315.0, distance)
+            options["args"][1].move(315.0, distance[1])
+    print(options["args"][1].design.rect)
 
 
 move_key_state: dict[int, bool] = {

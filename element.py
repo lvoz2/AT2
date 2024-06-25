@@ -20,8 +20,6 @@ class Element:
         self.listeners: dict[
             int, dict[Callable[..., None], Optional[dict[str, Any]]]
         ] = {}
-        self.x = self.design.rect.x
-        self.y = self.design.rect.y
         self.visible = visible
 
     def register_listener(
@@ -63,8 +61,12 @@ class Element:
 
     def draw(self, window: "display.Display") -> None:
         if self.visible:
-            if ((0 - self.design.rect.width) < self.x < window.dimensions[0]) and (
-                (0 - self.design.rect.height) < self.y < window.dimensions[1]
+            if (
+                (0 - self.design.rect.width) < self.design.rect.x < window.dimensions[0]
+            ) and (
+                (0 - self.design.rect.height)
+                < self.design.rect.y
+                < window.dimensions[1]
             ):
                 self.design.rect = window.window.blit(
                     self.design.surf, self.design.rect, self.mask

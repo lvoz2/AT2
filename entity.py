@@ -27,7 +27,10 @@ class Entity(element.Element):
         self.effects: dict[str, effect.Effect] = {}
 
     def get_opp_corner(self) -> list[int]:
-        return [self.x + self.design.rect.width, self.y + self.design.rect.height]
+        return [
+            self.design.rect.x + self.design.rect.width,
+            self.design.rect.y + self.design.rect.height,
+        ]
 
     def is_alive(self) -> bool:
         return self.health == 0

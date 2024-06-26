@@ -17,13 +17,13 @@ class Element:
     ) -> None:
         self.design = design
         self.mask = mask
-        self.listeners: dict[int, dict[Callable[..., None], dict[str, Any]]] = {}
+        self.listeners: dict[int, dict[Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]]] = {}
         self.visible = visible
 
     def register_listener(
         self,
         event_type: int,
-        func: Callable[..., None],
+        func: Callable[[pygame.event.Event, dict[str, Any]], None],
         options: Optional[dict[str, Any]] = None,
     ) -> None:
         if event_type not in self.listeners:
@@ -36,7 +36,7 @@ class Element:
     def deregister_listener(
         self,
         event_type: int,
-        func: Callable[..., None],
+        func: Callable[[pygame.event.Event, dict[str, Any]], None],
         options: Optional[dict[str, Any]] = None,
     ) -> None:
         if event_type not in self.listeners:

@@ -1,7 +1,7 @@
 import sys
 import warnings
 from typing import Any, Callable, Optional
-from functools import cache
+from functools import lru_cache
 
 import pygame
 
@@ -17,8 +17,9 @@ import singleton
 
 
 class Events(metaclass=singleton.Singleton):
-    def __init__(self) -> None:
+    def __init__(self, listener_maxsize: int = 300) -> None:
         if not hasattr(self, "created"):
+            self.listener_maxsize = listener_maxsize
             self.created: bool = True
             self.pressed_keys: list[int] = []
             self.__cur_screen: Optional[scene.Scene] = None
@@ -63,7 +64,7 @@ class Events(metaclass=singleton.Singleton):
         self,
         event_type: int,
         func: Callable[
-            [pygame.event.Event, Callable[..., None], Optional[dict[str, Any]]], bool
+            [pygame.event.Event, Callable[[pygame.event.Event, dict[str, Any]], None], Optional[dict[str, Any]]], bool
         ],
         options: Optional[dict[str, Any]] = None,
     ) -> None:
@@ -74,7 +75,7 @@ class Events(metaclass=singleton.Singleton):
     def deregister_processor(
         self,
         event_type: int,
-        func: Callable[[pygame.event.Event, Callable[..., None], dict[str, Any]], bool],
+        func: Callable[[pygame.event.Event, Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]], bool],
         options: Optional[dict[str, Any]] = None,
     ) -> None:
         warnings.warn(
@@ -95,14 +96,14 @@ class Events(metaclass=singleton.Singleton):
             )
         del self.__processors[event_type]
 
-    @cache
-    def get_listeners(self, cur_scene: scene.Scene) -> dict[int, dict[Callable[..., None], dict[str, Any]]]:
+    @lru_cache(maxsize=self.listener_maxsize)
+    def get_listeners(self, cur_scene: scene.Scene) -> dict[int, dict[Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]]]:
         if cur_scene is None:
             raise TypeError(
                 "Current Scene has not been set. Please set this first before "
                 "attempting to use event listeners"
             )
-        listeners: dict[int, dict[Callable[..., None], dict[str, Any]]] = cur_scene.listeners
+        listeners: dict[int, dict[Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]]] = cur_scene.listeners
         for layer in cur_scene.elements:
             for e in layer:
                 for event_type, listeners_dict in e.listeners.items():
@@ -112,8 +113,16 @@ class Events(metaclass=singleton.Singleton):
                         listeners[event_type][callback] = options
         return listeners
 
+    def __delete__(self) -> None:
+        self.get_listeners.cache_clear()
+        super().__delete__()
+
+    def __del__(self) -> None:
+        self.get_listeners.cache_clear()
+        super().__del__()
+
     @property
-    def active_listeners(self) -> dict[int, dict[Callable[..., None], dict[str, Any]]]:
+    def active_listeners(self) -> dict[int, dict[Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]]]:
         return self.get_listeners(self.__cur_screen)
 
     def notify(self, event: pygame.event.Event) -> None:
@@ -123,7 +132,7 @@ class Events(metaclass=singleton.Singleton):
             self.pressed_keys.append(event.key)
         elif event.type == pygame.KEYUP:
             self.pressed_keys.remove(event.key)
-        for listener in get_listeners(self.__cur_screen)[event.type]:
+        for listener in self.active_listeners[event.type]:
             for func, options in listener.items():
                 result: bool = False
                 if event.type in self.__processors:

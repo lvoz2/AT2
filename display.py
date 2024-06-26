@@ -128,6 +128,7 @@ class Display(metaclass=singleton.Singleton):
             )
             if self.cur_screen.elements != [None]:
                 for element_layer in self.cur_screen.elements:
+                    # Do the pool here. Use imap(lambda element: element.draw(self), element_layer)
                     for element in element_layer:
                         element.draw(self)
             self.update(self.delta)

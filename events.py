@@ -16,9 +16,10 @@ import singleton
 # is actually clicked, instead of every MouseDown Event.
 
 
-class Events(metaclass=singleton.Singleton):
+class Events(object, metaclass=singleton.Singleton):
 
-    listener_maxsize: int = 300
+    if not hasattr(__dict__, "created"):
+        listener_maxsize: int = 300
 
     def __init__(self, listener_maxsize: int = 300) -> None:
         if not hasattr(self, "created"):
@@ -100,7 +101,7 @@ class Events(metaclass=singleton.Singleton):
         del self.__processors[event_type]
 
     @lru_cache(maxsize=listener_maxsize)
-    def get_listeners(self, cur_scene: scene.Scene) -> dict[int, dict[Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]]]:
+    def __get_listeners(self, cur_scene: scene.Scene) -> dict[int, dict[Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]]]:
         if cur_scene is None:
             raise TypeError(
                 "Current Scene has not been set. Please set this first before "
@@ -116,17 +117,13 @@ class Events(metaclass=singleton.Singleton):
                         listeners[event_type][callback] = options
         return listeners
 
-    def __delete__(self, instance: Any) -> None:
-        self.get_listeners.cache_clear()
-        super().__delete__(instance)
-
-    def __del__(self) -> None:
-        self.get_listeners.cache_clear()
-        super().__del__()
-
     @property
     def active_listeners(self) -> dict[int, dict[Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]]]:
-        return self.get_listeners(self.__cur_screen)
+        return self.__get_listeners(self.__cur_screen)
+
+    @active_listeners.deleter
+    def active_listeners(self) -> None:
+        self.__get_listeners.clear_cache()
 
     def notify(self, event: pygame.event.Event) -> None:
         if event.type == pygame.QUIT:

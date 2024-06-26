@@ -72,7 +72,7 @@ class Display(metaclass=singleton.Singleton):
     def update(self, delta: list[int]) -> None:
         pass
 
-    def draw(self, inst: Optional[Display] = None) -> None:
+    def draw(self, inst: Optional["Display"] = None) -> None:
         ctx: Display = self if inst is None else inst
         if ctx.cur_screen is not None:
             ctx.delta.append(ctx.clock.tick(25))
@@ -116,7 +116,7 @@ class AsyncDisplay(Display):
                 if len(data) > 2:
                     if isinstance(data[1], AsyncDisplay) and isinstance(data[2], mp_sync.Lock):
                         with data[2] as l:
-                            data.draw(data[1])
+                            data[1].draw(data[1])
         conn.close()
 
     def handle_events(self) -> None:

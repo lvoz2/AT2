@@ -380,7 +380,7 @@ def process_dmg(
 def init() -> None:
     width: int = 800
     height: int = 600
-    window: display.Display = display.Display("Kings Quest", [width, height])
+    window: display.Display = display.Display("Kings Quest", [width, height], True, 2)
     window.events.register_processor(window.custom_events["dmg_event"], process_dmg)
     font = pygame.font.Font(None, 36)
     window.add_screen("main_menu", create_main_menu(width, window, font))

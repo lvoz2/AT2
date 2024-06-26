@@ -1,11 +1,12 @@
-import concurrent.futures as cf
 import multiprocessing as mp
+import os
 import pathlib
 import sys
-from typing import Any, Optional, Sequence
+from typing import Any, Callable, Optional, Sequence
 
 import pygame
 
+import element
 import event_processors
 import events
 import scene
@@ -14,7 +15,13 @@ import sprite
 
 
 class Display(metaclass=singleton.Singleton):
-    def __init__(self, title: str = "", dim: Sequence[int] = (0, 0)) -> None:
+    def __init__(
+        self,
+        title: str = "",
+        dim: Sequence[int] = (0, 0),
+        draw_async: bool = False,
+        num_processes: Optional[int] = None,
+    ) -> None:
         if not hasattr(self, "created"):
             self.dimensions = dim
             self.screens: dict[str, scene.Scene] = {}
@@ -33,9 +40,8 @@ class Display(metaclass=singleton.Singleton):
                 "dmg_event": pygame.event.custom_type(),
                 "keypress": pygame.event.custom_type(),
             }
-            self.draw_process: cf.ProcessPoolExecutor = cf.ProcessPoolExecutor(
-                max_workers=1
-            )
+            self.draw_async = draw_async
+            self.num_processes = num_processes
 
     def set_screen(self, new_screen: str) -> None:
         if new_screen in self.screens:
@@ -60,11 +66,12 @@ class Display(metaclass=singleton.Singleton):
         return name in self.screens
 
     def quit(self) -> None:
-        self.draw_process.shutdown()
+        # self.draw_process.shutdown()
+        pass
 
     def handle_events(self) -> None:
         if self.cur_screen is not None:
-            self.draw_process.submit(self.draw, self)
+            self.draw()
             self.cur_screen.get_all_listeners()
             for e in pygame.event.get():
                 self.events.notify(e, self.cur_screen.all_listeners)
@@ -72,20 +79,47 @@ class Display(metaclass=singleton.Singleton):
     def update(self, delta: list[int]) -> None:
         pass
 
-    def draw(self, window: "display.Display") -> None:
-        if window.cur_screen is not None:
-            window.delta.append(window.clock.tick(25))
-            if len(window.delta) > 10:
-                window.delta = window.delta[(len(window.delta) - 10) :]
-            window.window.fill([0, 0, 0])
-            window.cur_screen.design.rect = window.window.blit(
-                window.cur_screen.design.surf,
-                pygame.Rect(0, 0, window.dimensions[0], window.dimensions[1]),
+    def draw(self) -> None:
+        if self.cur_screen is not None:
+            self.delta.append(self.clock.tick(25))
+            if len(self.delta) > 10:
+                self.delta = self.delta[(len(self.delta) - 10) :]
+            self.window.fill([0, 0, 0])
+            self.cur_screen.design.rect = self.window.blit(
+                self.cur_screen.design.surf,
+                pygame.Rect(0, 0, self.dimensions[0], self.dimensions[1]),
             )
-            if window.cur_screen.elements != [None]:
-                for element_layer in window.cur_screen.elements:
-                    # Do the pool here. Use imap(lambda element: element.draw(window), element_layer)
-                    for element in element_layer:
-                        element.draw(window)
-            window.update(window.delta)
+            if self.cur_screen.elements != [None]:
+                if self.draw_async:
+                    func: Callable[[tuple["Display", element.Element]], None] = (
+                        lambda args: args[1].draw(args[0])
+                    )
+                    num_processes: Optional[int] = None
+                    if self.num_processes is None:
+                        num_processes = os.cpu_count()
+                    else:
+                        num_processes = self.num_processes
+                    if num_processes is None:
+                        raise ValueError("Number of processes cannot be None")
+                    print(num_processes)
+                    with mp.Pool(processes=num_processes) as draw_pool:
+                        for element_layer in self.cur_screen.elements:
+                            print("Test")
+                            iter_layer: list[tuple["Display", element.Element]] = [
+                                (self, e) for e in element_layer
+                            ]
+                            size: int = len(element_layer) // num_processes
+                            print(iter_layer)
+                            print(size)
+                            draw_pool.imap_unordered(
+                                func,
+                                iter_layer,
+                                size,
+                            )
+                            print("End")
+                else:
+                    for element_layer in self.cur_screen.elements:
+                        for e in element_layer:
+                            e.draw(self)
+            self.update(self.delta)
             pygame.display.flip()

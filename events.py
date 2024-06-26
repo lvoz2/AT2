@@ -17,13 +17,8 @@ import singleton
 
 
 class Events(object, metaclass=singleton.Singleton):
-
-    if not hasattr(__dict__, "created"):
-        listener_maxsize: int = 300
-
     def __init__(self, listener_maxsize: int = 300) -> None:
         if not hasattr(self, "created"):
-            self.listener_maxsize = listener_maxsize
             self.created: bool = True
             self.pressed_keys: list[int] = []
             self.__cur_screen: Optional[scene.Scene] = None
@@ -100,47 +95,23 @@ class Events(object, metaclass=singleton.Singleton):
             )
         del self.__processors[event_type]
 
-    @lru_cache(maxsize=listener_maxsize)
-    def __get_listeners(self, cur_scene: scene.Scene) -> dict[int, dict[Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]]]:
-        if cur_scene is None:
-            raise TypeError(
-                "Current Scene has not been set. Please set this first before "
-                "attempting to use event listeners"
-            )
-        listeners: dict[int, dict[Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]]] = cur_scene.listeners
-        for layer in cur_scene.elements:
-            for e in layer:
-                for event_type, listeners_dict in e.listeners.items():
-                    if listeners[event_type] is None:
-                        listeners[event_type] = {}
-                    for callback, options in listeners_dict.items():
-                        listeners[event_type][callback] = options
-        return listeners
-
-    @property
-    def active_listeners(self) -> dict[int, dict[Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]]]:
-        return self.__get_listeners(self.__cur_screen)
-
-    @active_listeners.deleter
-    def active_listeners(self) -> None:
-        self.__get_listeners.clear_cache()
-
-    def notify(self, event: pygame.event.Event) -> None:
+    def notify(self, event: pygame.event.Event, listeners: dict[int, dict[Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]]]) -> None:
         if event.type == pygame.QUIT:
             self.quit()
         elif event.type == pygame.KEYDOWN:
             self.pressed_keys.append(event.key)
         elif event.type == pygame.KEYUP:
             self.pressed_keys.remove(event.key)
-        for func, options in self.active_listeners[event.type].items():
-            result: bool = False
-            if event.type in self.__processors:
-                result = self.__processors[event.type][0](event, func, options)
-            else:
-                result = self.default_processor(event, func, options)
-            if result and options is not None:
-                if "once" in options:
-                    if options["once"]:
-                        options["target"].deregister_listener(
-                            event.type, func, options
-                        )
+        if event.type in listeners:
+            for func, options in listeners[event.type].items():
+                result: bool = False
+                if event.type in self.__processors:
+                    result = self.__processors[event.type][0](event, func, options)
+                else:
+                    result = self.default_processor(event, func, options)
+                if result and options is not None:
+                    if "once" in options:
+                        if options["once"]:
+                            options["target"].deregister_listener(
+                                event.type, func, options
+                            )

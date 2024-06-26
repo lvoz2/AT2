@@ -110,9 +110,14 @@ class Events(metaclass=singleton.Singleton):
     def notify(
         self,
         event: pygame.event.Event,
-        listeners: dict[
-            int,
-            dict[Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]],
+        listeners: Optional[
+            dict[
+                int,
+                dict[
+                    Callable[[pygame.event.Event, dict[str, Any]], None],
+                    list[dict[str, Any]],
+                ],
+            ]
         ],
     ) -> None:
         if event.type == pygame.QUIT:
@@ -121,8 +126,12 @@ class Events(metaclass=singleton.Singleton):
             self.pressed_keys.append(event.key)
         elif event.type == pygame.KEYUP:
             self.pressed_keys.remove(event.key)
-        if event.type in listeners:
-            for func, options in listeners[event.type].items():
+        if listeners is None:
+            return
+        if event.type not in listeners:
+            return
+        for func, options_list in listeners[event.type].items():
+            for options in options_list:
                 result: bool = False
                 if event.type in self.__processors:
                     result = self.__processors[event.type][0](event, func, options)

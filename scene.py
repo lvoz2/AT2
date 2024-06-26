@@ -15,7 +15,8 @@ class Scene(element.Element):
             dict[
                 int,
                 dict[
-                    Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]
+                    Callable[[pygame.event.Event, dict[str, Any]], None],
+                    list[dict[str, Any]],
                 ],
             ]
         ] = None
@@ -30,13 +31,20 @@ class Scene(element.Element):
     def get_all_listeners(self) -> None:
         listeners: dict[
             int,
-            dict[Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]],
-        ] = self.listeners
-        for layer in self.elements:
+            dict[
+                Callable[[pygame.event.Event, dict[str, Any]], None],
+                list[dict[str, Any]],
+            ],
+        ] = {}
+        all_elements: list[list[element.Element]] = [[self]]
+        all_elements.extend(self.elements)
+        for layer in all_elements:
             for e in layer:
                 for event_type, listeners_dict in e.listeners.items():
                     if event_type not in listeners:
                         listeners[event_type] = {}
                     for callback, options in listeners_dict.items():
-                        listeners[event_type][callback] = options
+                        if callback not in listeners[event_type]:
+                            listeners[event_type][callback] = []
+                        listeners[event_type][callback].append(options)
         self.all_listeners = listeners

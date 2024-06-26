@@ -110,8 +110,7 @@ class Display(metaclass=singleton.Singleton):
             self.draw()
             self.cur_screen.get_all_listeners()
             for e in pygame.event.get():
-                if self.cur_screen.all_listeners is not None:
-                    self.events.notify(e, self.cur_screen.all_listeners)
+                self.events.notify(e, self.cur_screen.all_listeners)
 
     def update(self, delta: list[int]) -> None:
         pass

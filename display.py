@@ -19,8 +19,6 @@ class Display(metaclass=singleton.Singleton):
         self,
         title: str = "",
         dim: Sequence[int] = (0, 0),
-        draw_async: bool = False,
-        num_processes: Optional[int] = None,
     ) -> None:
         if not hasattr(self, "created"):
             self.dimensions = dim
@@ -40,8 +38,6 @@ class Display(metaclass=singleton.Singleton):
                 "dmg_event": pygame.event.custom_type(),
                 "keypress": pygame.event.custom_type(),
             }
-            self.draw_async = draw_async
-            self.num_processes = num_processes
 
     def set_screen(self, new_screen: str) -> None:
         if new_screen in self.screens:
@@ -65,10 +61,6 @@ class Display(metaclass=singleton.Singleton):
             )
         return name in self.screens
 
-    def quit(self) -> None:
-        # self.draw_process.shutdown()
-        pass
-
     def handle_events(self) -> None:
         if self.cur_screen is not None:
             self.draw()
@@ -79,47 +71,56 @@ class Display(metaclass=singleton.Singleton):
     def update(self, delta: list[int]) -> None:
         pass
 
-    def draw(self) -> None:
-        if self.cur_screen is not None:
-            self.delta.append(self.clock.tick(25))
-            if len(self.delta) > 10:
-                self.delta = self.delta[(len(self.delta) - 10) :]
-            self.window.fill([0, 0, 0])
-            self.cur_screen.design.rect = self.window.blit(
-                self.cur_screen.design.surf,
-                pygame.Rect(0, 0, self.dimensions[0], self.dimensions[1]),
+    def draw(self, inst: Optional[Display] = None) -> None:
+        ctx: Display = self if inst is None else inst
+        if ctx.cur_screen is not None:
+            ctx.delta.append(ctx.clock.tick(25))
+            if len(ctx.delta) > 10:
+                ctx.delta = ctx.delta[(len(ctx.delta) - 10) :]
+            ctx.window.fill([0, 0, 0])
+            ctx.cur_screen.design.rect = ctx.window.blit(
+                ctx.cur_screen.design.surf,
+                pygame.Rect(0, 0, ctx.dimensions[0], ctx.dimensions[1]),
             )
-            if self.cur_screen.elements != [None]:
-                if self.draw_async:
-                    func: Callable[[tuple["Display", element.Element]], None] = (
-                        lambda args: args[1].draw(args[0])
-                    )
-                    num_processes: Optional[int] = None
-                    if self.num_processes is None:
-                        num_processes = os.cpu_count()
-                    else:
-                        num_processes = self.num_processes
-                    if num_processes is None:
-                        raise ValueError("Number of processes cannot be None")
-                    print(num_processes)
-                    with mp.Pool(processes=num_processes) as draw_pool:
-                        for element_layer in self.cur_screen.elements:
-                            print("Test")
-                            iter_layer: list[tuple["Display", element.Element]] = [
-                                (self, e) for e in element_layer
-                            ]
-                            size: int = len(element_layer) // num_processes
-                            print(iter_layer)
-                            print(size)
-                            draw_pool.imap_unordered(
-                                func,
-                                iter_layer,
-                                size,
-                            )
-                            print("End")
-                else:
-                    for element_layer in self.cur_screen.elements:
-                        for e in element_layer:
-                            e.draw(self)
-            self.update(self.delta)
+            if ctx.cur_screen.elements != [None]:
+                for element_layer in ctx.cur_screen.elements:
+                    for e in element_layer:
+                        e.draw(ctx)
+            ctx.update(ctx.delta)
             pygame.display.flip()
+
+
+class AsyncDisplay(Display):
+    def __init__(
+        self,
+        title: str = "",
+        dim: Sequence[int] = (0, 0),
+    ) -> None:
+        super().init(title, dim)
+        self.lock: mp.Lock = mp.Lock()
+        self.conn, conn = mp.Pipe()
+        self.ctx = mp.get_context("spawn")
+        self.draw_process = ctx.Process(target=self.draw_async, name=f"draw_process_for_{title}", args=[conn])
+        self.draw_process.start()
+        self.draw_process.run()
+
+    def draw_async(self, conn: mp.connection.Connection):
+        running: bool = True
+        while running:
+            data: Any = conn.recv()
+            if isinstance(data, tuple):
+                running = data[0]
+                if not running:
+                    break
+                if len(data) > 2:
+                    if isinstance(data[1], AsyncDisplay) and isinstance(data[2], mp.Lock):
+                        with data[2] as l:
+                            data.draw(data[1])
+        conn.close()
+
+    def handle_events(self) -> None:
+        if self.cur_screen is not None:
+            self.conn.send((True, self, self.lock))
+            self.cur_screen.get_all_listeners()
+            for e in pygame.event.get():
+                self.events.notify(e, self.cur_screen.all_listeners)

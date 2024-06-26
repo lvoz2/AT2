@@ -1,7 +1,7 @@
 import sys
 import warnings
-from typing import Any, Callable, Optional
 from functools import lru_cache
+from typing import Any, Callable, Optional
 
 import pygame
 
@@ -17,7 +17,7 @@ import singleton
 
 
 class Events(metaclass=singleton.Singleton):
-    def __init__(self, listener_maxsize: int = 300) -> None:
+    def __init__(self) -> None:
         if not hasattr(self, "created"):
             self.created: bool = True
             self.pressed_keys: list[int] = []
@@ -63,7 +63,12 @@ class Events(metaclass=singleton.Singleton):
         self,
         event_type: int,
         func: Callable[
-            [pygame.event.Event, Callable[[pygame.event.Event, dict[str, Any]], None], Optional[dict[str, Any]]], bool
+            [
+                pygame.event.Event,
+                Callable[[pygame.event.Event, dict[str, Any]], None],
+                Optional[dict[str, Any]],
+            ],
+            bool,
         ],
         options: Optional[dict[str, Any]] = None,
     ) -> None:
@@ -74,7 +79,14 @@ class Events(metaclass=singleton.Singleton):
     def deregister_processor(
         self,
         event_type: int,
-        func: Callable[[pygame.event.Event, Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]], bool],
+        func: Callable[
+            [
+                pygame.event.Event,
+                Callable[[pygame.event.Event, dict[str, Any]], None],
+                dict[str, Any],
+            ],
+            bool,
+        ],
         options: Optional[dict[str, Any]] = None,
     ) -> None:
         warnings.warn(
@@ -95,7 +107,14 @@ class Events(metaclass=singleton.Singleton):
             )
         del self.__processors[event_type]
 
-    def notify(self, event: pygame.event.Event, listeners: dict[int, dict[Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]]]) -> None:
+    def notify(
+        self,
+        event: pygame.event.Event,
+        listeners: dict[
+            int,
+            dict[Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]],
+        ],
+    ) -> None:
         if event.type == pygame.QUIT:
             self.quit()
         elif event.type == pygame.KEYDOWN:

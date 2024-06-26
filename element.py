@@ -17,7 +17,10 @@ class Element:
     ) -> None:
         self.design = design
         self.mask = mask
-        self.listeners: dict[int, dict[Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]]] = {}
+        self.listeners: dict[
+            int,
+            dict[Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]],
+        ] = {}
         self.visible = visible
 
     def register_listener(

@@ -4,6 +4,7 @@ import pygame
 
 import display
 import player
+import utils
 
 
 class Warrior(player.Player):
@@ -17,7 +18,7 @@ class Warrior(player.Player):
     ) -> None:
         window: display.Display = display.Display()
         super().__init__(
-            window.get_asset(
+            utils.get_asset(
                 "assets/warrior.png", rect=rect, rect_options=rect_options, scale=scale
             ),
             name,

@@ -15,6 +15,7 @@ import player
 import rogue
 import scene
 import sprite
+import utils
 import warrior
 import zombie
 
@@ -154,7 +155,7 @@ def check_dists(player_entity: player.Player) -> None:
 def create_main_menu(
     width: int, window: display.Display, font: pygame.font.Font
 ) -> scene.Scene:
-    bground: sprite.Sprite = window.get_asset("assets/main_menu_background.png")
+    bground: sprite.Sprite = utils.get_asset("assets/main_menu_background.png")
     bground.surf = pygame.transform.scale(
         bground.surf, (window.window.get_width(), window.window.get_height())
     )
@@ -217,7 +218,7 @@ def create_main_menu(
 def create_settings_menu(
     height: int, window: display.Display, font: pygame.font.Font
 ) -> scene.Scene:
-    bground: sprite.Sprite = window.get_asset("assets/main_menu_background.png")
+    bground: sprite.Sprite = utils.get_asset("assets/main_menu_background.png")
     bground.surf = pygame.transform.scale(
         bground.surf, (window.window.get_width(), window.window.get_height())
     )
@@ -251,7 +252,7 @@ def create_settings_menu(
 def create_class_select_menu(
     width: int, window: display.Display, height: int, font: pygame.font.Font
 ) -> scene.Scene:
-    bground: sprite.Sprite = window.get_asset("assets/main_menu_background.png")
+    bground: sprite.Sprite = utils.get_asset("assets/main_menu_background.png")
     bground.surf = pygame.transform.scale(
         bground.surf, (window.window.get_width(), window.window.get_height())
     )
@@ -266,7 +267,7 @@ def create_class_select_menu(
     for img_path in images:
         aspect_ratio: float = 0.75
         icon_height: int = int(icon_width // aspect_ratio)
-        img: sprite.Sprite = window.get_asset(
+        img: sprite.Sprite = utils.get_asset(
             img_path,
             rect_options={
                 "x": total_spacing
@@ -309,7 +310,7 @@ def create_class_select_menu(
 
 def create_game_screen(player_sprite: player.Player) -> scene.Scene:
     window: display.Display = display.Display()
-    bground: sprite.Sprite = window.get_asset("assets/dungeon_map.png")
+    bground: sprite.Sprite = utils.get_asset("assets/dungeon_map.png")
     bground.surf = pygame.transform.scale(
         bground.surf, (window.window.get_width(), window.window.get_height())
     )

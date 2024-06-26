@@ -4,6 +4,7 @@ import pygame
 
 import display
 import enemy
+import utils
 
 
 class Zombie(enemy.Enemy):
@@ -15,7 +16,7 @@ class Zombie(enemy.Enemy):
     ):
         window: display.Display = display.Display()
         super().__init__(
-            window.get_asset(
+            utils.get_asset(
                 "assets/skeleton.png", rect=rect, rect_options=rect_options
             ),
             "Zombie",

@@ -1,3 +1,5 @@
+import concurrent.futures as cf
+import multiprocessing as mp
 import pathlib
 import sys
 from typing import Any, Optional, Sequence
@@ -27,61 +29,13 @@ class Display(metaclass=singleton.Singleton):
             self.events = events.Events()
             event_processors.load()
             self.created: bool = True
-            self.__assets: dict[str, sprite.Sprite] = {}
             self.custom_events: dict[str, int] = {
                 "dmg_event": pygame.event.custom_type(),
                 "keypress": pygame.event.custom_type(),
             }
-
-    def get_asset(
-        self,
-        asset_location: str,
-        rect: Optional[pygame.Rect] = None,
-        rect_options: Optional[dict[str, Any]] = None,
-        scale: float = 1.0,
-    ) -> sprite.Sprite:
-        absolute_path: pathlib.Path = pathlib.Path.joinpath(
-            pathlib.Path.cwd(), asset_location
-        )
-        if not absolute_path.exists() or not absolute_path.is_file():
-            raise FileNotFoundError(f"Image file not found: {absolute_path}")
-        valid_types: list[str] = [
-            ".bmp",
-            ".gif",
-            ".jpeg",
-            ".jpg",
-            ".lbm",
-            ".pbm",
-            ".pgm",
-            ".ppm",
-            ".pcx",
-            ".png",
-            ".pnm",
-            ".svg",
-            ".tga",
-            ".tiff",
-            ".tif",
-            ".webp",
-            ".xpm",
-        ]
-        if absolute_path.suffix not in valid_types:
-            raise RuntimeError(
-                f"The file {absolute_path} does not have an appropriate extension/type"
+            self.draw_process: cf.ProcessPoolExecutor = cf.ProcessPoolExecutor(
+                max_workers=1
             )
-        posix_path: str = absolute_path.as_posix()
-        if posix_path in self.__assets:
-            return sprite.Sprite(
-                self.__assets[posix_path].clone(),
-                rect,
-                rect_options=rect_options,
-                scale=scale,
-            )
-        surf: pygame.Surface = pygame.image.load(absolute_path).convert_alpha()
-        design: sprite.Sprite = sprite.Sprite(
-            surf, rect, rect_options=rect_options, scale=scale, path=absolute_path
-        )
-        self.__assets[posix_path] = design
-        return design
 
     def set_screen(self, new_screen: str) -> None:
         if new_screen in self.screens:
@@ -105,9 +59,12 @@ class Display(metaclass=singleton.Singleton):
             )
         return name in self.screens
 
+    def quit(self) -> None:
+        self.draw_process.shutdown()
+
     def handle_events(self) -> None:
         if self.cur_screen is not None:
-            self.draw()
+            self.draw_process.submit(self.draw, self)
             self.cur_screen.get_all_listeners()
             for e in pygame.event.get():
                 self.events.notify(e, self.cur_screen.all_listeners)
@@ -115,20 +72,20 @@ class Display(metaclass=singleton.Singleton):
     def update(self, delta: list[int]) -> None:
         pass
 
-    def draw(self) -> None:
-        if self.cur_screen is not None:
-            self.delta.append(self.clock.tick(25))
-            if len(self.delta) > 10:
-                self.delta = self.delta[(len(self.delta) - 10) :]
-            self.window.fill([0, 0, 0])
-            self.cur_screen.design.rect = self.window.blit(
-                self.cur_screen.design.surf,
-                pygame.Rect(0, 0, self.dimensions[0], self.dimensions[1]),
+    def draw(self, window: "display.Display") -> None:
+        if window.cur_screen is not None:
+            window.delta.append(window.clock.tick(25))
+            if len(window.delta) > 10:
+                window.delta = window.delta[(len(window.delta) - 10) :]
+            window.window.fill([0, 0, 0])
+            window.cur_screen.design.rect = window.window.blit(
+                window.cur_screen.design.surf,
+                pygame.Rect(0, 0, window.dimensions[0], window.dimensions[1]),
             )
-            if self.cur_screen.elements != [None]:
-                for element_layer in self.cur_screen.elements:
-                    # Do the pool here. Use imap(lambda element: element.draw(self), element_layer)
+            if window.cur_screen.elements != [None]:
+                for element_layer in window.cur_screen.elements:
+                    # Do the pool here. Use imap(lambda element: element.draw(window), element_layer)
                     for element in element_layer:
-                        element.draw(self)
-            self.update(self.delta)
+                        element.draw(window)
+            window.update(window.delta)
             pygame.display.flip()

@@ -17,6 +17,9 @@ import singleton
 
 
 class Events(metaclass=singleton.Singleton):
+
+    listener_maxsize: int = 300
+
     def __init__(self, listener_maxsize: int = 300) -> None:
         if not hasattr(self, "created"):
             self.listener_maxsize = listener_maxsize
@@ -113,9 +116,9 @@ class Events(metaclass=singleton.Singleton):
                         listeners[event_type][callback] = options
         return listeners
 
-    def __delete__(self) -> None:
+    def __delete__(self, instance: Any) -> None:
         self.get_listeners.cache_clear()
-        super().__delete__(self)
+        super().__delete__(instance)
 
     def __del__(self) -> None:
         self.get_listeners.cache_clear()
@@ -132,16 +135,15 @@ class Events(metaclass=singleton.Singleton):
             self.pressed_keys.append(event.key)
         elif event.type == pygame.KEYUP:
             self.pressed_keys.remove(event.key)
-        for listener in self.active_listeners[event.type]:
-            for func, options in listener.items():
-                result: bool = False
-                if event.type in self.__processors:
-                    result = self.__processors[event.type][0](event, func, options)
-                else:
-                    result = self.default_processor(event, func, options)
-                if result and options is not None:
-                    if "once" in options:
-                        if options["once"]:
-                            options["target"].deregister_listener(
-                                event.type, func, options
-                            )
+        for func, options in self.active_listeners[event.type].items():
+            result: bool = False
+            if event.type in self.__processors:
+                result = self.__processors[event.type][0](event, func, options)
+            else:
+                result = self.default_processor(event, func, options)
+            if result and options is not None:
+                if "once" in options:
+                    if options["once"]:
+                        options["target"].deregister_listener(
+                            event.type, func, options
+                        )

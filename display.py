@@ -1,4 +1,5 @@
 import multiprocessing as mp
+import multiprocessing.synchronize as mp_sync
 import os
 import pathlib
 import sys
@@ -96,15 +97,15 @@ class AsyncDisplay(Display):
         title: str = "",
         dim: Sequence[int] = (0, 0),
     ) -> None:
-        super().init(title, dim)
-        self.lock: mp.Lock = mp.Lock()
+        super().__init__(title, dim)
+        self.lock: mp_sync.Lock = mp.Lock()
         self.conn, conn = mp.Pipe()
         self.ctx = mp.get_context("spawn")
-        self.draw_process = ctx.Process(target=self.draw_async, name=f"draw_process_for_{title}", args=[conn])
+        self.draw_process = self.ctx.Process(target=self.draw_async, name=f"draw_process_for_{title}", args=[conn])
         self.draw_process.start()
         self.draw_process.run()
 
-    def draw_async(self, conn: mp.connection.Connection):
+    def draw_async(self, conn: mp.connection.Connection) -> None:
         running: bool = True
         while running:
             data: Any = conn.recv()
@@ -113,7 +114,7 @@ class AsyncDisplay(Display):
                 if not running:
                     break
                 if len(data) > 2:
-                    if isinstance(data[1], AsyncDisplay) and isinstance(data[2], mp.Lock):
+                    if isinstance(data[1], AsyncDisplay) and isinstance(data[2], mp_sync.Lock):
                         with data[2] as l:
                             data.draw(data[1])
         conn.close()

@@ -16,7 +16,7 @@ import singleton
 # is actually clicked, instead of every MouseDown Event.
 
 
-class Events(object, metaclass=singleton.Singleton):
+class Events(metaclass=singleton.Singleton):
     def __init__(self, listener_maxsize: int = 300) -> None:
         if not hasattr(self, "created"):
             self.created: bool = True

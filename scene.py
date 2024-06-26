@@ -1,6 +1,7 @@
-from typing import Iterator
+from typing import Any, Callable, Iterator, Optional
 
 import element
+import pygame
 import sprite
 
 

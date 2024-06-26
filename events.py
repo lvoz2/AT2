@@ -96,7 +96,7 @@ class Events(metaclass=singleton.Singleton):
             )
         del self.__processors[event_type]
 
-    @lru_cache(maxsize=self.listener_maxsize)
+    @lru_cache(maxsize=listener_maxsize)
     def get_listeners(self, cur_scene: scene.Scene) -> dict[int, dict[Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]]]:
         if cur_scene is None:
             raise TypeError(
@@ -115,7 +115,7 @@ class Events(metaclass=singleton.Singleton):
 
     def __delete__(self) -> None:
         self.get_listeners.cache_clear()
-        super().__delete__()
+        super().__delete__(self)
 
     def __del__(self) -> None:
         self.get_listeners.cache_clear()

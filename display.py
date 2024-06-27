@@ -1,8 +1,9 @@
+import collections
 import multiprocessing as mp
 import multiprocessing.pool as mp_pool
 import multiprocessing.synchronize as mp_sync
 import time
-from typing import Any, Optional, Sequence
+from typing import Any, Callable, Optional, Sequence
 
 import pygame
 
@@ -164,18 +165,14 @@ class Display(DrawProps, metaclass=singleton.Singleton):
                 "keypress": pygame.event.custom_type(),
             }
 
-    def set_screen(self, new_screen: str) -> None:
-        if new_screen in self.scenes:
+    def set_screen(self, new_scene: str) -> None:
+        if new_scene in self.scenes:
             event_processor: events.Events = events.Events()
-            event_processor.cur_screen = self.scenes[new_screen]
-            self.cur_screen = (  # pylint: disable=attribute-defined-outside-init
-                self.scenes[  # pylint: disable=attribute-defined-outside-init
-                    new_screen  # pylint: disable=attribute-defined-outside-init
-                ]  # pylint: disable=attribute-defined-outside-init
-            )  # pylint: disable=attribute-defined-outside-init
+            event_processor.cur_screen = self.scenes[new_scene]
+            self.cur_scene = self.scenes[new_scene]
         else:
             raise KeyError(
-                f'Screen with identifier "{new_screen}" not \
+                f'Scene with identifier "{new_scene}" not \
             found, either because it does not exist or has \
             not been loaded into the Display'
             )
@@ -191,11 +188,16 @@ class Display(DrawProps, metaclass=singleton.Singleton):
         return name in self.scenes
 
     def handle_events(self) -> None:
-        if self.cur_screen is not None:
+        if self.cur_scene is not None:
             self.draw()
-            self.cur_screen.get_all_listeners()
+            self.cur_scene.get_all_listeners()
             for e in pygame.event.get():
-                self.events.notify(e, self.cur_screen.all_listeners)
+                self.events.notify(e, self.cur_scene.all_listeners)
+
+
+def draw_async(draw_func: Callable[[...], None], data: Any) -> None:
+    print("Test")
+    draw_func(data)
 
 
 class AsyncDisplay(Display, metaclass=singleton.Singleton):
@@ -212,9 +214,11 @@ class AsyncDisplay(Display, metaclass=singleton.Singleton):
             self.ready = True
 
     def handle_events(self) -> None:
-        if self.cur_screen is not None:
-            self.draw_process.apply_async(lambda data: data.draw(data), args=[self])
-            self.cur_screen.get_all_listeners()
+        if self.cur_scene is not None:
+            DrawPropsTuple = collections.namedtuple("DrawPropsTuple", "scenes, cur_scene, clock, delta dimensions window")
+            data = DrawPropsTuple(self.scenes, self.cur_scene, self.clock, self.delta, self.dimensions, self.window)
+            self.draw_process.apply_async(draw_async, (self.draw, data))
+            self.cur_scene.get_all_listeners()
             for e in pygame.event.get():
-                self.events.notify(e, self.cur_screen.all_listeners)
+                self.events.notify(e, self.cur_scene.all_listeners)
             time.sleep(0.04)

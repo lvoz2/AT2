@@ -61,7 +61,6 @@ class Element:
         del self.listeners[event_type][func]
 
     def draw(self, window: "display.DrawProps") -> None:
-        print("called")
         self.visible = (
             (0 - self.design.rect.width) < self.design.rect.x < window.dimensions[0]
         ) and (

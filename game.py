@@ -144,7 +144,7 @@ move_key_state: dict[int, bool] = {
 
 def check_dists(player_entity: player.Player) -> None:
     window: display.Display = display.Display()
-    for e in window.screens["game"].visible_elements:
+    for e in window.scenes["game"].visible_elements:
         if isinstance(e, entity.Entity):
             distance: float = player_entity.get_distance(e)
             if isinstance(e, enemy.Enemy) and distance <= 50.0:

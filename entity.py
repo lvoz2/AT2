@@ -42,8 +42,8 @@ class Entity(element.Element):
         pygame.event.post(dmg_event)
         if self.health == 0:
             window: display.Display = display.Display()
-            for screen in window.screens.values():
-                for element_layer in screen.elements:
+            for scene in window.scenes.values():
+                for element_layer in scene.elements:
                     if self in element_layer:
                         element_layer.remove(self)
 

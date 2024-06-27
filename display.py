@@ -109,23 +109,26 @@ class AsyncDisplay(Display):
     def draw_async(self, conn: "mp.connection.Connection") -> None:
         running: bool = True
         print("Test")
-        while running:
+        # while running:
+        print(conn.poll(1))
+        if conn.poll(1):
             data: Any = conn.recv()
+            print("Received")
             if isinstance(data, tuple):
                 running = data[0]
-                if not running:
-                    break
-                if len(data) > 2:
+                if len(data) > 2 and running:
                     if isinstance(data[1], AsyncDisplay) and isinstance(
                         data[2], mp_sync.Lock
                     ):
                         with data[2] as l:
                             data[1].draw(data[1])
-        conn.close()
+        # conn.close()
 
     def handle_events(self) -> None:
         if self.cur_screen is not None:
+            print("About to send")
             self.conn.send((True, self, self.lock))
+            print("Sent")
             self.cur_screen.get_all_listeners()
             for e in pygame.event.get():
                 self.events.notify(e, self.cur_screen.all_listeners)

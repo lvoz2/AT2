@@ -101,12 +101,14 @@ class AsyncDisplay(Display):
         self.lock: mp_sync.Lock = mp.Lock()
         self.conn, conn = mp.Pipe()
         self.ctx = mp.get_context("spawn")
-        self.draw_process = self.ctx.Process(target=self.draw_async, name=f"draw_process_for_{title}", args=[conn])
-        self.draw_process.start()
+        self.draw_process = self.ctx.Process(
+            target=self.draw_async, name=f"draw_process_for_{title}", args=[conn]
+        )
         self.draw_process.run()
 
-    def draw_async(self, conn: mp.connection.Connection) -> None:
+    def draw_async(self, conn: "mp.connection.Connection") -> None:
         running: bool = True
+        print("Test")
         while running:
             data: Any = conn.recv()
             if isinstance(data, tuple):
@@ -114,7 +116,9 @@ class AsyncDisplay(Display):
                 if not running:
                     break
                 if len(data) > 2:
-                    if isinstance(data[1], AsyncDisplay) and isinstance(data[2], mp_sync.Lock):
+                    if isinstance(data[1], AsyncDisplay) and isinstance(
+                        data[2], mp_sync.Lock
+                    ):
                         with data[2] as l:
                             data[1].draw(data[1])
         conn.close()

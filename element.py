@@ -81,14 +81,21 @@ class Element:
     def update_rect(self, res: pygame.Rect) -> None:
         self.design.rect.x, self.design.rect.y = res.x, res.y
 
-    def draw_async(self, qw: queue_wrapper.QueueWrapper, window: pygame.Surface, dimensions: Sequence[int]) -> None:
+    def draw_async(
+        self,
+        qw: queue_wrapper.QueueWrapper,
+        window: pygame.Surface,
+        dimensions: Sequence[int],
+    ) -> None:
         self.visible = (
             (0 - self.design.rect.width) < self.design.rect.x < dimensions[0]
-        ) and (
-            (0 - self.design.rect.height) < self.design.rect.y < dimensions[1]
-        )
+        ) and ((0 - self.design.rect.height) < self.design.rect.y < dimensions[1])
         if self.visible:
-            qw.add(window.blit, args=[self.design.surf, self.design.rect, self.mask], callback=self.update_rect)
+            qw.add(
+                window.blit,
+                args=[self.design.surf, self.design.rect, self.mask],
+                callback=self.update_rect,
+            )
 
     def draw(self, window: "display.DrawProps") -> None:
         self.visible = (

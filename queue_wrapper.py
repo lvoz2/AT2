@@ -1,14 +1,17 @@
 # import asyncio
 import multiprocessing as mp
+import multiprocessing.context as mp_c
 import multiprocessing.queues as mp_q
 import queue
-from typing import Any, Callable, Optional
 import uuid
+from typing import Any, Callable, Optional
 
 
 def run(receive_queue: mp_q.JoinableQueue, send_queue: mp_q.Queue) -> None:
     while True:
-        data: tuple[str, Callable[..., Any], list[Any], dict[str, Any]] | bool = receive_queue.get()
+        data: tuple[str, Callable[..., Any], list[Any], dict[str, Any]] | bool = (
+            receive_queue.get()
+        )
         if isinstance(data, bool):
             send_queue.put(True)
             break
@@ -22,12 +25,20 @@ class QueueWrapper:
         self.receive_queue: mp_q.Queue = mp.Queue()
         self.__res_funcs: dict[str, Callable[[Any], None]] = {}
         self.__ctx = mp.get_context(method="spawn")
-        self.__process: mp.Process = self.__ctx.Process(target=run, args=(self.send_queue, self.receive_queue))
+        self.__process: mp_c.SpawnProcess = self.__ctx.Process(
+            target=run, args=(self.send_queue, self.receive_queue)
+        )
         self.__process.start()
 
-    def add(self, func: Callable[..., Any], args: Optional[list[Any]] = None, kwargs: Optional[dict[str, Any]] = None, callback: Optional[Callable[[Any], None]] = None) -> None:
+    def add(
+        self,
+        func: Callable[..., Any],
+        args: Optional[list[Any]] = None,
+        kwargs: Optional[dict[str, Any]] = None,
+        callback: Optional[Callable[[Any], None]] = None,
+    ) -> None:
         unique_id: str = str(uuid.uuid4())
-        if callable is not None:
+        if callback is not None:
             self.__res_funcs[unique_id] = callback
         if args is None:
             args = []

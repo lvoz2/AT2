@@ -1,8 +1,8 @@
 import collections
 import multiprocessing as mp
-import multiprocessing.synchronize as mp_sync
 import multiprocessing.pool as mp_pool
 import multiprocessing.queues as mp_q
+import multiprocessing.synchronize as mp_sync
 import time
 from typing import Any, Callable, Optional, Sequence
 
@@ -169,7 +169,10 @@ class AsyncDisplay(Display, metaclass=singleton.Singleton):
 
     def update_rect(self, res: pygame.Rect) -> None:
         if self.cur_scene is None:
-            raise ValueError("No scene set, please set this first with AsyncDisplay.set_scene(scene_name) first.")
+            raise ValueError(
+                "No scene set, please set this first with "
+                "AsyncDisplay.set_scene(scene_name) first."
+            )
         self.cur_scene.design.rect = res
 
     def draw(self) -> None:
@@ -178,7 +181,14 @@ class AsyncDisplay(Display, metaclass=singleton.Singleton):
             if len(self.delta) > 10:
                 self.delta = self.delta[(len(self.delta) - 10) :]
             self.qw.add(self.window.fill, args=[[0, 0, 0]])
-            self.qw.add(self.window.blit, args=[self.cur_scene.design.surf, pygame.Rect(0, 0, self.dimensions[0], self.dimensions[1])], callback=self.update_rect)
+            self.qw.add(
+                self.window.blit,
+                args=[
+                    self.cur_scene.design.surf,
+                    pygame.Rect(0, 0, self.dimensions[0], self.dimensions[1]),
+                ],
+                callback=self.update_rect,
+            )
             if self.cur_scene.elements != [None]:
                 for element_layer in self.cur_scene.elements:
                     for e in element_layer:

@@ -25,11 +25,15 @@ class QueueWrapper:
         self.__process: mp.Process = self.__ctx.Process(target=run, args=(self.send_queue, self.receive_queue))
         self.__process.start()
 
-    def add(self, func: Callable[..., Any], args: list[Any] = [], kwargs: dict[str, Any] = {}, callback: Optional[Callable[[Any], None]] = None) -> None:
-        id: str = str(uuid.uuid4())
+    def add(self, func: Callable[..., Any], args: Optional[list[Any]] = None, kwargs: Optional[dict[str, Any]] = None, callback: Optional[Callable[[Any], None]] = None) -> None:
+        unique_id: str = str(uuid.uuid4())
         if callable is not None:
-            self.__res_funcs[id] = callback
-        self.send_queue.put((id, func, args, kwargs))
+            self.__res_funcs[unique_id] = callback
+        if args is None:
+            args = []
+        if kwargs is None:
+            kwargs = {}
+        self.send_queue.put((unique_id, func, args, kwargs))
 
     async def fetch(self) -> None:
         while True:
@@ -49,7 +53,6 @@ class QueueWrapper:
             if isinstance(res, bool):
                 self.__process.join()
                 return True
-            else:
-                if res[0] in self.__res_funcs:
-                    self.__res_funcs[res[0]][0](res[1])
+            if res[0] in self.__res_funcs:
+                self.__res_funcs[res[0]][0](res[1])
         return False

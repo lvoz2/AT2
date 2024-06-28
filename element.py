@@ -1,3 +1,5 @@
+import multiprocessing as mp
+import multiprocessing.synchronize as mp_sync
 from typing import TYPE_CHECKING, Any, Callable, Optional, Sequence
 
 import pygame

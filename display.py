@@ -1,7 +1,5 @@
 import collections
-import multiprocessing as mp
 import multiprocessing.pool as mp_pool
-import multiprocessing.synchronize as mp_sync
 import multiprocessing.queues as mp_q
 import time
 from typing import Any, Callable, Optional, Sequence
@@ -18,16 +16,10 @@ import singleton
 class DrawProps(metaclass=singleton.Singleton):
     def __init__(self, dim: Sequence[int] = (0, 0)) -> None:
         if not hasattr(self, "created"):
-            self.__scenes: list[mp_sync.Lock | dict[str, scene.Scene]] = [mp.Lock(), {}]
             self.__cur_scene: list[mp_sync.Lock | Optional[scene.Scene]] = [
                 mp.Lock(),
                 None,
             ]
-            self.__clock: list[mp_sync.Lock | pygame.time.Clock] = [
-                mp.Lock(),
-                pygame.time.Clock(),
-            ]
-            self.__delta: list[mp_sync.Lock | list[int]] = [mp.Lock(), [0]]
             self.__dimensions: list[mp_sync.Lock | Sequence[int]] = [mp.Lock(), dim]
             self.__window: list[mp_sync.Lock | pygame.Surface] = [
                 mp.Lock(),
@@ -36,21 +28,6 @@ class DrawProps(metaclass=singleton.Singleton):
             self.created: bool = True
 
     # Accessors with locks
-    @property
-    def scenes(self) -> dict[str, scene.Scene]:
-        if isinstance(self.__scenes[0], mp_sync.Lock) and isinstance(
-            self.__scenes[1], dict
-        ):
-            with self.__scenes[0] as lock:
-                return self.__scenes[1]
-        raise TypeError("__scenes has the wrong types")
-
-    @scenes.setter
-    def scenes(self, new_scenes: dict[str, scene.Scene]) -> None:
-        if isinstance(self.__scenes[0], mp_sync.Lock):
-            with self.__scenes[0] as lock:
-                self.__scenes[1] = new_scenes
-
     @property
     def cur_scene(self) -> Optional[scene.Scene]:
         if isinstance(self.__cur_scene[0], mp_sync.Lock) and (
@@ -65,36 +42,6 @@ class DrawProps(metaclass=singleton.Singleton):
         if isinstance(self.__cur_scene[0], mp_sync.Lock):
             with self.__cur_scene[0] as lock:
                 self.__cur_scene[1] = new_scene
-
-    @property
-    def clock(self) -> pygame.time.Clock:
-        if isinstance(self.__clock[0], mp_sync.Lock) and isinstance(
-            self.__clock[1], pygame.time.Clock
-        ):
-            with self.__clock[0] as lock:
-                return self.__clock[1]
-        raise TypeError("__clock has the wrong types")
-
-    @clock.setter
-    def clock(self, new_clock: pygame.time.Clock) -> None:
-        if isinstance(self.__clock[0], mp_sync.Lock):
-            with self.__clock[0] as lock:
-                self.__clock[1] = new_clock
-
-    @property
-    def delta(self) -> list[int]:
-        if isinstance(self.__delta[0], mp_sync.Lock) and isinstance(
-            self.__delta[1], list
-        ):
-            with self.__delta[0] as lock:
-                return self.__delta[1]
-        raise TypeError("__delta has the wrong types")
-
-    @delta.setter
-    def delta(self, new_delta: list[int]) -> None:
-        if isinstance(self.__delta[0], mp_sync.Lock):
-            with self.__delta[0] as lock:
-                self.__delta[1] = new_delta
 
     @property
     def window(self) -> pygame.Surface:
@@ -137,6 +84,9 @@ class Display(DrawProps, metaclass=singleton.Singleton):
         dim: Sequence[int] = (0, 0),
     ) -> None:
         if not hasattr(self, "created"):
+            self.scenes: dict[str, scene.Scene] = {}
+            self.clock: pygame.time.Clock = pygame.time.Clock()
+            self.delta: list[int] = [0]
             pygame.init()
             super().__init__(dim)
             pygame.display.set_caption(title)
@@ -215,7 +165,7 @@ class AsyncDisplay(Display, metaclass=singleton.Singleton):
                 self.events.notify(e, self.cur_scene.all_listeners)
             time.sleep(0.04)
 
-    def update_rect(res: pygame.Rect) -> None:
+    def update_rect(self, res: pygame.Rect) -> None:
         self.cur_scene.design.rect = res
 
     def draw(self) -> None:
@@ -228,6 +178,6 @@ class AsyncDisplay(Display, metaclass=singleton.Singleton):
             if self.cur_scene.elements != [None]:
                 for element_layer in self.cur_scene.elements:
                     for e in element_layer:
-                        e.draw_async(self)
+                        e.draw_async(self.qw, self.window, self.dimensions)
             self.update(self.delta)
             self.qw.add(pygame.display.flip)

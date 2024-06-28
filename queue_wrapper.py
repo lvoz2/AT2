@@ -22,7 +22,8 @@ class QueueWrapper:
         self.receive_queue: mp_q.Queue = mp.Queue()
         self.__res_funcs: dict[str, Callable[[Any], None]] = {}
         self.__ctx = mp.get_context(method="spawn")
-        self.__process: mp.Process = self.__ctx.Process(target=run, args=(self.send_queue, self.receive_queue)).start()
+        self.__process: mp.Process = self.__ctx.Process(target=run, args=(self.send_queue, self.receive_queue))
+        self.__process.start()
 
     def add(self, func: Callable[..., Any], args: Optional[list[Any]] = None, kwargs: Optional[dict[str, Any]] = None, callback: Optional[Callable[[Any], None]] = None) -> None:
         unique_id: str = str(uuid.uuid4())

@@ -101,10 +101,10 @@ class Display(DrawProps, metaclass=singleton.Singleton):
                 "keypress": pygame.event.custom_type(),
             }
 
-    def set_screen(self, new_scene: str) -> None:
+    def set_scene(self, new_scene: str) -> None:
         if new_scene in self.scenes:
             event_processor: events.Events = events.Events()
-            event_processor.cur_screen = self.scenes[new_scene]
+            event_processor.cur_scene = self.scenes[new_scene]
             self.cur_scene = self.scenes[new_scene]
         else:
             raise KeyError(
@@ -113,9 +113,9 @@ class Display(DrawProps, metaclass=singleton.Singleton):
             not been loaded into the Display'
             )
 
-    def add_screen(self, name: str, new_screen: scene.Scene) -> bool:
+    def add_scene(self, name: str, new_scene: scene.Scene) -> bool:
         if name not in self.scenes:
-            self.scenes[name] = new_screen
+            self.scenes[name] = new_scene
         else:
             raise KeyError(
                 "Scene couldn't be added, becuase another Scene with the same name "
@@ -168,6 +168,8 @@ class AsyncDisplay(Display, metaclass=singleton.Singleton):
             time.sleep(0.04)
 
     def update_rect(self, res: pygame.Rect) -> None:
+        if self.cur_scene is None:
+            raise ValueError("No scene set, please set this first with AsyncDisplay.set_scene(scene_name) first.")
         self.cur_scene.design.rect = res
 
     def draw(self) -> None:

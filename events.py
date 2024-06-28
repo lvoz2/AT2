@@ -21,7 +21,7 @@ class Events(metaclass=singleton.Singleton):
         if not hasattr(self, "created"):
             self.created: bool = True
             self.pressed_keys: list[int] = []
-            self.__cur_screen: Optional[scene.Scene] = None
+            self.__cur_scene: Optional[scene.Scene] = None
             self.__processors: dict[
                 int,
                 tuple[
@@ -38,12 +38,12 @@ class Events(metaclass=singleton.Singleton):
             ] = {}
 
     @property
-    def cur_screen(self) -> Optional[scene.Scene]:
-        return self.__cur_screen
+    def cur_scene(self) -> Optional[scene.Scene]:
+        return self.__cur_scene
 
-    @cur_screen.setter
-    def cur_screen(self, new_screen: scene.Scene) -> None:
-        self.__cur_screen = new_screen
+    @cur_scene.setter
+    def cur_scene(self, new_scene: scene.Scene) -> None:
+        self.__cur_scene = new_scene
 
     def quit(self) -> None:
         sys.exit()

@@ -26,7 +26,7 @@ def play(
     options: dict[str, Any],  # pylint: disable=unused-argument
 ) -> None:  # pylint: disable=unused-argument
     window: display.Display = display.Display()
-    window.set_screen("class_select_menu")
+    window.set_scene("class_select_menu")
 
 
 def settings(
@@ -34,7 +34,7 @@ def settings(
     options: dict[str, Any],  # pylint: disable=unused-argument
 ) -> None:  # pylint: disable=unused-argument
     window: display.Display = display.Display()
-    window.set_screen("settings_menu")
+    window.set_scene("settings_menu")
 
 
 def leave(
@@ -51,9 +51,9 @@ def back(
 ) -> None:  # pylint: disable=unused-argument
     window: display.Display = display.Display()
     if isinstance(options["args"], str):
-        window.set_screen(options["args"])
+        window.set_scene(options["args"])
     else:
-        window.set_screen(options["args"][0])
+        window.set_scene(options["args"][0])
 
 
 def select_class(
@@ -87,8 +87,8 @@ def select_class(
                 scale=0.3,
             )
     if player_class is not None:
-        window.add_screen("game", create_game_screen(player_class))
-        window.set_screen("game")
+        window.add_scene("game", create_game_scene(player_class))
+        window.set_scene("game")
 
 
 def move_player(
@@ -309,7 +309,7 @@ def create_class_select_menu(
     return class_select_menu
 
 
-def create_game_screen(player_sprite: player.Player) -> scene.Scene:
+def create_game_scene(player_sprite: player.Player) -> scene.Scene:
     window: display.Display = display.Display()
     bground: sprite.Sprite = utils.get_asset("assets/dungeon_map.png")
     bground.surf = pygame.transform.scale(
@@ -327,10 +327,10 @@ def create_game_screen(player_sprite: player.Player) -> scene.Scene:
     enemies: list[enemy.Enemy] = [
         zombie.Zombie(rect_options=rect_options) for rect_options in enemy_rect_options
     ]
-    game_screen: scene.Scene = scene.Scene(bground)
-    game_screen.elements[0].append(player_sprite)
+    game_scene: scene.Scene = scene.Scene(bground)
+    game_scene.elements[0].append(player_sprite)
     for enemy_inst in enemies:
-        game_screen.elements[0].append(enemy_inst)
+        game_scene.elements[0].append(enemy_inst)
     player_hp_bar_bground = element.Element(
         sprite.Sprite(
             rect=pygame.Rect(10, 10, 260, 30),
@@ -347,12 +347,12 @@ def create_game_screen(player_sprite: player.Player) -> scene.Scene:
         window.custom_events["dmg_event"],
         lambda event, options: player_hp_bar.update(event.target.health),
     )
-    game_screen.elements[0].append(player_hp_bar_bground)
-    game_screen.elements.append([player_hp_bar])
+    game_scene.elements[0].append(player_hp_bar_bground)
+    game_scene.elements.append([player_hp_bar])
     keys: list[int] = [pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d]
     for press_type in [pygame.KEYDOWN, pygame.KEYUP]:
         for key in keys:
-            game_screen.register_listener(
+            game_scene.register_listener(
                 press_type,
                 lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
                     event, options  # pylint: disable=unnecessary-lambda
@@ -363,7 +363,7 @@ def create_game_screen(player_sprite: player.Player) -> scene.Scene:
                     "args": player_sprite,
                 },
             )
-    return game_screen
+    return game_scene
 
 
 def process_dmg(
@@ -384,12 +384,12 @@ def init() -> None:
     window: display.Display = display.Display("Kings Quest", [width, height])
     window.events.register_processor(window.custom_events["dmg_event"], process_dmg)
     font = pygame.font.Font(None, 36)
-    window.add_screen("main_menu", create_main_menu(width, window, font))
-    window.add_screen("settings_menu", create_settings_menu(height, window, font))
-    window.add_screen(
+    window.add_scene("main_menu", create_main_menu(width, window, font))
+    window.add_scene("settings_menu", create_settings_menu(height, window, font))
+    window.add_scene(
         "class_select_menu", create_class_select_menu(width, window, height, font)
     )
-    window.set_screen("main_menu")
+    window.set_scene("main_menu")
     while True:
         window.handle_events()
 

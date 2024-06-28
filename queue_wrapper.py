@@ -1,4 +1,4 @@
-import asyncio
+# import asyncio
 import multiprocessing as mp
 import multiprocessing.queues as mp_q
 import queue
@@ -17,13 +17,12 @@ def run(receive_queue: mp_q.JoinableQueue, send_queue: mp_q.Queue) -> None:
 
 
 class QueueWrapper:
-    def __init__(self):
+    def __init__(self) -> None:
         self.send_queue: mp_q.JoinableQueue = mp.JoinableQueue()
         self.receive_queue: mp_q.Queue = mp.Queue()
-        self.__res_funcs: dict[str, tuple[Callable[[Any], None], Any]] = {}
+        self.__res_funcs: dict[str, Callable[[Any], None]] = {}
         self.__ctx = mp.get_context(method="spawn")
-        self.__process: mp.Process = self.__ctx.Process(target=run, args=(self.send_queue, self.receive_queue))
-        self.__process.start()
+        self.__process: mp.Process = self.__ctx.Process(target=run, args=(self.send_queue, self.receive_queue)).start()
 
     def add(self, func: Callable[..., Any], args: Optional[list[Any]] = None, kwargs: Optional[dict[str, Any]] = None, callback: Optional[Callable[[Any], None]] = None) -> None:
         unique_id: str = str(uuid.uuid4())
@@ -35,16 +34,14 @@ class QueueWrapper:
             kwargs = {}
         self.send_queue.put((unique_id, func, args, kwargs))
 
-    async def fetch(self) -> None:
-        while True:
-            try:
-                while True:
-                    res: tuple[str, Any] = self.receive_queue.get(False)
-                    if res[0] in self.__res_funcs:
-                        self.__res_funcs[res[0]][0](res[1])
-            except queue.Empty as e:
-                pass
-            asyncio.sleep(0.05)
+    def fetch(self) -> None:
+        try:
+            while True:
+                res: tuple[str, Any] = self.receive_queue.get(False)
+                if res[0] in self.__res_funcs:
+                    self.__res_funcs[res[0]](res[1])
+        except queue.Empty as e:
+            pass
 
     def kill(self) -> bool:
         self.send_queue.put(True)
@@ -54,5 +51,5 @@ class QueueWrapper:
                 self.__process.join()
                 return True
             if res[0] in self.__res_funcs:
-                self.__res_funcs[res[0]][0](res[1])
+                self.__res_funcs[res[0]](res[1])
         return False

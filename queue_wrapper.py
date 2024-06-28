@@ -10,7 +10,7 @@ def run(receive_queue: mp_q.JoinableQueue, send_queue: mp_q.Queue) -> None:
     while True:
         data: tuple[str, Callable[..., Any], list[Any], dict[str, Any]] | bool = receive_queue.get()
         if isinstance(data, bool):
-            self.send_queue.put(True)
+            send_queue.put(True)
             break
         res: Any = data[1](*data[2], **data[3])
         send_queue.put((data[0], res))

@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Any, Callable, Optional, Sequence
 
 import pygame
 
+import queue_wrapper
 import sprite
 
 if TYPE_CHECKING:
@@ -15,13 +16,28 @@ class Element:
         mask: Optional[pygame.Rect] = None,
         visible: bool = False,
     ) -> None:
-        self.design = design
+        self.__design: list[mp_sync.Lock | sprite.Sprite] = [mp.Lock(), design]
         self.mask = mask
         self.listeners: dict[
             int,
             dict[Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]],
         ] = {}
         self.visible = visible
+
+    @property
+    def design(self) -> sprite.Sprite:
+        if isinstance(self.__design[0], mp_sync.Lock) and isinstance(
+            self.__design[1], sprite.Sprite
+        ):
+            with self.__design[0] as lock:
+                return self.__design[1]
+        raise TypeError("__design has the wrong types")
+
+    @design.setter
+    def design(self, new_design: sprite.Sprite) -> None:
+        if isinstance(self.__design[0], mp_sync.Lock):
+            with self.__design[0] as lock:
+                self.__design[1] = new_design
 
     def register_listener(
         self,
@@ -59,6 +75,18 @@ class Element:
                 f"received {options}"
             )
         del self.listeners[event_type][func]
+
+    def update_rect(self, res: pygame.Rect) -> None:
+        self.design.rect.x, self.design.rect.y = res.x, res.y
+
+    def draw_async(self, qw: queue_wrapper.QueueWrapper, window: pygame.Surface, dimensions: Sequence[int]) -> None:
+        self.visible = (
+            (0 - self.design.rect.width) < self.design.rect.x < dimensions[0]
+        ) and (
+            (0 - self.design.rect.height) < self.design.rect.y < dimensions[1]
+        )
+        if self.visible:
+            qw.add(window.blit, args=[self.design.surf, self.design.rect, self.mask], callback=self.update_rect)
 
     def draw(self, window: "display.DrawProps") -> None:
         self.visible = (

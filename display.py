@@ -2,6 +2,7 @@ import collections
 import multiprocessing as mp
 import multiprocessing.pool as mp_pool
 import multiprocessing.synchronize as mp_sync
+import multiprocessing.queues as mp_q
 import time
 from typing import Any, Callable, Optional, Sequence
 
@@ -9,6 +10,7 @@ import pygame
 
 import event_processors
 import events
+import queue_wrapper as qw
 import scene
 import singleton
 
@@ -127,24 +129,6 @@ class DrawProps(metaclass=singleton.Singleton):
     def update(self, delta: list[int]) -> None:
         pass
 
-    def draw(self, inst: Optional["DrawProps"] = None) -> None:
-        ctx: "DrawProps" = self if inst is None else inst
-        if ctx.cur_scene is not None:
-            ctx.delta.append(ctx.clock.tick(25))
-            if len(ctx.delta) > 10:
-                ctx.delta = ctx.delta[(len(ctx.delta) - 10) :]
-            ctx.window.fill([0, 0, 0])
-            ctx.cur_scene.design.rect = ctx.window.blit(
-                ctx.cur_scene.design.surf,
-                pygame.Rect(0, 0, ctx.dimensions[0], ctx.dimensions[1]),
-            )
-            if ctx.cur_scene.elements != [None]:
-                for element_layer in ctx.cur_scene.elements:
-                    for e in element_layer:
-                        e.draw(ctx)
-            ctx.update(ctx.delta)
-            pygame.display.flip()
-
 
 class Display(DrawProps, metaclass=singleton.Singleton):
     def __init__(
@@ -194,10 +178,22 @@ class Display(DrawProps, metaclass=singleton.Singleton):
             for e in pygame.event.get():
                 self.events.notify(e, self.cur_scene.all_listeners)
 
-
-def draw_async(draw_func: Callable[[...], None], data: Any) -> None:
-    print("Test")
-    draw_func(data)
+    def draw(self) -> None:
+        if self.cur_scene is not None:
+            self.delta.append(self.clock.tick(25))
+            if len(self.delta) > 10:
+                self.delta = self.delta[(len(self.delta) - 10) :]
+            self.window.fill([0, 0, 0])
+            self.cur_scene.design.rect = self.window.blit(
+                self.cur_scene.design.surf,
+                pygame.Rect(0, 0, self.dimensions[0], self.dimensions[1]),
+            )
+            if self.cur_scene.elements != [None]:
+                for element_layer in self.cur_scene.elements:
+                    for e in element_layer:
+                        e.draw(self)
+            self.update(self.delta)
+            pygame.display.flip()
 
 
 class AsyncDisplay(Display, metaclass=singleton.Singleton):
@@ -209,16 +205,29 @@ class AsyncDisplay(Display, metaclass=singleton.Singleton):
         if not hasattr(self, "ready"):
             self.ready = False
             super().__init__(title, dim)
-            self.ctx = mp.get_context("spawn")
-            self.draw_process: mp_pool.Pool = mp.Pool(processes=1)
+            self.qw = qw.QueueWrapper()
             self.ready = True
 
     def handle_events(self) -> None:
         if self.cur_scene is not None:
-            DrawPropsTuple = collections.namedtuple("DrawPropsTuple", "scenes, cur_scene, clock, delta dimensions window")
-            data = DrawPropsTuple(self.scenes, self.cur_scene, self.clock, self.delta, self.dimensions, self.window)
-            self.draw_process.apply_async(draw_async, (self.draw, data))
             self.cur_scene.get_all_listeners()
             for e in pygame.event.get():
                 self.events.notify(e, self.cur_scene.all_listeners)
             time.sleep(0.04)
+
+    def update_rect(res: pygame.Rect) -> None:
+        self.cur_scene.design.rect = res
+
+    def draw(self) -> None:
+        if self.cur_scene is not None:
+            self.delta.append(self.clock.tick(25))
+            if len(self.delta) > 10:
+                self.delta = self.delta[(len(self.delta) - 10) :]
+            self.qw.add(self.window.fill, args=[[0, 0, 0]])
+            self.qw.add(self.window.blit, args=[self.cur_scene.design.surf, pygame.Rect(0, 0, self.dimensions[0], self.dimensions[1])], callback=self.update_rect)
+            if self.cur_scene.elements != [None]:
+                for element_layer in self.cur_scene.elements:
+                    for e in element_layer:
+                        e.draw_async(self)
+            self.update(self.delta)
+            self.qw.add(pygame.display.flip)

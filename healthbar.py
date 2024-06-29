@@ -3,7 +3,6 @@ from typing import Any
 import pygame
 
 import element
-import player
 import sprite
 
 

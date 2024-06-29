@@ -2,7 +2,6 @@ from typing import Any, Optional
 
 import pygame
 
-import display
 import enemy
 import utils
 
@@ -14,7 +13,6 @@ class Zombie(enemy.Enemy):
         rect_options: Optional[dict[str, Any]] = None,
         mask: Optional[pygame.Rect] = None,
     ):
-        window: display.Display = display.Display()
         super().__init__(
             utils.get_asset(
                 "assets/skeleton.png", rect=rect, rect_options=rect_options

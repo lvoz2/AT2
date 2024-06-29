@@ -2,7 +2,6 @@ from typing import Any, Optional
 
 import pygame
 
-import display
 import player
 import utils
 
@@ -16,7 +15,6 @@ class Rogue(player.Player):
         mask: Optional[pygame.Rect] = None,
         scale: float = 1.0,
     ) -> None:
-        window: display.Display = display.Display()
         super().__init__(
             utils.get_asset(
                 "assets/rogue.png", rect=rect, rect_options=rect_options, scale=scale

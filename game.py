@@ -1,4 +1,4 @@
-import copy
+import concurrent.futures as cf
 import math
 import sys
 import time
@@ -381,9 +381,13 @@ def process_dmg(
 def init() -> None:
     width: int = 800
     height: int = 600
-    window: display.AsyncDisplay = display.AsyncDisplay("Kings Quest", [width, height])
+    window: display.AsyncDisplay = display.AsyncDisplay(
+        title="Kings Quest", dim=[width, height], start_method="spawn"
+    )
     window.events.register_processor(window.custom_events["dmg_event"], process_dmg)
-    font = pygame.font.Font(None, 36)
+    font_fut = window.runner.executor.submit(pygame.font.Font, None, 36)
+    cf.wait([font_fut])
+    font: pygame.font.Font = font_fut.result(0.01)
     window.add_scene("main_menu", create_main_menu(width, window, font))
     window.add_scene("settings_menu", create_settings_menu(height, window, font))
     window.add_scene(

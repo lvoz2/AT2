@@ -1,12 +1,11 @@
 import sys
 import warnings
-from functools import lru_cache
 from typing import Any, Callable, Optional
 
 import pygame
 
 import scene
-import singleton
+import utils
 
 # The way events will be handled is heavily influenced by JavaScript, especially
 # addEventListener and removeEventListener. The interface for it should share its state
@@ -16,7 +15,7 @@ import singleton
 # is actually clicked, instead of every MouseDown Event.
 
 
-class Events(metaclass=singleton.Singleton):
+class Events(metaclass=utils.Singleton):
     def __init__(self) -> None:
         if not hasattr(self, "created"):
             self.created: bool = True

@@ -1,10 +1,11 @@
+import concurrent.futures._base as cf_b
+import concurrent.futures.process as cf_p
 import multiprocessing as mp
 import multiprocessing.synchronize as mp_sync
 from typing import TYPE_CHECKING, Any, Callable, Optional, Sequence
 
 import pygame
 
-import queue_wrapper
 import sprite
 
 if TYPE_CHECKING:
@@ -78,12 +79,13 @@ class Element:
             )
         del self.listeners[event_type][func]
 
-    def update_rect(self, res: pygame.Rect) -> None:
+    def update_rect(self, future: cf_b.Future) -> None:
+        res: pygame.Rect = future.result(0.01)
         self.design.rect.x, self.design.rect.y = res.x, res.y
 
     def draw_async(
         self,
-        qw: queue_wrapper.QueueWrapper,
+        executor: cf_p.ProcessPoolExecutor,
         window: pygame.Surface,
         dimensions: Sequence[int],
     ) -> None:
@@ -91,11 +93,10 @@ class Element:
             (0 - self.design.rect.width) < self.design.rect.x < dimensions[0]
         ) and ((0 - self.design.rect.height) < self.design.rect.y < dimensions[1])
         if self.visible:
-            qw.add(
-                window.blit,
-                args=[self.design.surf, self.design.rect, self.mask],
-                callback=self.update_rect,
+            future: cf_b.Future = executor.submit(
+                window.blit, self.design.surf, self.design.rect, self.mask
             )
+            future.add_done_callback(self.update_rect)
 
     def draw(self, window: "display.DrawProps") -> None:
         self.visible = (

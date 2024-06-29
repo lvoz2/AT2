@@ -1,0 +1,12 @@
+{
+    "pylint.args": [
+        "--rcfile ./.pylintrc *.py"
+    ],
+    "flake8.args": [
+        "--extend-exclude='.venv'",
+        "--ignore=E203,E701",
+        "--extend-ignore=E203,E701,W503,F841",
+        "--count",
+        "--max-line-length=88"
+    ]
+}

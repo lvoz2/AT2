@@ -105,7 +105,8 @@ class Events(metaclass=utils.Singleton):
                 "poll_sentinel": 0x7F00,
             }
             self.reversed_event_types: dict[int, str] = {
-                self.event_types[name]: name for name in self.event_types
+                event_id: event_name
+                for event_name, event_id in self.event_types.items()
             }
             self.pygame_evts = types.MappingProxyType(copy.deepcopy(self.event_types))
 

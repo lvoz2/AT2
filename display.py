@@ -9,7 +9,6 @@ from typing import Any, Optional, Sequence
 import pygame
 
 import draw_process_funcs as dpf
-import event_processors
 import events
 import scene
 import utils
@@ -111,11 +110,6 @@ class Display(DrawProps, metaclass=utils.Singleton):
                 pygame.key.set_repeat(25)
             self.game_over: bool = False
             self.events = events.Events()
-            event_processors.load()
-            self.custom_events: dict[str, int] = {
-                "dmg_event": pygame.event.custom_type(),
-                "keypress": pygame.event.custom_type(),
-            }
 
     def set_scene(self, new_scene: str) -> None:
         if new_scene in self.scenes:

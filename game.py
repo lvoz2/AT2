@@ -7,7 +7,7 @@ import math
 import sys
 
 # import time
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 import pygame
 
@@ -156,8 +156,8 @@ def check_dists(player_entity: player.Player) -> None:
         if isinstance(e, entity.Entity):
             distance: float = player_entity.get_distance(e)
             if isinstance(e, enemy.Enemy) and distance <= 50.0:
-                player_entity.attack(0, e, window.custom_events["dmg_event"])
-                e.attack(0, player_entity, window.custom_events["dmg_event"])
+                player_entity.attack(0, e, window.events.event_types["dmg_event"])
+                e.attack(0, player_entity, window.events.event_types["dmg_event"])
 
 
 def create_main_menu(
@@ -372,7 +372,7 @@ def create_game_scene(player_sprite: player.Player) -> scene.Scene:
         {"x": 15, "y": 15, "colour": [255, 0, 0]},
     )
     player_sprite.register_listener(
-        window.custom_events["dmg_event"],
+        window.events.event_types["dmg_event"],
         lambda event, options: player_hp_bar.update(event.target.health),
     )
     game_scene.elements[0].append(player_hp_bar_bground)
@@ -394,23 +394,10 @@ def create_game_scene(player_sprite: player.Player) -> scene.Scene:
     return game_scene
 
 
-def process_dmg(
-    event: pygame.event.Event,
-    func: Callable[[pygame.event.Event, dict[str, Any]], None],
-    options: Optional[dict[str, Any]],
-) -> bool:
-    if options is not None:
-        if options["target"] == event.target:
-            func(event, options)
-            return True
-    return False
-
-
 def init() -> None:
     width: int = 800
     height: int = 600
     window: display.Display = display.Display(title="Kings Quest", dim=[width, height])
-    window.events.register_processor(window.custom_events["dmg_event"], process_dmg)
     pygame.font.init()
     font: pygame.font.Font = pygame.font.Font(None, 36)
     window.add_scene("main_menu", create_main_menu(width, window, font))

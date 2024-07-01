@@ -9,7 +9,6 @@ import pygame
 import scene
 import utils
 
-
 # The way events will be handled is heavily influenced by JavaScript, especially
 # addEventListener and removeEventListener. The interface for it should share its state
 # across all instantiations, and so it is a Singleton. This file should implement the
@@ -259,11 +258,8 @@ class Events(metaclass=utils.Singleton):
                 raise ValueError(
                     f"No event type exists as of yet with string {event_type}"
                 )
-            else:
-                raise ValueError(
-                    f"No event type exists as of yet with int {event_type}"
-                )
-        elif isinstance(event_type, str):
+            raise ValueError(f"No event type exists as of yet with int {event_type}")
+        if isinstance(event_type, str):
             event_type = self.get_event_id(event_type)
         if event_type in self.__processors:
             raise ValueError(f"A processor for event type {event_type} already exists.")
@@ -287,15 +283,10 @@ class Events(metaclass=utils.Singleton):
         ):
             if isinstance(event_type, str):
                 raise ValueError(
-                    f"No event type exists as of yet with string {event_type}, "
-                    f"int {self.get_event_id(event_type)}"
+                    f"No event type exists as of yet with string {event_type}"
                 )
-            else:
-                raise ValueError(
-                    f"No event type exists as of yet with string "
-                    f"{self.get_event_name(event_type)}, int {event_type}"
-                )
-        elif isinstance(event_type, str):
+            raise ValueError(f"No event type exists as of yet with int {event_type}")
+        if isinstance(event_type, str):
             event_type = self.get_event_id(event_type)
         warnings.warn(
             f"You are attempting to remove a processor for event type {event_type}. "

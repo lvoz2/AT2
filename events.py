@@ -1,4 +1,6 @@
+import copy
 import sys
+import types
 import warnings
 from typing import Any, Callable, Optional
 
@@ -39,7 +41,8 @@ class Events(metaclass=utils.Singleton):
             # I had to find where they were set in SDL2's source code to use them here
             # Not all (I don't think all) are actually mentioned in the pygame docs,
             # and if more event codes are required than the 32669 pygame.USEREVENT codes
-            # available, this dict can be used to find what's free
+            # available, this dict can be used to find what's free. Also available to
+            # do lookups
             self.event_types: dict[str, int] = {
                 "first_event": 0x0,
                 "quit": pygame.QUIT,
@@ -64,7 +67,57 @@ class Events(metaclass=utils.Singleton):
                 "mouse_button_up": pygame.MOUSEBUTTONUP,
                 "mouse_wheel": pygame.MOUSEWHEEL,
                 "joy_axis_motion": pygame.JOYAXISMOTION,
+                "joy_ball_motion": pygame.JOYBALLMOTION,
+                "joy_hat_motion": pygame.JOYHATMOTION,
+                "joy_button_down": pygame.JOYBUTTONDOWN,
+                "joy_button_up": pygame.JOYBUTTONUP,
+                "joy_device_added": pygame.JOYDEVICEADDED,
+                "joy_device_removed": pygame.JOYDEVICEREMOVED,
+                "joy_battery_updated": 0x607,
+                "controller_axis_motion": pygame.CONTROLLERAXISMOTION,
+                "controller_button_down": pygame.CONTROLLERBUTTONDOWN,
+                "controller_button_up": pygame.CONTROLLERBUTTONUP,
+                "controller_device_added": pygame.CONTROLLERDEVICEADDED,
+                "controller_device_removed": pygame.CONTROLLERDEVICEREMOVED,
+                "controller_device_remapped": pygame.CONTROLLERDEVICEREMAPPED,
+                "controller_touch_pad_down": pygame.CONTROLLERTOUCHPADDOWN,
+                "controller_touch_pad_motion": pygame.CONTROLLERTOUCHPADMOTION,
+                "controller_touch_pad_up": pygame.CONTROLLERTOUCHPADUP,
+                "controller_sensor_update": pygame.CONTROLLERSENSORUPDATE,
+                "controller_update_complete": 0x660,  # Reserved for SDL3, do not use
+                "controller_steam_handle_updated": 0x661,
+                "finger_down": pygame.FINGERDOWN,
+                "finger_up": pygame.FINGERUP,
+                "finger_motion": pygame.FINGERMOTION,
+                "dollar_gesture": 0x800,
+                "dollar_record": 0x801,
+                "multi_gesture": pygame.MULTIGESTURE,
+                "clipboard_update": pygame.CLIPBOARDUPDATE,
+                "drop_file": pygame.DROPFILE,
+                "drop_text": pygame.DROPTEXT,
+                "drop_begin": pygame.DROPBEGIN,
+                "drop_complete": pygame.DROPCOMPLETE,
+                "audio_device_added": pygame.AUDIODEVICEADDED,
+                "audio_device_removed": pygame.AUDIODEVICEREMOVED,
+                "sensor_update": 0x1200,
+                "render_targets_reset": pygame.RENDER_TARGETS_RESET,
+                "render_device_reset": pygame.RENDER_DEVICE_RESET,
+                "poll_sentinel": 0x7F00,
             }
+            self.reversed_event_types: dict[int, str] = {
+                self.event_types[name]: name for name in self.event_types
+            }
+            self.pygame_evts = types.MappingProxyType(copy.deepcopy(self.event_types))
+
+    def get_event_id(self, event_name: str) -> int:
+        if event_name not in self.event_types:
+            raise ValueError(f"No event with name {event_name} is in event_types")
+        return self.event_types[event_name]
+
+    def get_event_name(self, event_id: int) -> str:
+        if event_id not in self.reversed_event_types:
+            raise ValueError(f"No event with id {event_id} in event_types")
+        return self.reversed_event_types[event_id]
 
     @property
     def cur_scene(self) -> Optional[scene.Scene]:

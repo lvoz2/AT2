@@ -40,7 +40,7 @@ class Player(character.Character):
         self.inventory: list[Any] = []
         self.money: int = 0
         self.attr_pts: int = 0
-        self.ATTR_PTS_PER_LVL: int = 3
+        self.attr_pts_per_lvl: int = 3
         self.attacks: list[attack.Attack] = [attack.Attack(25, 0)]
 
     def assign_attr_pts(self, attr: str, pts: int) -> None:
@@ -53,10 +53,10 @@ class Player(character.Character):
     def gain_xp(self, xp: int) -> None:
         self.xp += xp
         req_xp: int = self.calc_req_xp(self.lvl + 1)
-        while self.xp >= req_xp and self.lvl < self.MAX_LVL:
+        while self.xp >= req_xp and self.lvl < self.max_lvl:
             self.lvl += 1
             self.xp -= req_xp
-            self.attr_pts += self.ATTR_PTS_PER_LVL
+            self.attr_pts += self.attr_pts_per_lvl
             # screen.show("Level Up", f"{self.name} is now level {self.level}")
             req_xp = self.calc_req_xp(self.lvl + 1)
 

@@ -6,8 +6,8 @@ import pygame
 
 def init(dim: Sequence[int]) -> None:
     pygame.init()
-    global window
-    window = pygame.display.set_mode(dim)
+    global window  # pylint: disable=global-variable-undefined
+    window = pygame.display.set_mode(dim)  # type: ignore[name-defined]
     pygame.key.set_repeat(25)
 
 
@@ -20,18 +20,18 @@ def construct_and_blit(
     rect: pygame.Rect,
     mask: Optional[pygame.Rect] = None,
 ) -> pygame.Rect:
-    global window
+    global window  # pylint: disable=global-variable-not-assigned
     surf: pygame.Surface = pygame.image.frombuffer(
         surf_as_bytes[0],
         surf_as_bytes[1],
         surf_as_bytes[2],
     )
-    return window.blit(surf, rect, mask)
+    return window.blit(surf, rect, mask)  # type: ignore[name-defined]
 
 
 def fill_screen(colour: Sequence[int] | tuple[int, int, int]) -> pygame.Rect:
-    global window
-    return window.fill(color=colour)
+    global window  # pylint: disable=global-variable-not-assigned
+    return window.fill(color=colour)  # type: ignore[name-defined]
 
 
 def load_image(

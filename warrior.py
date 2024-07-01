@@ -2,7 +2,6 @@ from typing import Any, Optional
 
 import pygame
 
-import display
 import player
 import utils
 

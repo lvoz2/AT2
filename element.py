@@ -40,14 +40,14 @@ class Element:
         if isinstance(self.__design[0], mp_sync.Lock) and isinstance(
             self.__design[1], sprite.Sprite
         ):
-            with self.__design[0] as lock:
+            with self.__design[0] as lock:  # pylint: disable=unused-variable
                 return self.__design[1]
         raise TypeError("__design has the wrong types")
 
     @design.setter
     def design(self, new_design: sprite.Sprite) -> None:
         if isinstance(self.__design[0], mp_sync.Lock):
-            with self.__design[0] as lock:
+            with self.__design[0] as lock:  # pylint: disable=unused-variable
                 self.__design[1] = new_design
                 self.bytes = (
                     pygame.image.tobytes(self.design.surf, "RGBA"),

@@ -34,7 +34,7 @@ class DrawProps(metaclass=utils.Singleton):
                 ]
             self.from_async = from_async
             self.executor: Optional[cf_p.ProcessPoolExecutor] = None
-            self.__built: bool = True
+            self.__built: bool = True  # pylint: disable=unused-private-member
 
     # Accessors with locks
     @property
@@ -42,14 +42,14 @@ class DrawProps(metaclass=utils.Singleton):
         if isinstance(self.__cur_scene[0], mp_sync.Lock) and (
             isinstance(self.__cur_scene[1], scene.Scene) or self.__cur_scene[1] is None
         ):
-            with self.__cur_scene[0] as lock:
+            with self.__cur_scene[0] as lock:  # pylint: disable=unused-variable
                 return self.__cur_scene[1]
         raise TypeError("__cur_scene has the wrong types")
 
     @cur_scene.setter
     def cur_scene(self, new_scene: Optional[scene.Scene]) -> None:
         if isinstance(self.__cur_scene[0], mp_sync.Lock):
-            with self.__cur_scene[0] as lock:
+            with self.__cur_scene[0] as lock:  # pylint: disable=unused-variable
                 self.__cur_scene[1] = new_scene
 
     @property
@@ -58,18 +58,18 @@ class DrawProps(metaclass=utils.Singleton):
             if isinstance(self.__window[0], mp_sync.Lock) and isinstance(
                 self.__window[1], pygame.Surface
             ):
-                with self.__window[0] as lock:
+                with self.__window[0] as lock:  # pylint: disable=unused-variable
                     return self.__window[1]
         except AttributeError as e:
             raise AttributeError(
                 "The requested window does not exist in the main thread"
-            )
+            ) from e
         raise TypeError("__window has the wrong types")
 
     @window.setter
     def window(self, new_window: pygame.Surface) -> None:
         if isinstance(self.__window[0], mp_sync.Lock):
-            with self.__window[0] as lock:
+            with self.__window[0] as lock:  # pylint: disable=unused-variable
                 self.__window[1] = new_window
 
     @property
@@ -77,14 +77,14 @@ class DrawProps(metaclass=utils.Singleton):
         if isinstance(self.__dimensions[0], mp_sync.Lock) and isinstance(
             self.__dimensions[1], Sequence
         ):
-            with self.__dimensions[0] as lock:
+            with self.__dimensions[0] as lock:  # pylint: disable=unused-variable
                 return self.__dimensions[1]
         raise TypeError("__dimensions has the wrong types")
 
     @dimensions.setter
     def dimensions(self, new_dimensions: Sequence[int]) -> None:
         if isinstance(self.__dimensions[0], mp_sync.Lock):
-            with self.__dimensions[0] as lock:
+            with self.__dimensions[0] as lock:  # pylint: disable=unused-variable
                 self.__dimensions[1] = new_dimensions
 
     def update(self, delta: list[int]) -> None:

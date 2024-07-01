@@ -1,11 +1,10 @@
-import tracemalloc
+# import tracemalloc
 
-tracemalloc.start()
+# tracemalloc.start()
 
 # import concurrent.futures as cf
 import math
 import sys
-import time
 
 # import time
 from typing import Any, Callable, Optional
@@ -25,6 +24,8 @@ import sprite
 import utils
 import warrior
 import zombie
+
+# import time
 
 
 def play(
@@ -422,14 +423,14 @@ def init() -> None:
         try:
             window.handle_events()
         except KeyboardInterrupt as e:
-            # raise e
-            snapshot = tracemalloc.take_snapshot()
-            top_stats = top_stats = snapshot.statistics("lineno")
-            print("[ Top 500 ]")
-            for stat in top_stats[:500]:
-                if str(stat)[:32] == "/home/mint/Documents/GitHub/AT2/":
-                    print(stat)
-            sys.exit()
+            raise e
+            # snapshot = tracemalloc.take_snapshot()
+            # top_stats = top_stats = snapshot.statistics("lineno")
+            # print("[ Top 500 ]")
+            # for stat in top_stats[:500]:
+            #     if str(stat)[:32] == "/home/mint/Documents/GitHub/AT2/":
+            #         print(stat)
+            # sys.exit()
 
 
 if __name__ == "__main__":

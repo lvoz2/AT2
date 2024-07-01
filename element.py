@@ -2,10 +2,11 @@ import concurrent.futures._base as cf_b
 import concurrent.futures.process as cf_p
 import multiprocessing as mp
 import multiprocessing.synchronize as mp_sync
-from typing import TYPE_CHECKING, Any, Callable, Optional, Sequence
+from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, Sequence
 
 import pygame
 
+import draw_process_funcs as dpf
 import sprite
 
 if TYPE_CHECKING:
@@ -26,6 +27,13 @@ class Element:
             dict[Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]],
         ] = {}
         self.visible = visible
+        self.bytes: tuple[
+            bytes, Sequence[int], Literal["P", "RGB", "RGBX", "RGBA", "ARGB", "BGRA"]
+        ] = (
+            pygame.image.tobytes(self.design.surf, "RGBA"),
+            [self.design.rect.width, self.design.rect.height],
+            "RGBA",
+        )
 
     @property
     def design(self) -> sprite.Sprite:
@@ -41,6 +49,11 @@ class Element:
         if isinstance(self.__design[0], mp_sync.Lock):
             with self.__design[0] as lock:
                 self.__design[1] = new_design
+                self.bytes = (
+                    pygame.image.tobytes(self.design.surf, "RGBA"),
+                    [self.design.rect.width, self.design.rect.height],
+                    "RGBA",
+                )
 
     def register_listener(
         self,
@@ -86,7 +99,6 @@ class Element:
     def draw_async(
         self,
         executor: cf_p.ProcessPoolExecutor,
-        window: pygame.Surface,
         dimensions: Sequence[int],
     ) -> None:
         self.visible = (
@@ -94,7 +106,14 @@ class Element:
         ) and ((0 - self.design.rect.height) < self.design.rect.y < dimensions[1])
         if self.visible:
             future: cf_b.Future = executor.submit(
-                window.blit, self.design.surf, self.design.rect, self.mask
+                dpf.construct_and_blit,
+                (
+                    self.bytes[0],
+                    self.bytes[1],
+                    self.bytes[2],
+                ),
+                self.design.rect,
+                self.mask,
             )
             future.add_done_callback(self.update_rect)
 

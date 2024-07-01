@@ -1,7 +1,13 @@
-import concurrent.futures as cf
+import tracemalloc
+
+tracemalloc.start()
+
+# import concurrent.futures as cf
 import math
 import sys
 import time
+
+# import time
 from typing import Any, Callable, Optional
 
 import pygame
@@ -154,14 +160,14 @@ def check_dists(player_entity: player.Player) -> None:
 
 
 def create_main_menu(
-    width: int, window: display.Display, font: pygame.font.Font
+    width: int, window: display.Display | display.AsyncDisplay, font: pygame.font.Font
 ) -> scene.Scene:
     bground: sprite.Sprite = utils.get_asset("assets/main_menu_background.png")
     bground.surf = pygame.transform.scale(
-        bground.surf, (window.window.get_width(), window.window.get_height())
+        bground.surf, (window.dimensions[0], window.dimensions[1])
     )
-    bground.rect.width = window.window.get_width()
-    bground.rect.height = window.window.get_height()
+    bground.rect.width = window.dimensions[0]
+    bground.rect.height = window.dimensions[1]
     half_width: float = width / 2
     main_menu: scene.Scene = scene.Scene(bground)
     y_vals: list[int] = [150, 200, 250]
@@ -176,6 +182,8 @@ def create_main_menu(
                         "y": y_val,
                         "colour": [255, 255, 255],
                     },
+                    is_async=window.from_async,
+                    executor=window.executor,
                 ),
                 visible=True,
             )
@@ -190,6 +198,8 @@ def create_main_menu(
                         "font": font,
                         "colour": [255, 0, 0],
                     },
+                    is_async=window.from_async,
+                    executor=window.executor,
                 ),
                 visible=True,
             ),
@@ -197,6 +207,8 @@ def create_main_menu(
                 sprite.Sprite(
                     rect_options={"center": True, "x": half_width, "y": 200.0},
                     font_options={"text": "Settings", "font": font},
+                    is_async=window.from_async,
+                    executor=window.executor,
                 ),
                 visible=True,
             ),
@@ -204,6 +216,8 @@ def create_main_menu(
                 sprite.Sprite(
                     rect_options={"center": True, "x": half_width, "y": 250.0},
                     font_options={"text": "Exit", "font": font},
+                    is_async=window.from_async,
+                    executor=window.executor,
                 ),
                 visible=True,
             ),
@@ -217,11 +231,11 @@ def create_main_menu(
 
 
 def create_settings_menu(
-    height: int, window: display.Display, font: pygame.font.Font
+    height: int, window: display.Display | display.AsyncDisplay, font: pygame.font.Font
 ) -> scene.Scene:
     bground: sprite.Sprite = utils.get_asset("assets/main_menu_background.png")
     bground.surf = pygame.transform.scale(
-        bground.surf, (window.window.get_width(), window.window.get_height())
+        bground.surf, (window.dimensions[0], window.dimensions[1])
     )
     settings_menu: scene.Scene = scene.Scene(bground)
     settings_menu.elements[0] = [
@@ -229,6 +243,8 @@ def create_settings_menu(
             sprite.Sprite(
                 rect=pygame.Rect(50, height - 80, 100, 30),
                 rect_options={"x": 50, "y": height - 80, "colour": [255, 255, 255]},
+                is_async=window.from_async,
+                executor=window.executor,
             ),
             visible=True,
         )
@@ -239,6 +255,8 @@ def create_settings_menu(
                 sprite.Sprite(
                     rect_options={"center": True, "x": 100, "y": height - 65},
                     font_options={"text": "Back", "font": font},
+                    is_async=window.from_async,
+                    executor=window.executor,
                 ),
                 visible=True,
             )
@@ -251,11 +269,14 @@ def create_settings_menu(
 
 
 def create_class_select_menu(
-    width: int, window: display.Display, height: int, font: pygame.font.Font
+    width: int,
+    window: display.Display | display.AsyncDisplay,
+    height: int,
+    font: pygame.font.Font,
 ) -> scene.Scene:
     bground: sprite.Sprite = utils.get_asset("assets/main_menu_background.png")
     bground.surf = pygame.transform.scale(
-        bground.surf, (window.window.get_width(), window.window.get_height())
+        bground.surf, (window.dimensions[0], window.dimensions[1])
     )
     class_select_menu: scene.Scene = scene.Scene(bground)
     images: list[str] = [
@@ -284,6 +305,8 @@ def create_class_select_menu(
             sprite.Sprite(
                 rect=pygame.Rect(50, height - 80, 100, 30),
                 rect_options={"x": 50, "y": height - 80, "colour": [255, 255, 255]},
+                is_async=window.from_async,
+                executor=window.executor,
             ),
             visible=True,
         )
@@ -294,6 +317,8 @@ def create_class_select_menu(
                 sprite.Sprite(
                     rect_options={"x": 100, "y": height - 65, "center": True},
                     font_options={"text": "Back", "font": font},
+                    is_async=window.from_async,
+                    executor=window.executor,
                 ),
                 visible=True,
             )
@@ -335,6 +360,8 @@ def create_game_scene(player_sprite: player.Player) -> scene.Scene:
         sprite.Sprite(
             rect=pygame.Rect(10, 10, 260, 30),
             rect_options={"x": 10, "y": 10, "colour": [192, 192, 192]},
+            is_async=window.from_async,
+            executor=window.executor,
         ),
         visible=True,
     )
@@ -381,13 +408,10 @@ def process_dmg(
 def init() -> None:
     width: int = 800
     height: int = 600
-    window: display.AsyncDisplay = display.AsyncDisplay(
-        title="Kings Quest", dim=[width, height], start_method="spawn"
-    )
+    window: display.Display = display.Display(title="Kings Quest", dim=[width, height])
     window.events.register_processor(window.custom_events["dmg_event"], process_dmg)
-    font_fut = window.runner.executor.submit(pygame.font.Font, None, 36)
-    cf.wait([font_fut])
-    font: pygame.font.Font = font_fut.result(0.01)
+    pygame.font.init()
+    font: pygame.font.Font = pygame.font.Font(None, 36)
     window.add_scene("main_menu", create_main_menu(width, window, font))
     window.add_scene("settings_menu", create_settings_menu(height, window, font))
     window.add_scene(
@@ -395,10 +419,17 @@ def init() -> None:
     )
     window.set_scene("main_menu")
     while True:
-        if window.ready:
+        try:
             window.handle_events()
-        else:
-            time.sleep(0.1)
+        except KeyboardInterrupt as e:
+            # raise e
+            snapshot = tracemalloc.take_snapshot()
+            top_stats = top_stats = snapshot.statistics("lineno")
+            print("[ Top 500 ]")
+            for stat in top_stats[:500]:
+                if str(stat)[:32] == "/home/mint/Documents/GitHub/AT2/":
+                    print(stat)
+            sys.exit()
 
 
 if __name__ == "__main__":

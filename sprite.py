@@ -1,7 +1,12 @@
+import concurrent.futures as cf
+import concurrent.futures._base as cf_b
+import concurrent.futures.process as cf_p
 import pathlib
 from typing import Any, Optional
 
 import pygame
+
+import draw_process_funcs as dpf
 
 
 class Sprite:
@@ -13,7 +18,13 @@ class Sprite:
         rect_options: Optional[dict[str, Any]] = None,
         font_options: Optional[dict[str, Any]] = None,
         path: Optional[pathlib.Path] = None,
+        is_async: bool = False,
+        executor: Optional[cf_p.ProcessPoolExecutor] = None,
     ) -> None:
+        self.is_async = is_async
+        if self.is_async and executor is None:
+            raise TypeError("An executor must be provided to do asynchronous execution")
+        self.executor = executor
         self.__surf = surf
         self.__rect = rect
         self.rect_options = rect_options
@@ -28,7 +39,24 @@ class Sprite:
 
     @surf.setter
     def surf(self, new_surf: pygame.Surface) -> None:
-        self.__surf = new_surf.convert_alpha()
+        if self.is_async:
+            if self.executor is None:
+                raise TypeError(
+                    "An executor must be provided to do asynchronous execution"
+                )
+            fut: cf_b.Future = self.executor.submit(
+                dpf.convert,
+                (
+                    pygame.image.tobytes(new_surf, "RGBA"),
+                    [new_surf.get_width(), new_surf.get_height()],
+                    "RGBA",
+                ),
+            )
+            cf.wait([fut])
+            res = fut.result()
+            self.__surf = pygame.image.frombuffer(res[0], res[1], res[2])
+        else:
+            self.__surf = new_surf.convert_alpha()
 
     @property
     def rect(self) -> pygame.Rect:
@@ -124,10 +152,11 @@ class Sprite:
             int(self.rect.height * scale),
         )
         self.rect.update(self.rect.x, self.rect.y, new_dimensions[0], new_dimensions[1])
-        return pygame.transform.scale(
+        scaled: pygame.Surface = pygame.transform.scale(
             self.surf,
             (
                 new_dimensions[0],
                 new_dimensions[1],
             ),
         )
+        return scaled

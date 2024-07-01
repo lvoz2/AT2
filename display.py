@@ -1,12 +1,14 @@
-import concurrent.futures as cf
+# import concurrent.futures as cf
 import concurrent.futures._base as cf_b
+import concurrent.futures.process as cf_p
 import multiprocessing as mp
 import multiprocessing.synchronize as mp_sync
 import time
-from typing import Optional, Sequence
+from typing import Any, Optional, Sequence
 
 import pygame
 
+import draw_process_funcs as dpf
 import event_processors
 import events
 import scene
@@ -18,9 +20,8 @@ class DrawProps(metaclass=utils.Singleton):
         self,
         dim: Sequence[int] = (0, 0),
         from_async: bool = False,
-        runner: Optional[utils.AsyncRunner] = None,
     ) -> None:
-        if not hasattr(self, "created"):
+        if not hasattr(self, "__built"):
             self.__cur_scene: list[mp_sync.Lock | Optional[scene.Scene]] = [
                 mp.Lock(),
                 None,
@@ -31,22 +32,9 @@ class DrawProps(metaclass=utils.Singleton):
                     mp.Lock(),
                     pygame.display.set_mode(dim),
                 ]
-            else:
-                if runner is None:
-                    raise TypeError(
-                        "A runner must be provided to do work asynchronously"
-                    )
-                future: cf_b.Future = runner.executor.submit(
-                    pygame.display.set_mode, dim
-                )
-                cf.wait([future])
-                print(future.result())
-                self.__window: list[mp_sync.Lock | pygame.Surface] = [
-                    mp.Lock(),
-                    future.result(0.01),
-                ]
-                print(self.__window)
-            self.created: bool = True
+            self.from_async = from_async
+            self.executor: Optional[cf_p.ProcessPoolExecutor] = None
+            self.__built: bool = True
 
     # Accessors with locks
     @property
@@ -66,11 +54,16 @@ class DrawProps(metaclass=utils.Singleton):
 
     @property
     def window(self) -> pygame.Surface:
-        if isinstance(self.__window[0], mp_sync.Lock) and isinstance(
-            self.__window[1], pygame.Surface
-        ):
-            with self.__window[0] as lock:
-                return self.__window[1]
+        try:
+            if isinstance(self.__window[0], mp_sync.Lock) and isinstance(
+                self.__window[1], pygame.Surface
+            ):
+                with self.__window[0] as lock:
+                    return self.__window[1]
+        except AttributeError as e:
+            raise AttributeError(
+                "The requested window does not exist in the main thread"
+            )
         raise TypeError("__window has the wrong types")
 
     @window.setter
@@ -104,27 +97,18 @@ class Display(DrawProps, metaclass=utils.Singleton):
         title: str = "",
         dim: Sequence[int] = (0, 0),
         from_async: bool = False,
-        runner: Optional[utils.AsyncRunner] = None,
     ) -> None:
         if not hasattr(self, "created"):
+            self.created: bool = True
             self.scenes: dict[str, scene.Scene] = {}
             self.clock: pygame.time.Clock = pygame.time.Clock()
             self.delta: list[int] = [0]
             if not from_async:
                 pygame.init()
-            super().__init__(dim=dim, from_async=from_async, runner=runner)
+            super().__init__(dim=dim, from_async=from_async)
             pygame.display.set_caption(title)
             if not from_async:
                 pygame.key.set_repeat(25)
-            else:
-                if runner is None:
-                    raise TypeError(
-                        "A runner must be provided to do work asynchronously"
-                    )
-                cf.wait(
-                    [runner.executor.submit(pygame.key.set_repeat, 25)],
-                    return_when=cf.ALL_COMPLETED,
-                )
             self.game_over: bool = False
             self.events = events.Events()
             event_processors.load()
@@ -186,27 +170,28 @@ class AsyncDisplay(Display, metaclass=utils.Singleton):
     ) -> None:
         if not hasattr(self, "ready"):
             self.ready = False
-            pygame.init()
-            pygame.display.init()
+            super().__init__(title=title, dim=dim, from_async=True)
             self.runner: utils.AsyncRunner = utils.AsyncRunner(
-                "display", start_method=start_method
+                "display", start_method=start_method, initfunc=dpf.init, initargs=(dim,)
             )
-            cf.wait(
-                [self.runner.executor.submit(pygame.init)], return_when=cf.ALL_COMPLETED
-            )
-            cf.wait(
-                [self.runner.executor.submit(pygame.display.init)],
-                return_when=cf.ALL_COMPLETED,
-            )
-            super().__init__(title=title, dim=dim, from_async=True, runner=self.runner)
+            self.executor = self.runner.executor
+            self.dimensions = dim
             self.ready = True
+
+    def event_callback(self, fut: cf_b.Future) -> None:
+        if self.cur_scene is not None:
+            events_list: list[tuple[int, dict[str, Any]]] = fut.result()
+            for evt in events_list:
+                self.events.notify(
+                    pygame.event.Event(evt[0], evt[1]), self.cur_scene.all_listeners
+                )
 
     def handle_events(self) -> None:
         if self.cur_scene is not None:
             self.draw()
             self.cur_scene.get_all_listeners()
-            for e in pygame.event.get():
-                self.events.notify(e, self.cur_scene.all_listeners)
+            events_fut = self.runner.executor.submit(dpf.get_events)
+            events_fut.add_done_callback(self.event_callback)
             time.sleep(0.04)
 
     def update_rect(self, future: cf_b.Future) -> None:
@@ -222,17 +207,42 @@ class AsyncDisplay(Display, metaclass=utils.Singleton):
             self.delta.append(self.clock.tick(25))
             if len(self.delta) > 10:
                 self.delta = self.delta[(len(self.delta) - 10) :]
-            self.runner.executor.submit(print, "Test")
-            self.runner.executor.submit(self.window.fill, [0, 0, 0])
+            self.runner.executor.submit(dpf.fill_screen, [0, 0, 0])
+            if (
+                self.cur_scene.design.surf.get_width() != self.dimensions[0]
+                or self.cur_scene.design.surf.get_height() != self.dimensions[1]
+            ):
+                self.cur_scene.design.rect.update(
+                    0, 0, self.dimensions[0], self.dimensions[1]
+                )
+                self.cur_scene.design.surf = pygame.transform.scale(
+                    self.cur_scene.design.surf,
+                    (
+                        self.dimensions[0],
+                        self.dimensions[1],
+                    ),
+                )
+                self.cur_scene.bytes = (
+                    pygame.image.tobytes(self.cur_scene.design.surf, "RGBA"),
+                    [
+                        self.cur_scene.design.rect.width,
+                        self.cur_scene.design.rect.height,
+                    ],
+                    "RGBA",
+                )
             screen_flush: cf_b.Future = self.runner.executor.submit(
-                self.window.blit,
-                self.cur_scene.design.surf,
+                dpf.construct_and_blit,
+                (
+                    self.cur_scene.bytes[0],
+                    self.cur_scene.bytes[1],
+                    self.cur_scene.bytes[2],
+                ),
                 pygame.Rect(0, 0, self.dimensions[0], self.dimensions[1]),
             )
             screen_flush.add_done_callback(self.update_rect)
             if self.cur_scene.elements != [None]:
                 for element_layer in self.cur_scene.elements:
                     for e in element_layer:
-                        e.draw_async(self.runner.executor, self.window, self.dimensions)
+                        e.draw_async(self.runner.executor, self.dimensions)
             self.update(self.delta)
             self.runner.executor.submit(pygame.display.flip)

@@ -16,7 +16,6 @@ class Warrior(player.Player):
         mask: Optional[pygame.Rect] = None,
         scale: float = 1.0,
     ) -> None:
-        window: display.Display = display.Display()
         super().__init__(
             utils.get_asset(
                 "assets/warrior.png", rect=rect, rect_options=rect_options, scale=scale

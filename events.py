@@ -35,6 +35,36 @@ class Events(metaclass=utils.Singleton):
                     Optional[dict[str, Any]],
                 ],
             ] = {}
+            # The following dict of event types are the types reserved by SDL2.
+            # I had to find where they were set in SDL2's source code to use them here
+            # Not all (I don't think all) are actually mentioned in the pygame docs,
+            # and if more event codes are required than the 32669 pygame.USEREVENT codes
+            # available, this dict can be used to find what's free
+            self.event_types: dict[str, int] = {
+                "first_event": 0x0,
+                "quit": pygame.QUIT,
+                "app_terminating": pygame.APP_TERMINATING,
+                "app_low_memory": pygame.APP_LOWMEMORY,
+                "app_will_enter_background": pygame.APP_WILLENTERBACKGROUND,
+                "app_did_enter_background": pygame.APP_DIDENTERBACKGROUND,
+                "app_will_enter_foreground": pygame.APP_WILLENTERFOREGROUND,
+                "app_did_enter_foreground": pygame.APP_DIDENTERFOREGROUND,
+                "locale_changed": pygame.LOCALECHANGED,
+                "display_event": 0x150,
+                "window_event": 0x200,
+                "sys_wm_event": pygame.SYSWMEVENT,  # Not in docs
+                "key_down": pygame.KEYDOWN,
+                "key_up": pygame.KEYUP,
+                "text_editing": pygame.TEXTEDITING,
+                "text_input": pygame.TEXTINPUT,
+                "key_map_changed": pygame.KEYMAPCHANGED,
+                "text_editing_ext": 0x305,
+                "mouse_motion": pygame.MOUSEMOTION,
+                "mouse_button_down": pygame.MOUSEBUTTONDOWN,
+                "mouse_button_up": pygame.MOUSEBUTTONUP,
+                "mouse_wheel": pygame.MOUSEWHEEL,
+                "joy_axis_motion": pygame.JOYAXISMOTION,
+            }
 
     @property
     def cur_scene(self) -> Optional[scene.Scene]:

@@ -4,21 +4,31 @@ import concurrent.futures.process as cf_p
 import multiprocessing as mp
 import multiprocessing.context as mp_c
 import pathlib
-from typing import Any, Optional
+from typing import Any, Callable, Literal, Optional, Sequence
 
 import pygame
 
+import draw_process_funcs as dpf
 import sprite
 
 __assets: dict[str, sprite.Sprite] = {}
 
 
 class AsyncRunner:
-    def __init__(self, name: str, start_method: str = "fork") -> None:
+    def __init__(
+        self,
+        name: str,
+        start_method: str = "fork",
+        initfunc: Optional[Callable[..., None]] = None,
+        initargs: tuple[Any, ...] = (),
+    ) -> None:
         self.start_method = start_method
         self.__ctx: mp_c.BaseContext = mp.get_context(self.start_method)
         self.executor: cf_p.ProcessPoolExecutor = cf.ProcessPoolExecutor(
-            max_workers=1, mp_context=self.__ctx
+            max_workers=1,
+            mp_context=self.__ctx,
+            initializer=initfunc,
+            initargs=initargs,
         )
         runners[name] = self
 
@@ -67,22 +77,34 @@ def get_asset(
             rect,
             rect_options=rect_options,
             scale=scale,
+            is_async=__assets[posix_path].is_async,
+            executor=__assets[posix_path].executor,
         )
     if "display" not in runners:
         surf: pygame.Surface = pygame.image.load(absolute_path).convert_alpha()
+        design: sprite.Sprite = sprite.Sprite(
+            surf, rect, rect_options=rect_options, scale=scale, path=absolute_path
+        )
     else:
         load_fut: cf_b.Future = runners["display"].executor.submit(
-            pygame.image.load, absolute_path
+            dpf.load_image, absolute_path
         )
         cf.wait([load_fut])
-        res: pygame.Surface = load_fut.result()
-        conv_fut: cf_b.Future = runners["display"].executor.submit(res.convert_alpha)
-        cf.wait([conv_fut])
-        surf: pygame.Surface = conv_fut.result()
-        print(surf)
-    design: sprite.Sprite = sprite.Sprite(
-        surf, rect, rect_options=rect_options, scale=scale, path=absolute_path
-    )
+        res: tuple[
+            bytes,
+            Sequence[int] | tuple[int, int],
+            Literal["P", "RGB", "BGR", "BGRA", "RGBX", "RGBA", "ARGB"],
+        ] = load_fut.result()
+        surf = pygame.image.frombuffer(res[0], res[1], res[2])
+        design = sprite.Sprite(
+            surf,
+            rect,
+            rect_options=rect_options,
+            scale=scale,
+            path=absolute_path,
+            is_async=True,
+            executor=runners["display"].executor,
+        )
     __assets[posix_path] = design
     return design
 

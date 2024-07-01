@@ -8,5 +8,7 @@
         "--extend-ignore=E203,E701,W503,F841",
         "--count",
         "--max-line-length=88"
-    ]
+    ],
+    "editor.fontFamily": "'Cascadia Code', 'monospace', monospace",
+    "editor.fontLigatures": true
 }

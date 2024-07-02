@@ -29,11 +29,11 @@ class Character(dynentity.DynEntity):
         self.name = name
         self.lvl: int = 0
         self.skills: dict[str, Any] = {}
-        self.attacks: list[attack.Attack] = []
+        self.attacks: list[tuple[str, attack.Attack]] = []
         self.defense: int = defense
         self.mana: int = mana
         self.strength: int = strength
         self.max_lvl: int = 50
 
     def attack(self, category: int, target: entity.Entity, event_id: int) -> None:
-        self.attacks[category].damage(target, event_id)
+        self.attacks[category][1].damage(self.strength, target, event_id)

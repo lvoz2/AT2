@@ -2,6 +2,7 @@ from typing import Any, Optional
 
 import pygame
 
+import attack
 import player
 import utils
 
@@ -24,3 +25,8 @@ class Warrior(player.Player):
             mask=mask,
             strength=15,
         )
+        self.attacks: list[tuple[str, attack.Attack]] = [
+            ("Charge", attack.Attack(2, 0)),
+            ("Cleave", attack.Attack(4, 0)),
+            ("Shield Bash", attack.Attack(3, 0)),
+        ]

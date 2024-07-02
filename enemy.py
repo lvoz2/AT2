@@ -27,4 +27,6 @@ class Enemy(character.Character):
             strength=strength,
             mask=mask,
         )
-        self.attacks: list[attack.Attack] = [attack.Attack(5, 0)]
+        self.attacks: list[tuple[str, attack.Attack]] = [
+            ("Charge", attack.Attack(0.5, 0))
+        ]

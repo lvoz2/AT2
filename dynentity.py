@@ -69,8 +69,24 @@ class DynEntity(entity.Entity):
             abs(self.design.rect.x - opp_corner["other"][0]),
         ]
         horizontal: float = min(linear_distances[1], linear_distances[3])
+        if (
+            other.design.rect.x <= self.design.rect.x <= opp_corner["other"][0]
+            or other.design.rect.x <= opp_corner["self"][0] <= opp_corner["other"][0]
+        ):
+            horizontal = 0
         vertical: float = min(linear_distances[0], linear_distances[2])
-        hypotenuse: float = math.sqrt(horizontal**2 + vertical**2)
+        if (
+            other.design.rect.y <= self.design.rect.y <= opp_corner["other"][1]
+            or other.design.rect.y <= opp_corner["self"][1] <= opp_corner["other"][1]
+        ):
+            vertical = 0
+        hypotenuse: float = (
+            horizontal
+            if vertical == 0
+            else (
+                vertical if horizontal == 0 else math.sqrt(horizontal**2 + vertical**2)
+            )
+        )
         return hypotenuse
 
     def get_angle(self, other: entity.Entity) -> float:

@@ -7,7 +7,7 @@ import entity
 class Attack:
     def __init__(
         self,
-        dmg: int,
+        dmg: float,
         cost: int,
         effects: Optional[dict[str, effect.Effect]] = None,
     ) -> None:
@@ -22,8 +22,8 @@ class Attack:
     def has_effects(self) -> bool:
         return self.effects is not None and len(self.effects) != 0
 
-    def damage(self, target: entity.Entity, event_id: int) -> None:
-        target.damage(self.dmg, event_id)
+    def damage(self, strength: int, target: entity.Entity, event_id: int) -> None:
+        target.damage(round(self.dmg * strength), event_id)
 
     def apply_effects(self, target: entity.Entity, delta: int, event_id: int) -> None:
         if self.effects is not None:

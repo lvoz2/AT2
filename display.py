@@ -86,15 +86,14 @@ class DrawProps(metaclass=utils.Singleton):
             with self.__dimensions[0] as lock:  # pylint: disable=unused-variable
                 self.__dimensions[1] = new_dimensions
 
-    def update(self, delta: list[int]) -> None:
-        pass
-
 
 class Display(DrawProps, metaclass=utils.Singleton):
     def __init__(
         self,
         title: str = "",
         dim: Sequence[int] = (0, 0),
+        key_press_initial_delay: int = 0,
+        key_press_interval: int = 0,
         from_async: bool = False,
     ) -> None:
         if not hasattr(self, "created"):
@@ -106,10 +105,11 @@ class Display(DrawProps, metaclass=utils.Singleton):
                 pygame.init()
             super().__init__(dim=dim, from_async=from_async)
             pygame.display.set_caption(title)
-            if not from_async:
-                pygame.key.set_repeat(25)
             self.game_over: bool = False
             self.events = events.Events()
+            self.__key_press_leftover_delta: int = 0
+            if not from_async:
+                self.events.set_key_repeat(key_press_initial_delay, key_press_interval)
 
     def set_scene(self, new_scene: str) -> None:
         if new_scene in self.scenes:
@@ -132,6 +132,11 @@ class Display(DrawProps, metaclass=utils.Singleton):
                 f"already loaded. Find a different name and try again. Name: {name}"
             )
         return name in self.scenes
+
+    def update(self, delta: list[int]) -> None:
+        self.__key_press_leftover_delta = self.events.create_key_press_event(
+            delta[len(delta) - 1] + self.__key_press_leftover_delta
+        )
 
     def handle_events(self) -> None:
         if self.cur_scene is not None:

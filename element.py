@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, Sequence
 import pygame
 
 import draw_process_funcs as dpf
+import events
 import sprite
 
 if TYPE_CHECKING:
@@ -57,40 +58,50 @@ class Element:
 
     def register_listener(
         self,
-        event_type: int,
+        event_type: int | str,
         func: Callable[[pygame.event.Event, dict[str, Any]], None],
         options: Optional[dict[str, Any]] = None,
     ) -> None:
-        if event_type not in self.listeners:
-            self.listeners[event_type] = {}
+        if isinstance(event_type, str):
+            evts: events.Events = events.Events()
+            evt_type: int = evts.get_event_id(event_type)
+        else:
+            evt_type = event_type
+        if evt_type not in self.listeners:
+            self.listeners[evt_type] = {}
         if options is None:
             options = {}
         options["target"] = self
-        self.listeners[event_type][func] = options
+        self.listeners[evt_type][func] = options
 
     def deregister_listener(
         self,
-        event_type: int,
+        event_type: int | str,
         func: Callable[[pygame.event.Event, dict[str, Any]], None],
         options: Optional[dict[str, Any]] = None,
     ) -> None:
-        if event_type not in self.listeners:
+        if isinstance(event_type, str):
+            evts: events.Events = events.Events()
+            evt_type: int = evts.get_event_id(event_type)
+        else:
+            evt_type = event_type
+        if evt_type not in self.listeners:
             raise KeyError(
                 "No event listeners created yet for event type "
-                f"{event_type}. Function: {func}"
+                f"{evt_type}. Function: {func}"
             )
-        if func not in self.listeners[event_type]:
+        if func not in self.listeners[evt_type]:
             raise KeyError(
                 "Event listener does not exist. Event Type: "
-                f"{event_type}, Function: {func}"
+                f"{evt_type}, Function: {func}"
             )
-        if self.listeners[event_type][func] != options:
+        if self.listeners[evt_type][func] != options:
             raise ValueError(
                 "The options argument provided did not match what was expected. "
-                f"Expected {self.listeners[event_type][func]}, "
+                f"Expected {self.listeners[evt_type][func]}, "
                 f"received {options}"
             )
-        del self.listeners[event_type][func]
+        del self.listeners[evt_type][func]
 
     def update_rect(self, future: cf_b.Future) -> None:
         res: pygame.Rect = future.result(0.01)

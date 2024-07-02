@@ -2,8 +2,6 @@
 
 # tracemalloc.start()
 
-# import concurrent.futures as cf
-import math
 import sys
 
 # import time
@@ -102,52 +100,35 @@ def move_player(
     event: pygame.event.Event,  # pylint: disable=unused-argument
     options: dict[str, Any],  # pylint: disable=unused-argument
 ) -> None:  # pylint: disable=unused-argument
-    speed: float = 2.0
-    updated_state: Optional[bool] = None
-    match (event.type):
-        case pygame.KEYUP:
-            updated_state = False
-        case pygame.KEYDOWN:
-            updated_state = True
-        case _:
-            raise ValueError('The arguments given in options were not "up" or "down"')
-    move_key_state[event.key] = updated_state
+    speed: float = 3.5
     direction: list[int] = [0, 0]
-    if move_key_state[pygame.K_w] and not move_key_state[pygame.K_s]:
+    if pygame.K_w in event.key and pygame.K_s not in event.key:
         direction[1] = -1
-    elif not move_key_state[pygame.K_w] and move_key_state[pygame.K_s]:
+    elif pygame.K_w not in event.key and pygame.K_s in event.key:
         direction[1] = 1
-    if move_key_state[pygame.K_a] and not move_key_state[pygame.K_d]:
+    if pygame.K_a in event.key and pygame.K_d not in event.key:
         direction[0] = -1
-    elif not move_key_state[pygame.K_a] and move_key_state[pygame.K_d]:
+    elif pygame.K_a not in event.key and pygame.K_d in event.key:
         direction[0] = 1
-    distance: list[float] = [speed, math.sqrt((speed**2) * 2)]
+    distance: float = speed
     match (direction):
         case [0, -1]:
-            options["args"].move(0.0, distance[0])
+            options["args"].move(0.0, distance)
         case [1, -1]:
-            options["args"].move(45.0, distance[1])
+            options["args"].move(45.0, distance)
         case [1, 0]:
-            options["args"].move(90.0, distance[0])
+            options["args"].move(90.0, distance)
         case [1, 1]:
-            options["args"].move(135.0, distance[1])
+            options["args"].move(135.0, distance)
         case [0, 1]:
-            options["args"].move(180.0, distance[0])
+            options["args"].move(180.0, distance)
         case [-1, 1]:
-            options["args"].move(225.0, distance[1])
+            options["args"].move(225.0, distance)
         case [-1, 0]:
-            options["args"].move(270.0, distance[0])
+            options["args"].move(270.0, distance)
         case [-1, -1]:
-            options["args"].move(315.0, distance[1])
+            options["args"].move(315.0, distance)
     check_dists(options["args"])
-
-
-move_key_state: dict[int, bool] = {
-    pygame.K_w: False,
-    pygame.K_a: False,
-    pygame.K_s: False,
-    pygame.K_d: False,
-}
 
 
 def check_dists(player_entity: player.Player) -> None:
@@ -378,26 +359,27 @@ def create_game_scene(player_sprite: player.Player) -> scene.Scene:
     game_scene.elements[0].append(player_hp_bar_bground)
     game_scene.elements.append([player_hp_bar])
     keys: list[int] = [pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d]
-    for press_type in [pygame.KEYDOWN, pygame.KEYUP]:
-        for key in keys:
-            game_scene.register_listener(
-                press_type,
-                lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
-                    event, options  # pylint: disable=unnecessary-lambda
-                ),  # pylint: disable=unnecessary-lambda
-                {
-                    "key": key,
-                    "mods": pygame.KMOD_NONE,
-                    "args": player_sprite,
-                },
-            )
+    for key in keys:
+        game_scene.register_listener(
+            "key_press",
+            lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
+                event, options  # pylint: disable=unnecessary-lambda
+            ),  # pylint: disable=unnecessary-lambda
+            {
+                "key": key,
+                "mods": pygame.KMOD_NONE,
+                "args": player_sprite,
+            },
+        )
     return game_scene
 
 
 def init() -> None:
     width: int = 800
     height: int = 600
-    window: display.Display = display.Display(title="Kings Quest", dim=[width, height])
+    window: display.Display = display.Display(
+        title="Kings Quest", dim=[width, height], key_press_initial_delay=20
+    )
     pygame.font.init()
     font: pygame.font.Font = pygame.font.Font(None, 36)
     window.add_scene("main_menu", create_main_menu(width, window, font))

@@ -2,12 +2,14 @@ import copy
 import sys
 import types
 import warnings
-from typing import Any, Callable, Optional
+from typing import TYPE_CHECKING, Any, Callable, Optional
 
 import pygame
 
-import scene
 import utils
+
+if TYPE_CHECKING:
+    import scene
 
 # The way events will be handled is heavily influenced by JavaScript, especially
 # addEventListener and removeEventListener. The interface for it should share its state
@@ -21,8 +23,17 @@ class Events(metaclass=utils.Singleton):
     def __init__(self) -> None:
         if not hasattr(self, "created"):
             self.created: bool = True
-            self.pressed_keys: list[int] = []
-            self.__cur_scene: Optional[scene.Scene] = None
+            self.__pressed_keys: dict[str, list[int]] = {
+                "keys": [],
+                "mods": [],
+                "unicode": [],
+                "scancode": [],
+            }
+            self.__repeat: bool = False
+            self.__start_repeat: bool = False
+            self.__repeat_initial_delay: int = 0
+            self.__repeat_interval: int = 0
+            self.__cur_scene: Optional["scene.Scene"] = None
             self.__processors: dict[
                 int,
                 tuple[
@@ -217,12 +228,55 @@ class Events(metaclass=utils.Singleton):
         return self.reversed_event_types[event_id]
 
     @property
-    def cur_scene(self) -> Optional[scene.Scene]:
+    def cur_scene(self) -> Optional["scene.Scene"]:
         return self.__cur_scene
 
     @cur_scene.setter
-    def cur_scene(self, new_scene: scene.Scene) -> None:
+    def cur_scene(self, new_scene: "scene.Scene") -> None:
         self.__cur_scene = new_scene
+
+    def start_repeat(self) -> None:
+        if self.__repeat_initial_delay == self.__repeat_interval == 0:
+            raise ValueError(
+                "A delay and/or repeat must be specified to repeat keypresses"
+            )
+        self.__start_repeat = True
+
+    def set_key_repeat(self, initial_delay: int = 0, interval: int = 0) -> None:
+        if initial_delay == interval == 0:
+            return
+        if initial_delay == 0:
+            initial_delay = interval
+        elif interval == 0:
+            interval = initial_delay
+        self.__repeat_initial_delay = initial_delay
+        self.__repeat_interval = interval
+        if self.__start_repeat:
+            return
+        self.start_repeat()
+
+    def create_key_press_event(self, full_delta: int) -> int:
+        if (
+            len(self.__pressed_keys["keys"])
+            == len(self.__pressed_keys["mods"])
+            == len(self.__pressed_keys["unicode"])
+            == len(self.__pressed_keys["scancode"])
+            == 0
+        ):
+            return 0
+        evt: pygame.event.Event = pygame.event.Event(
+            self.event_types["key_press"],
+            key=self.__pressed_keys["keys"],
+            mod=self.__pressed_keys["mods"],
+            unicode=self.__pressed_keys["unicode"],
+            scancode=self.__pressed_keys["scancode"],
+        )
+        if self.__repeat:
+            loops: int = full_delta // self.__repeat_interval
+            pygame.time.set_timer(evt, self.__repeat_interval, loops=loops)
+            return full_delta % self.__repeat_interval
+        pygame.time.set_timer(evt, self.__repeat_initial_delay, loops=1)
+        return int(full_delta - self.__repeat_initial_delay)
 
     def quit(self) -> None:
         sys.exit()
@@ -322,9 +376,23 @@ class Events(metaclass=utils.Singleton):
         if event.type == pygame.QUIT:
             self.quit()
         elif event.type == pygame.KEYDOWN:
-            self.pressed_keys.append(event.key)
+            self.__pressed_keys["keys"].append(event.key)
+            self.__pressed_keys["mods"].append(event.mod)
+            self.__pressed_keys["unicode"].append(event.unicode)
+            self.__pressed_keys["scancode"].append(event.scancode)
         elif event.type == pygame.KEYUP:
-            self.pressed_keys.remove(event.key)
+            self.__pressed_keys["keys"].remove(event.key)
+            self.__pressed_keys["mods"].remove(event.mod)
+            self.__pressed_keys["unicode"].remove(event.unicode)
+            self.__pressed_keys["scancode"].remove(event.scancode)
+            if (
+                len(self.__pressed_keys["keys"])
+                == len(self.__pressed_keys["mods"])
+                == len(self.__pressed_keys["unicode"])
+                == len(self.__pressed_keys["scancode"])
+                == 0
+            ):
+                self.__repeat = False
         if listeners is None:
             return
         if event.type not in listeners:

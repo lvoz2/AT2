@@ -124,6 +124,7 @@ class Events(metaclass=utils.Singleton):
             )
             self.event_types["key_press"] = pygame.event.custom_type()
             self.event_types["dmg_event"] = pygame.event.custom_type()
+            self.event_types["switch_scene"] = pygame.event.custom_type()
 
             def __process_key_up_or_down(
                 event: pygame.event.Event,

@@ -1,15 +1,18 @@
 from typing import Any, Callable
 
-import scene
-import sprite
-import element
-import display
 import pygame
-import utils
+
+import display
+import element
 import enemy
 import healthbar
 import player
+import scene
+import sprite
+import utils
 import zombie
+
+bgrounds: dict[str, sprite.Sprite] = {}
 
 
 def create_main_menu(
@@ -20,12 +23,15 @@ def create_main_menu(
     settings: Callable[[pygame.event.Event, dict[str, Any]], None],
     leave: Callable[[pygame.event.Event, dict[str, Any]], None],
 ) -> scene.Scene:
-    bground: sprite.Sprite = utils.get_asset("assets/main_menu_background.png")
-    bground.surf = pygame.transform.scale(
-        bground.surf, (window.dimensions[0], window.dimensions[1])
-    )
-    bground.rect.width = window.dimensions[0]
-    bground.rect.height = window.dimensions[1]
+    if "assets/main_menu_background.png" not in bgrounds:
+        bground: sprite.Sprite = utils.get_asset("assets/main_menu_background.png")
+        bground.surf = pygame.transform.scale(
+            bground.surf, (window.dimensions[0], window.dimensions[1])
+        )
+        bground.rect.width = window.dimensions[0]
+        bground.rect.height = window.dimensions[1]
+    else:
+        bground = bgrounds["assets/main_menu_background.png"]
     half_width: float = width / 2
     main_menu: scene.Scene = scene.Scene(bground)
     y_vals: list[int] = [150, 200, 250]
@@ -94,10 +100,15 @@ def create_settings_menu(
     font: pygame.font.Font,
     back: Callable[[pygame.event.Event, dict[str, Any]], None],
 ) -> scene.Scene:
-    bground: sprite.Sprite = utils.get_asset("assets/main_menu_background.png")
-    bground.surf = pygame.transform.scale(
-        bground.surf, (window.dimensions[0], window.dimensions[1])
-    )
+    if "assets/main_menu_background.png" not in bgrounds:
+        bground: sprite.Sprite = utils.get_asset("assets/main_menu_background.png")
+        bground.surf = pygame.transform.scale(
+            bground.surf, (window.dimensions[0], window.dimensions[1])
+        )
+        bground.rect.width = window.dimensions[0]
+        bground.rect.height = window.dimensions[1]
+    else:
+        bground = bgrounds["assets/main_menu_background.png"]
     settings_menu: scene.Scene = scene.Scene(bground)
     settings_menu.elements[0] = [
         element.Element(
@@ -137,10 +148,15 @@ def create_class_select_menu(
     back: Callable[[pygame.event.Event, dict[str, Any]], None],
     select_class: Callable[[pygame.event.Event, dict[str, Any]], None],
 ) -> scene.Scene:
-    bground: sprite.Sprite = utils.get_asset("assets/main_menu_background.png")
-    bground.surf = pygame.transform.scale(
-        bground.surf, (window.dimensions[0], window.dimensions[1])
-    )
+    if "assets/main_menu_background.png" not in bgrounds:
+        bground: sprite.Sprite = utils.get_asset("assets/main_menu_background.png")
+        bground.surf = pygame.transform.scale(
+            bground.surf, (window.dimensions[0], window.dimensions[1])
+        )
+        bground.rect.width = window.dimensions[0]
+        bground.rect.height = window.dimensions[1]
+    else:
+        bground = bgrounds["assets/main_menu_background.png"]
     class_select_menu: scene.Scene = scene.Scene(bground)
     images: list[str] = [
         "assets/rogue_button.png",
@@ -202,10 +218,15 @@ def create_game_scene(
     move_player: Callable[[pygame.event.Event, dict[str, Any]], None],
 ) -> scene.Scene:
     window: display.Display = display.Display()
-    bground: sprite.Sprite = utils.get_asset("assets/dungeon_map.png")
-    bground.surf = pygame.transform.scale(
-        bground.surf, (window.window.get_width(), window.window.get_height())
-    )
+    if "assets/dungeon_map.png" not in bgrounds:
+        bground: sprite.Sprite = utils.get_asset("assets/dungeon_map.png")
+        bground.surf = pygame.transform.scale(
+            bground.surf, (window.dimensions[0], window.dimensions[1])
+        )
+        bground.rect.width = window.dimensions[0]
+        bground.rect.height = window.dimensions[1]
+    else:
+        bground = bgrounds["assets/dungeon_map.png"]
     enemy_rect_options: list[dict[str, int]] = [
         {"x": 50, "y": 50},
         {"x": window.window.get_width() - 120, "y": 50},
@@ -253,3 +274,18 @@ def create_game_scene(
         },
     )
     return game_scene
+
+
+def create_attack_scene() -> scene.Scene:
+    window: display.Display = display.Display()
+    if "assets/attack_screen.png" not in bgrounds:
+        bground: sprite.Sprite = utils.get_asset("assets/attack_screen.png")
+        bground.surf = pygame.transform.scale(
+            bground.surf, (window.dimensions[0], window.dimensions[1])
+        )
+        bground.rect.width = window.dimensions[0]
+        bground.rect.height = window.dimensions[1]
+    else:
+        bground = bgrounds["assets/attack_screen.png"]
+    attack_scene: scene.Scene = scene.Scene(bground)
+    return attack_scene

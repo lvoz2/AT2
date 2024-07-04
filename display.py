@@ -25,6 +25,7 @@ class DrawProps(metaclass=utils.Singleton):
                 mp.Lock(),
                 None,
             ]
+            self.events = events.Events()
             self.__dimensions: list[mp_sync.Lock | Sequence[int]] = [mp.Lock(), dim]
             if not from_async:
                 self.__window: list[mp_sync.Lock | pygame.Surface] = [
@@ -46,10 +47,11 @@ class DrawProps(metaclass=utils.Singleton):
         raise TypeError("__cur_scene has the wrong types")
 
     @cur_scene.setter
-    def cur_scene(self, new_scene: Optional[scene.Scene]) -> None:
+    def cur_scene(self, new_scene: scene.Scene) -> None:
         if isinstance(self.__cur_scene[0], mp_sync.Lock):
             with self.__cur_scene[0] as lock:  # pylint: disable=unused-variable
                 self.__cur_scene[1] = new_scene
+                self.events.cur_scene = new_scene
 
     @property
     def window(self) -> pygame.Surface:
@@ -106,16 +108,21 @@ class Display(DrawProps, metaclass=utils.Singleton):
             super().__init__(dim=dim, from_async=from_async)
             pygame.display.set_caption(title)
             self.game_over: bool = False
-            self.events = events.Events()
             self.__key_press_leftover_delta: int = 0
             if not from_async:
                 self.events.set_key_repeat(key_press_initial_delay, key_press_interval)
 
-    def set_scene(self, new_scene: str) -> None:
+    def set_scene(self, new_scene: str, no_event: bool = False) -> None:
         if new_scene in self.scenes:
-            event_processor: events.Events = events.Events()
-            event_processor.cur_scene = self.scenes[new_scene]
-            self.cur_scene = self.scenes[new_scene]
+            if no_event:
+                self.cur_scene = self.scenes[new_scene]
+                return
+            evt: pygame.event.Event = pygame.event.Event(
+                self.events.event_types["switch_scene"],
+                new_scene=self.scenes[new_scene],
+                scene_name=new_scene,
+            )
+            pygame.event.post(evt)
         else:
             raise KeyError(
                 f'Scene with identifier "{new_scene}" not \
@@ -143,7 +150,11 @@ class Display(DrawProps, metaclass=utils.Singleton):
             self.draw()
             self.cur_scene.get_all_listeners()
             for e in pygame.event.get():
-                self.events.notify(e, self.cur_scene.all_listeners)
+                if self.cur_scene is not None:
+                    self.events.notify(e, self.cur_scene.all_listeners)
+                if e.type == self.events.event_types["switch_scene"]:
+                    if e.new_scene is not None:
+                        self.cur_scene = e.new_scene
 
     def draw(self) -> None:
         if self.cur_scene is not None:

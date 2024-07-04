@@ -2,13 +2,13 @@
 
 # tracemalloc.start()
 
-import sys
-
 import math
+import sys
 from typing import Any, Optional
 
 import pygame
 
+import create_menu as cm
 import display
 import enemy
 import entity
@@ -16,7 +16,6 @@ import mage
 import player
 import rogue
 import warrior
-import create_menu as cm
 
 # import time
 
@@ -154,7 +153,7 @@ def init() -> None:
         "class_select_menu",
         cm.create_class_select_menu(width, window, height, font, back, select_class),
     )
-    window.set_scene("main_menu")
+    window.set_scene("main_menu", no_event=True)
     while True:
         try:
             window.handle_events()

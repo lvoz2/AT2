@@ -30,7 +30,6 @@ class Events(metaclass=utils.Singleton):
                 "scancode": [],
             }
             self.__repeat: bool = False
-            self.__start_repeat: bool = False
             self.__repeat_initial_delay: int = 0
             self.__repeat_interval: int = 0
             self.__cur_scene: Optional["scene.Scene"] = None
@@ -174,7 +173,17 @@ class Events(metaclass=utils.Singleton):
                 options: Optional[dict[str, Any]],
             ) -> bool:
                 if options is not None:
-                    if options["key"] in event.key and options["mods"] in event.mod:
+                    keys_in: int = 0
+                    mods_in: int = 0
+                    for key in options["key"]:
+                        keys_in += int(key in event.key)
+                        if keys_in > 0:
+                            break
+                    for mod in options["mods"]:
+                        mods_in += int(mod in event.mod)
+                        if mods_in > 0:
+                            break
+                    if keys_in > 0 and mods_in > 0:
                         func(event, options)
                         return True
                 return False
@@ -240,7 +249,7 @@ class Events(metaclass=utils.Singleton):
             raise ValueError(
                 "A delay and/or repeat must be specified to repeat keypresses"
             )
-        self.__start_repeat = True
+        self.__repeat = True
 
     def set_key_repeat(self, initial_delay: int = 0, interval: int = 0) -> None:
         if initial_delay == interval == 0:
@@ -251,8 +260,6 @@ class Events(metaclass=utils.Singleton):
             interval = initial_delay
         self.__repeat_initial_delay = initial_delay
         self.__repeat_interval = interval
-        if self.__start_repeat:
-            return
         self.start_repeat()
 
     def create_key_press_event(self, full_delta: int) -> int:
@@ -275,8 +282,10 @@ class Events(metaclass=utils.Singleton):
             loops: int = full_delta // self.__repeat_interval
             pygame.time.set_timer(evt, self.__repeat_interval, loops=loops)
             return full_delta % self.__repeat_interval
-        pygame.time.set_timer(evt, self.__repeat_initial_delay, loops=1)
-        return int(full_delta - self.__repeat_initial_delay)
+        if full_delta >= self.__repeat_initial_delay:
+            pygame.time.set_timer(evt, self.__repeat_initial_delay, loops=1)
+            return int(full_delta - self.__repeat_initial_delay)
+        return full_delta
 
     def quit(self) -> None:
         sys.exit()

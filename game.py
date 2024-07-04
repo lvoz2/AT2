@@ -4,7 +4,7 @@
 
 import sys
 
-# import time
+import math
 from typing import Any, Optional
 
 import pygame
@@ -110,24 +110,24 @@ def move_player(
         direction[0] = -1
     elif pygame.K_a not in event.key and pygame.K_d in event.key:
         direction[0] = 1
-    distance: float = speed
+    distance: list[float] = [speed, math.sqrt((speed**2) * 2)]
     match (direction):
         case [0, -1]:
-            options["args"].move(0.0, distance)
+            options["args"].move(0.0, distance[0])
         case [1, -1]:
-            options["args"].move(45.0, distance)
+            options["args"].move(45.0, distance[1])
         case [1, 0]:
-            options["args"].move(90.0, distance)
+            options["args"].move(90.0, distance[0])
         case [1, 1]:
-            options["args"].move(135.0, distance)
+            options["args"].move(135.0, distance[1])
         case [0, 1]:
-            options["args"].move(180.0, distance)
+            options["args"].move(180.0, distance[0])
         case [-1, 1]:
-            options["args"].move(225.0, distance)
+            options["args"].move(225.0, distance[1])
         case [-1, 0]:
-            options["args"].move(270.0, distance)
+            options["args"].move(270.0, distance[0])
         case [-1, -1]:
-            options["args"].move(315.0, distance)
+            options["args"].move(315.0, distance[1])
     check_dists(options["args"])
 
 
@@ -359,18 +359,15 @@ def create_game_scene(player_sprite: player.Player) -> scene.Scene:
     game_scene.elements[0].append(player_hp_bar_bground)
     game_scene.elements.append([player_hp_bar])
     keys: list[int] = [pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d]
-    for key in keys:
-        game_scene.register_listener(
-            "key_press",
-            lambda event, options: move_player(  # pylint: disable=unnecessary-lambda
-                event, options  # pylint: disable=unnecessary-lambda
-            ),  # pylint: disable=unnecessary-lambda
-            {
-                "key": key,
-                "mods": pygame.KMOD_NONE,
-                "args": player_sprite,
-            },
-        )
+    game_scene.register_listener(
+        "key_press",
+        move_player,
+        {
+            "key": keys,
+            "mods": [pygame.KMOD_NONE],
+            "args": player_sprite,
+        },
+    )
     return game_scene
 
 

@@ -235,8 +235,8 @@ class AsyncDisplay(Display, metaclass=utils.Singleton):
                 self.cur_scene.bytes = (
                     pygame.image.tobytes(self.cur_scene.design.surf, "RGBA"),
                     [
-                        self.cur_scene.design.rect.width,
-                        self.cur_scene.design.rect.height,
+                        self.cur_scene.design.width,
+                        self.cur_scene.design.height,
                     ],
                     "RGBA",
                 )

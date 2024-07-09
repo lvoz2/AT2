@@ -163,8 +163,8 @@ def init() -> None:
             # top_stats = top_stats = snapshot.statistics("lineno")
             # print("[ Top 500 ]")
             # for stat in top_stats[:500]:
-            #     if str(stat)[:32] == "/home/mint/Documents/GitHub/AT2/":
-            #         print(stat)
+            #    if str(stat)[:32] == "/home/mint/Documents/GitHub/AT2/":
+            #        print(stat)
             # sys.exit()
 
 

@@ -32,7 +32,7 @@ class Element:
             bytes, Sequence[int], Literal["P", "RGB", "RGBX", "RGBA", "ARGB", "BGRA"]
         ] = (
             pygame.image.tobytes(self.design.surf, "RGBA"),
-            [self.design.rect.width, self.design.rect.height],
+            [self.design.width, self.design.height],
             "RGBA",
         )
 
@@ -52,7 +52,7 @@ class Element:
                 self.__design[1] = new_design
                 self.bytes = (
                     pygame.image.tobytes(self.design.surf, "RGBA"),
-                    [self.design.rect.width, self.design.rect.height],
+                    [self.design.width, self.design.height],
                     "RGBA",
                 )
 
@@ -105,16 +105,16 @@ class Element:
 
     def update_rect(self, future: cf_b.Future) -> None:
         res: pygame.Rect = future.result(0.01)
-        self.design.rect.x, self.design.rect.y = res.x, res.y
+        self.design.x, self.design.y = res.x, res.y
 
     def draw_async(
         self,
         executor: cf_p.ProcessPoolExecutor,
         dimensions: Sequence[int],
     ) -> None:
-        self.visible = (
-            (0 - self.design.rect.width) < self.design.rect.x < dimensions[0]
-        ) and ((0 - self.design.rect.height) < self.design.rect.y < dimensions[1])
+        self.visible = ((0 - self.design.width) < self.design.x < dimensions[0]) and (
+            (0 - self.design.height) < self.design.y < dimensions[1]
+        )
         if self.visible:
             future: cf_b.Future = executor.submit(
                 dpf.construct_and_blit,
@@ -130,12 +130,10 @@ class Element:
 
     def draw(self, window: "display.DrawProps") -> None:
         self.visible = (
-            (0 - self.design.rect.width) < self.design.rect.x < window.dimensions[0]
-        ) and (
-            (0 - self.design.rect.height) < self.design.rect.y < window.dimensions[1]
-        )
+            (0 - self.design.width) < self.design.x < window.dimensions[0]
+        ) and ((0 - self.design.height) < self.design.y < window.dimensions[1])
         if self.visible:
             new_rect: pygame.Rect = window.window.blit(
                 self.design.surf, self.design.rect, self.mask
             )
-            self.design.rect.x, self.design.rect.y = new_rect.x, new_rect.y
+            self.design.x, self.design.y = new_rect.x, new_rect.y

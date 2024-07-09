@@ -28,8 +28,8 @@ def create_main_menu(
         bground.surf = pygame.transform.scale(
             bground.surf, (window.dimensions[0], window.dimensions[1])
         )
-        bground.rect.width = window.dimensions[0]
-        bground.rect.height = window.dimensions[1]
+        bground.width = window.dimensions[0]
+        bground.height = window.dimensions[1]
     else:
         bground = bgrounds["assets/main_menu_background.png"]
     half_width: float = width / 2
@@ -105,8 +105,8 @@ def create_settings_menu(
         bground.surf = pygame.transform.scale(
             bground.surf, (window.dimensions[0], window.dimensions[1])
         )
-        bground.rect.width = window.dimensions[0]
-        bground.rect.height = window.dimensions[1]
+        bground.width = window.dimensions[0]
+        bground.height = window.dimensions[1]
     else:
         bground = bgrounds["assets/main_menu_background.png"]
     settings_menu: scene.Scene = scene.Scene(bground)
@@ -153,8 +153,8 @@ def create_class_select_menu(
         bground.surf = pygame.transform.scale(
             bground.surf, (window.dimensions[0], window.dimensions[1])
         )
-        bground.rect.width = window.dimensions[0]
-        bground.rect.height = window.dimensions[1]
+        bground.width = window.dimensions[0]
+        bground.height = window.dimensions[1]
     else:
         bground = bgrounds["assets/main_menu_background.png"]
     class_select_menu: scene.Scene = scene.Scene(bground)
@@ -177,7 +177,7 @@ def create_class_select_menu(
             },
         )
         img.surf = pygame.transform.scale(img.surf, (icon_width, icon_height))
-        img.rect.width, img.rect.height = icon_width, icon_height
+        img.width, img.height = icon_width, icon_height
         class_select_menu.elements[0].append(element.Element(img, visible=True))
     class_select_menu.elements[0].append(
         element.Element(
@@ -223,8 +223,8 @@ def create_game_scene(
         bground.surf = pygame.transform.scale(
             bground.surf, (window.dimensions[0], window.dimensions[1])
         )
-        bground.rect.width = window.dimensions[0]
-        bground.rect.height = window.dimensions[1]
+        bground.width = window.dimensions[0]
+        bground.height = window.dimensions[1]
     else:
         bground = bgrounds["assets/dungeon_map.png"]
     enemy_rect_options: list[dict[str, int]] = [
@@ -283,8 +283,8 @@ def create_attack_scene() -> scene.Scene:
         bground.surf = pygame.transform.scale(
             bground.surf, (window.dimensions[0], window.dimensions[1])
         )
-        bground.rect.width = window.dimensions[0]
-        bground.rect.height = window.dimensions[1]
+        bground.width = window.dimensions[0]
+        bground.height = window.dimensions[1]
     else:
         bground = bgrounds["assets/attack_screen.png"]
     attack_scene: scene.Scene = scene.Scene(bground)

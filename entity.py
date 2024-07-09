@@ -29,8 +29,8 @@ class Entity(element.Element):
 
     def get_opp_corner(self) -> list[int]:
         return [
-            self.design.rect.x + self.design.rect.width,
-            self.design.rect.y + self.design.rect.height,
+            self.design.x + self.design.width,
+            self.design.y + self.design.height,
         ]
 
     def is_alive(self) -> bool:

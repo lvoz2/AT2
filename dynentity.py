@@ -52,8 +52,8 @@ class DynEntity(entity.Entity):
             direction = math.radians(360 - direction)
             horizontal = -(math.sin(direction) * distance)
             vertical = -(math.cos(direction) * distance)
-        self.design.rect.x += int(round(horizontal))
-        self.design.rect.y += int(round(vertical))
+        self.design.x += int(round(horizontal))
+        self.design.y += int(round(vertical))
 
     def get_distance(self, other: entity.Entity) -> float:
         if self.design.rect.colliderect(other.design.rect):
@@ -63,21 +63,21 @@ class DynEntity(entity.Entity):
             "other": other.get_opp_corner(),
         }
         linear_distances: list[float] = [
-            abs(self.design.rect.y - opp_corner["other"][1]),
-            abs(other.design.rect.x - opp_corner["self"][0]),
-            abs(other.design.rect.y - opp_corner["self"][1]),
-            abs(self.design.rect.x - opp_corner["other"][0]),
+            abs(self.design.y - opp_corner["other"][1]),
+            abs(other.design.x - opp_corner["self"][0]),
+            abs(other.design.y - opp_corner["self"][1]),
+            abs(self.design.x - opp_corner["other"][0]),
         ]
         horizontal: float = min(linear_distances[1], linear_distances[3])
         if (
-            other.design.rect.x <= self.design.rect.x <= opp_corner["other"][0]
-            or other.design.rect.x <= opp_corner["self"][0] <= opp_corner["other"][0]
+            other.design.x <= self.design.x <= opp_corner["other"][0]
+            or other.design.x <= opp_corner["self"][0] <= opp_corner["other"][0]
         ):
             horizontal = 0
         vertical: float = min(linear_distances[0], linear_distances[2])
         if (
-            other.design.rect.y <= self.design.rect.y <= opp_corner["other"][1]
-            or other.design.rect.y <= opp_corner["self"][1] <= opp_corner["other"][1]
+            other.design.y <= self.design.y <= opp_corner["other"][1]
+            or other.design.y <= opp_corner["self"][1] <= opp_corner["other"][1]
         ):
             vertical = 0
         hypotenuse: float = (

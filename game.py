@@ -3,6 +3,7 @@
 # tracemalloc.start()
 
 import math
+import pathlib
 import sys
 from typing import Any, Optional
 
@@ -131,8 +132,12 @@ def check_dists(player_entity: player.Player) -> None:
         if isinstance(e, entity.Entity):
             distance: float = player_entity.get_distance(e)
             if isinstance(e, enemy.Enemy) and distance <= 50.0:
-                player_entity.attack(0, e, window.events.event_types["dmg_event"])
-                e.attack(0, player_entity, window.events.event_types["dmg_event"])
+                window.add_scene(
+                    "attack",
+                    cm.create_attack_scene(player_entity, e, back),
+                    overwrite=True,
+                )
+                window.set_scene("attack")
 
 
 def init() -> None:
@@ -142,16 +147,20 @@ def init() -> None:
         title="Kings Quest", dim=[width, height], key_press_initial_delay=20
     )
     pygame.font.init()
-    font: pygame.font.Font = pygame.font.Font(None, 36)
-    window.add_scene(
-        "main_menu", cm.create_main_menu(width, window, font, play, settings, leave)
+    path: pathlib.Path = pathlib.Path.joinpath(
+        pathlib.Path.cwd(), "fonts/static/GrenzeGotisch-Regular.ttf"
     )
+    if path.exists():
+        cm.game_fonts = [pygame.font.Font(path, 36), pygame.font.Font(path, 20)]
+    else:
+        cm.game_fonts = [pygame.font.Font(path, 36), pygame.font.Font(path, 20)]
     window.add_scene(
-        "settings_menu", cm.create_settings_menu(height, window, font, back)
+        "main_menu", cm.create_main_menu(width, window, play, settings, leave)
     )
+    window.add_scene("settings_menu", cm.create_settings_menu(height, window, back))
     window.add_scene(
         "class_select_menu",
-        cm.create_class_select_menu(width, window, height, font, back, select_class),
+        cm.create_class_select_menu(width, window, height, back, select_class),
     )
     window.set_scene("main_menu", no_event=True)
     while True:

@@ -2,7 +2,6 @@ from typing import Any, Optional
 
 import pygame
 
-import attack
 import character
 import sprite
 
@@ -41,9 +40,6 @@ class Player(character.Character):
         self.money: int = 0
         self.attr_pts: int = 0
         self.attr_pts_per_lvl: int = 3
-        self.attacks: list[tuple[str, attack.Attack]] = [
-            ("Charge", attack.Attack(2.5, 0))
-        ]
 
     def assign_attr_pts(self, attr: str, pts: int) -> None:
         if attr in self.__dict__:

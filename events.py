@@ -1,4 +1,5 @@
 import copy
+import functools
 import sys
 import types
 import warnings
@@ -39,7 +40,10 @@ class Events(metaclass=utils.Singleton):
                     Callable[
                         [
                             pygame.event.Event,
-                            Callable[[pygame.event.Event, dict[str, Any]], None],
+                            Callable[
+                                [pygame.event.Event, dict[str, Any]],
+                                Optional[functools.partial[None]],
+                            ],
                             dict[str, Any],
                         ],
                         bool,
@@ -128,10 +132,15 @@ class Events(metaclass=utils.Singleton):
 
             def __process_key_up_or_down(
                 event: pygame.event.Event,
-                func: Callable[[pygame.event.Event, dict[str, Any]], None],
+                func: Callable[
+                    [pygame.event.Event, dict[str, Any]],
+                    Optional[functools.partial[None]],
+                ],
                 options: Optional[dict[str, Any]],
             ) -> bool:
                 if options is not None:
+                    if "mods" not in options:
+                        options["mods"] = pygame.KMOD_NONE
                     if options["key"] == event.key and options["mods"] == event.mod:
                         func(event, options)
                         return True
@@ -139,7 +148,10 @@ class Events(metaclass=utils.Singleton):
 
             def __process_mouse_button_down(
                 event: pygame.event.Event,
-                func: Callable[[pygame.event.Event, dict[str, Any]], None],
+                func: Callable[
+                    [pygame.event.Event, dict[str, Any]],
+                    Optional[functools.partial[None]],
+                ],
                 options: Optional[dict[str, Any]],
             ) -> bool:
                 if options is not None:
@@ -151,7 +163,8 @@ class Events(metaclass=utils.Singleton):
             def __process_exit(  # pylint: disable=unused-argument
                 event: pygame.event.Event,  # pylint: disable=unused-argument
                 func: Callable[
-                    [pygame.event.Event, dict[str, Any]], None
+                    [pygame.event.Event, dict[str, Any]],
+                    Optional[functools.partial[None]],
                 ],  # pylint: disable=unused-argument
                 options: Optional[dict[str, Any]],  # pylint: disable=unused-argument
             ) -> bool:  # pylint: disable=unused-argument
@@ -159,7 +172,10 @@ class Events(metaclass=utils.Singleton):
 
             def __process_dmg(
                 event: pygame.event.Event,
-                func: Callable[[pygame.event.Event, dict[str, Any]], None],
+                func: Callable[
+                    [pygame.event.Event, dict[str, Any]],
+                    Optional[functools.partial[None]],
+                ],
                 options: Optional[dict[str, Any]],
             ) -> bool:
                 if options is not None:
@@ -170,7 +186,10 @@ class Events(metaclass=utils.Singleton):
 
             def __process_key_press(
                 event: pygame.event.Event,
-                func: Callable[[pygame.event.Event, dict[str, Any]], None],
+                func: Callable[
+                    [pygame.event.Event, dict[str, Any]],
+                    Optional[functools.partial[None]],
+                ],
                 options: Optional[dict[str, Any]],
             ) -> bool:
                 if options is not None:
@@ -294,7 +313,9 @@ class Events(metaclass=utils.Singleton):
     def default_processor(
         self,
         event: pygame.event.Event,
-        func: Callable[[pygame.event.Event, dict[str, Any]], None],
+        func: Callable[
+            [pygame.event.Event, dict[str, Any]], Optional[functools.partial[None]]
+        ],
         options: Optional[dict[str, Any]],
     ) -> bool:
         if options is not None:
@@ -308,7 +329,10 @@ class Events(metaclass=utils.Singleton):
         func: Callable[
             [
                 pygame.event.Event,
-                Callable[[pygame.event.Event, dict[str, Any]], None],
+                Callable[
+                    [pygame.event.Event, dict[str, Any]],
+                    Optional[functools.partial[None]],
+                ],
                 Optional[dict[str, Any]],
             ],
             bool,
@@ -335,7 +359,10 @@ class Events(metaclass=utils.Singleton):
         func: Callable[
             [
                 pygame.event.Event,
-                Callable[[pygame.event.Event, dict[str, Any]], None],
+                Callable[
+                    [pygame.event.Event, dict[str, Any]],
+                    Optional[functools.partial[None]],
+                ],
                 dict[str, Any],
             ],
             bool,
@@ -377,7 +404,10 @@ class Events(metaclass=utils.Singleton):
             dict[
                 int,
                 dict[
-                    Callable[[pygame.event.Event, dict[str, Any]], None],
+                    Callable[
+                        [pygame.event.Event, dict[str, Any]],
+                        Optional[functools.partial[None]],
+                    ],
                     list[dict[str, Any]],
                 ],
             ]
@@ -391,10 +421,14 @@ class Events(metaclass=utils.Singleton):
             self.__pressed_keys["unicode"].append(event.unicode)
             self.__pressed_keys["scancode"].append(event.scancode)
         elif event.type == pygame.KEYUP:
-            self.__pressed_keys["keys"].remove(event.key)
-            self.__pressed_keys["mods"].remove(event.mod)
-            self.__pressed_keys["unicode"].remove(event.unicode)
-            self.__pressed_keys["scancode"].remove(event.scancode)
+            if event.key in self.__pressed_keys["keys"]:
+                self.__pressed_keys["keys"].remove(event.key)
+            if event.mod in self.__pressed_keys["mods"]:
+                self.__pressed_keys["mods"].remove(event.mod)
+            if event.unicode in self.__pressed_keys["unicode"]:
+                self.__pressed_keys["unicode"].remove(event.unicode)
+            if event.scancode in self.__pressed_keys["scancode"]:
+                self.__pressed_keys["scancode"].remove(event.scancode)
             if (
                 len(self.__pressed_keys["keys"])
                 == len(self.__pressed_keys["mods"])

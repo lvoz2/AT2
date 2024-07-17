@@ -1,3 +1,4 @@
+import functools
 from typing import Any, Callable
 
 import pygame
@@ -12,17 +13,22 @@ import sprite
 import utils
 import zombie
 
+pygame.font.init()
 bgrounds: dict[str, sprite.Sprite] = {}
+game_fonts: list[pygame.font.Font] = [
+    pygame.font.Font(None, 36),
+    pygame.font.Font(None, 20),
+]
 
 
 def create_main_menu(
     width: int,
     window: display.Display | display.AsyncDisplay,
-    font: pygame.font.Font,
     play: Callable[[pygame.event.Event, dict[str, Any]], None],
     settings: Callable[[pygame.event.Event, dict[str, Any]], None],
     leave: Callable[[pygame.event.Event, dict[str, Any]], None],
 ) -> scene.Scene:
+    font = game_fonts[0]
     if "assets/main_menu_background.png" not in bgrounds:
         bground: sprite.Sprite = utils.get_asset("assets/main_menu_background.png")
         bground.surf = pygame.transform.scale(
@@ -34,12 +40,12 @@ def create_main_menu(
         bground = bgrounds["assets/main_menu_background.png"]
     half_width: float = width / 2
     main_menu: scene.Scene = scene.Scene(bground)
-    y_vals: list[int] = [150, 200, 250]
+    y_vals: list[int] = [152, 205, 252]
     for y_val in y_vals:
         main_menu.elements[0].append(
             element.Element(
                 sprite.Sprite(
-                    rect=pygame.Rect(half_width, y_val, 150, 30),
+                    rect=pygame.Rect(half_width, y_val, 150, 40),
                     rect_options={
                         "center": True,
                         "x": half_width,
@@ -97,9 +103,9 @@ def create_main_menu(
 def create_settings_menu(
     height: int,
     window: display.Display | display.AsyncDisplay,
-    font: pygame.font.Font,
     back: Callable[[pygame.event.Event, dict[str, Any]], None],
 ) -> scene.Scene:
+    font = game_fonts[0]
     if "assets/main_menu_background.png" not in bgrounds:
         bground: sprite.Sprite = utils.get_asset("assets/main_menu_background.png")
         bground.surf = pygame.transform.scale(
@@ -114,7 +120,7 @@ def create_settings_menu(
         element.Element(
             sprite.Sprite(
                 rect=pygame.Rect(50, height - 80, 100, 30),
-                rect_options={"x": 50, "y": height - 80, "colour": [255, 255, 255]},
+                rect_options={"x": 50, "y": height - 78, "colour": [255, 255, 255]},
                 is_async=window.from_async,
                 executor=window.executor,
             ),
@@ -140,14 +146,14 @@ def create_settings_menu(
     return settings_menu
 
 
-def create_class_select_menu(
+def create_class_select_menu(  # pylint: disable=too-many-locals
     width: int,
     window: display.Display | display.AsyncDisplay,
     height: int,
-    font: pygame.font.Font,
     back: Callable[[pygame.event.Event, dict[str, Any]], None],
     select_class: Callable[[pygame.event.Event, dict[str, Any]], None],
 ) -> scene.Scene:
+    font = game_fonts[0]
     if "assets/main_menu_background.png" not in bgrounds:
         bground: sprite.Sprite = utils.get_asset("assets/main_menu_background.png")
         bground.surf = pygame.transform.scale(
@@ -182,8 +188,8 @@ def create_class_select_menu(
     class_select_menu.elements[0].append(
         element.Element(
             sprite.Sprite(
-                rect=pygame.Rect(50, height - 80, 100, 30),
-                rect_options={"x": 50, "y": height - 80, "colour": [255, 255, 255]},
+                rect=pygame.Rect(50, height - 50, 100, 30),
+                rect_options={"x": 50, "y": height - 78, "colour": [255, 255, 255]},
                 is_async=window.from_async,
                 executor=window.executor,
             ),
@@ -276,7 +282,13 @@ def create_game_scene(
     return game_scene
 
 
-def create_attack_scene() -> scene.Scene:
+def create_attack_scene(  # pylint: disable=too-many-locals
+    player_entity: player.Player,
+    target: enemy.Enemy,
+    back: Callable[[pygame.event.Event, dict[str, Any]], None],
+) -> scene.Scene:
+    title_font = game_fonts[0]
+    text_font = game_fonts[1]
     window: display.Display = display.Display()
     if "assets/attack_screen.png" not in bgrounds:
         bground: sprite.Sprite = utils.get_asset("assets/attack_screen.png")
@@ -288,4 +300,135 @@ def create_attack_scene() -> scene.Scene:
     else:
         bground = bgrounds["assets/attack_screen.png"]
     attack_scene: scene.Scene = scene.Scene(bground)
+    player_rect = player_entity.design.rect.copy()
+    player_scale = 150 / min(player_rect.width, player_rect.height)
+    player_e = element.Element(
+        sprite.Sprite(
+            player_entity.design.surf,
+            player_rect,
+            scale=player_scale,
+            path=player_entity.design.path,
+            is_async=window.from_async,
+            executor=window.executor,
+        )
+    )
+    new_player_rect = player_e.design.rect.copy()
+    new_player_rect.centerx = 200
+    new_player_rect.bottom = 300
+    player_e.design.rect = new_player_rect
+    target_rect = target.design.rect.copy()
+    target_scale = 150 / min(target_rect.width, target_rect.height)
+    target_e = element.Element(
+        sprite.Sprite(
+            target.design.surf,
+            target_rect,
+            scale=target_scale,
+            path=target.design.path,
+            is_async=window.from_async,
+            executor=window.executor,
+        )
+    )
+    new_target_rect = target_e.design.rect.copy()
+    new_target_rect.centerx = 600
+    new_target_rect.bottom = 200
+    target_e.design.rect = new_target_rect
+    left_panel_title: element.Element = element.Element(
+        sprite.Sprite(
+            rect_options={"center": True, "x": 200, "y": 342},
+            font_options={"text": "~ ATTACKS ~", "font": title_font},
+            is_async=window.from_async,
+            executor=window.executor,
+        ),
+        visible=True,
+    )
+    right_panel_title: element.Element = element.Element(
+        sprite.Sprite(
+            rect_options={"center": True, "x": 600, "y": 342},
+            font_options={"text": "~ OTHER ~", "font": title_font},
+            is_async=window.from_async,
+            executor=window.executor,
+        ),
+        visible=True,
+    )
+    leave_text: element.Element = element.Element(
+        sprite.Sprite(
+            rect_options={"x": 400, "y": 558, "center": True},
+            font_options={"text": "~ RUN ~", "font": title_font},
+            is_async=window.from_async,
+            executor=window.executor,
+        ),
+        visible=True,
+    )
+    leave_text_container: element.Element = element.Element(
+        sprite.Sprite(
+            rect=pygame.Rect(340, 540, 120, 36),
+            rect_options={"colour": [209, 211, 212]},
+        )
+    )
+    leave_text_container.register_listener("mouse_button_down", back, {"args": "game"})
+    attack_scene.elements[0] = [
+        player_e,
+        target_e,
+        left_panel_title,
+        right_panel_title,
+        leave_text_container,
+        leave_text,
+    ]
+    attack_funcs: list[functools.partial[None]] = []
+    # attack_menu_rect = pygame.Rect(45, 355, 340, 190)
+    for i, (name, attack) in enumerate(player_entity.attacks):
+        text: element.Element = element.Element(
+            sprite.Sprite(
+                rect_options={"x": 45, "y": 355 + (i * 30)},
+                font_options={"text": name, "font": text_font},
+                is_async=window.from_async,
+                executor=window.executor,
+            ),
+            visible=True,
+        )
+        dmg: element.Element = element.Element(
+            sprite.Sprite(
+                rect_options={"x": 235, "y": 355 + (i * 30)},
+                font_options={
+                    "text": "DMG: " + str(int(attack.dmg * player_entity.strength)),
+                    "font": text_font,
+                },
+                is_async=window.from_async,
+                executor=window.executor,
+            ),
+            visible=True,
+        )
+        cost: element.Element = element.Element(
+            sprite.Sprite(
+                rect_options={"x": 310, "y": 355 + (i * 30)},
+                font_options={"text": "Cost: " + str(attack.cost), "font": text_font},
+                is_async=window.from_async,
+                executor=window.executor,
+            ),
+            visible=True,
+        )
+        container: element.Element = element.Element(
+            sprite.Sprite(
+                rect=pygame.Rect(45, 355 + (i * 30), 340, 30),
+                rect_options={"colour": [209, 211, 212]},
+            )
+        )
+        attack_funcs.append(
+            functools.partial(
+                attack.damage,
+                player_entity.strength,
+                target,
+                window.events.event_types["dmg_event"],
+            )
+        )
+        container.register_listener(
+            "mouse_button_down",
+            lambda event, options: attack_funcs[options["i"]](),
+            {"i": i},
+        )
+        attack_scene.elements[0].append(container)
+        attack_scene.elements[0].append(text)
+        attack_scene.elements[0].append(dmg)
+        attack_scene.elements[0].append(cost)
+    # other_menu_rect = pygame.Rect(445, 355, 340, 190)
     return attack_scene

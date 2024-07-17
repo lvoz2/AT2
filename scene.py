@@ -1,3 +1,4 @@
+import functools
 from typing import Any, Callable, Iterator, Optional
 
 import pygame
@@ -15,7 +16,10 @@ class Scene(element.Element):
             dict[
                 int,
                 dict[
-                    Callable[[pygame.event.Event, dict[str, Any]], None],
+                    Callable[
+                        [pygame.event.Event, dict[str, Any]],
+                        Optional[functools.partial[None]],
+                    ],
                     list[dict[str, Any]],
                 ],
             ]
@@ -32,7 +36,10 @@ class Scene(element.Element):
         listeners: dict[
             int,
             dict[
-                Callable[[pygame.event.Event, dict[str, Any]], None],
+                Callable[
+                    [pygame.event.Event, dict[str, Any]],
+                    Optional[functools.partial[None]],
+                ],
                 list[dict[str, Any]],
             ],
         ] = {}

@@ -2,6 +2,7 @@ from typing import Any, Optional
 
 import pygame
 
+import attack
 import player
 import utils
 
@@ -24,3 +25,6 @@ class Mage(player.Player):
             mask=mask,
             mana=15,
         )
+        self.attacks: list[tuple[str, attack.Attack]] = [
+            ("Charge", attack.Attack(2.5, 0))
+        ]

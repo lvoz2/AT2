@@ -58,26 +58,44 @@ class DynEntity(entity.Entity):
     def get_distance(self, other: entity.Entity) -> float:
         if self.design.rect.colliderect(other.design.rect):
             return -1.0
+        rect_vals: dict[str, dict[str, int]] = {
+            "self": {
+                "x": self.design.rect.x,
+                "y": self.design.rect.y,
+                "width": self.design.rect.width,
+                "height": self.design.rect.height,
+            },
+            "other": {
+                "x": other.design.rect.x,
+                "y": other.design.rect.y,
+                "width": other.design.rect.width,
+                "height": other.design.rect.height,
+            },
+        }
         opp_corner: dict[str, list[int]] = {
             "self": self.get_opp_corner(),
             "other": other.get_opp_corner(),
         }
         linear_distances: list[float] = [
-            abs(self.design.y - opp_corner["other"][1]),
-            abs(other.design.x - opp_corner["self"][0]),
-            abs(other.design.y - opp_corner["self"][1]),
-            abs(self.design.x - opp_corner["other"][0]),
+            abs(rect_vals["self"]["y"] - opp_corner["other"][1]),
+            abs(rect_vals["other"]["x"] - opp_corner["self"][0]),
+            abs(rect_vals["other"]["y"] - opp_corner["self"][1]),
+            abs(rect_vals["self"]["x"] - opp_corner["other"][0]),
         ]
         horizontal: float = min(linear_distances[1], linear_distances[3])
         if (
-            other.design.x <= self.design.x <= opp_corner["other"][0]
-            or other.design.x <= opp_corner["self"][0] <= opp_corner["other"][0]
+            rect_vals["other"]["x"] <= rect_vals["self"]["x"] <= opp_corner["other"][0]
+            or rect_vals["other"]["x"]
+            <= opp_corner["self"][0]
+            <= opp_corner["other"][0]
         ):
             horizontal = 0
         vertical: float = min(linear_distances[0], linear_distances[2])
         if (
-            other.design.y <= self.design.y <= opp_corner["other"][1]
-            or other.design.y <= opp_corner["self"][1] <= opp_corner["other"][1]
+            rect_vals["other"]["y"] <= rect_vals["self"]["y"] <= opp_corner["other"][1]
+            or rect_vals["other"]["y"]
+            <= opp_corner["self"][1]
+            <= opp_corner["other"][1]
         ):
             vertical = 0
         hypotenuse: float = (

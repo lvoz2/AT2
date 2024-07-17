@@ -9,6 +9,7 @@ from typing import Any, Optional, Sequence
 import pygame
 
 import draw_process_funcs as dpf
+import element
 import events
 import scene
 import utils
@@ -89,7 +90,7 @@ class DrawProps(metaclass=utils.Singleton):
                 self.__dimensions[1] = new_dimensions
 
 
-class Display(DrawProps, metaclass=utils.Singleton):
+class Display(DrawProps, element.ListenerHolder, metaclass=utils.Singleton):
     def __init__(
         self,
         title: str = "",
@@ -130,13 +131,16 @@ class Display(DrawProps, metaclass=utils.Singleton):
             not been loaded into the Display'
             )
 
-    def add_scene(self, name: str, new_scene: scene.Scene) -> bool:
-        if name not in self.scenes:
+    def add_scene(
+        self, name: str, new_scene: scene.Scene, overwrite: bool = False
+    ) -> bool:
+        if name not in self.scenes or overwrite:
             self.scenes[name] = new_scene
         else:
             raise KeyError(
                 "Scene couldn't be added, becuase another Scene with the same name "
-                f"already loaded. Find a different name and try again. Name: {name}"
+                "already loaded, and you have specified not to overwrite it. "
+                f"Find a different name and try again. Name: {name}"
             )
         return name in self.scenes
 

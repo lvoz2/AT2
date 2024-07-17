@@ -1,5 +1,6 @@
 import concurrent.futures._base as cf_b
 import concurrent.futures.process as cf_p
+import functools
 import multiprocessing as mp
 import multiprocessing.synchronize as mp_sync
 from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, Sequence
@@ -14,52 +15,25 @@ if TYPE_CHECKING:
     import display
 
 
-class Element:
-    def __init__(
-        self,
-        design: sprite.Sprite,
-        mask: Optional[pygame.Rect] = None,
-        visible: bool = False,
-    ) -> None:
-        self.__design: list[mp_sync.Lock | sprite.Sprite] = [mp.Lock(), design]
-        self.mask = mask
+class ListenerHolder:
+    def __init__(self) -> None:
         self.listeners: dict[
             int,
-            dict[Callable[[pygame.event.Event, dict[str, Any]], None], dict[str, Any]],
+            dict[
+                Callable[
+                    [pygame.event.Event, dict[str, Any]],
+                    Optional[functools.partial[None]],
+                ],
+                dict[str, Any],
+            ],
         ] = {}
-        self.visible = visible
-        self.bytes: tuple[
-            bytes, Sequence[int], Literal["P", "RGB", "RGBX", "RGBA", "ARGB", "BGRA"]
-        ] = (
-            pygame.image.tobytes(self.design.surf, "RGBA"),
-            [self.design.width, self.design.height],
-            "RGBA",
-        )
-
-    @property
-    def design(self) -> sprite.Sprite:
-        if isinstance(self.__design[0], mp_sync.Lock) and isinstance(
-            self.__design[1], sprite.Sprite
-        ):
-            with self.__design[0] as lock:  # pylint: disable=unused-variable
-                return self.__design[1]
-        raise TypeError("__design has the wrong types")
-
-    @design.setter
-    def design(self, new_design: sprite.Sprite) -> None:
-        if isinstance(self.__design[0], mp_sync.Lock):
-            with self.__design[0] as lock:  # pylint: disable=unused-variable
-                self.__design[1] = new_design
-                self.bytes = (
-                    pygame.image.tobytes(self.design.surf, "RGBA"),
-                    [self.design.width, self.design.height],
-                    "RGBA",
-                )
 
     def register_listener(
         self,
         event_type: int | str,
-        func: Callable[[pygame.event.Event, dict[str, Any]], None],
+        func: Callable[
+            [pygame.event.Event, dict[str, Any]], Optional[functools.partial[None]]
+        ],
         options: Optional[dict[str, Any]] = None,
     ) -> None:
         if isinstance(event_type, str):
@@ -77,7 +51,9 @@ class Element:
     def deregister_listener(
         self,
         event_type: int | str,
-        func: Callable[[pygame.event.Event, dict[str, Any]], None],
+        func: Callable[
+            [pygame.event.Event, dict[str, Any]], Optional[functools.partial[None]]
+        ],
         options: Optional[dict[str, Any]] = None,
     ) -> None:
         if isinstance(event_type, str):
@@ -102,6 +78,46 @@ class Element:
                 f"received {options}"
             )
         del self.listeners[evt_type][func]
+
+
+class Element(ListenerHolder):
+    def __init__(
+        self,
+        design: sprite.Sprite,
+        mask: Optional[pygame.Rect] = None,
+        visible: bool = False,
+    ) -> None:
+        super().__init__()
+        self.__design: list[mp_sync.Lock | sprite.Sprite] = [mp.Lock(), design]
+        self.mask = mask
+        self.visible = visible
+        self.bytes: tuple[
+            bytes, Sequence[int], Literal["P", "RGB", "RGBX", "RGBA", "ARGB", "BGRA"]
+        ] = (
+            pygame.image.tobytes(self.design.surf, "RGBA"),
+            [self.design.rect.width, self.design.rect.height],
+            "RGBA",
+        )
+
+    @property
+    def design(self) -> sprite.Sprite:
+        if isinstance(self.__design[0], mp_sync.Lock) and isinstance(
+            self.__design[1], sprite.Sprite
+        ):
+            with self.__design[0] as lock:  # pylint: disable=unused-variable
+                return self.__design[1]
+        raise TypeError("__design has the wrong types")
+
+    @design.setter
+    def design(self, new_design: sprite.Sprite) -> None:
+        if isinstance(self.__design[0], mp_sync.Lock):
+            with self.__design[0] as lock:  # pylint: disable=unused-variable
+                self.__design[1] = new_design
+                self.bytes = (
+                    pygame.image.tobytes(self.design.surf, "RGBA"),
+                    [self.design.rect.width, self.design.rect.height],
+                    "RGBA",
+                )
 
     def update_rect(self, future: cf_b.Future) -> None:
         res: pygame.Rect = future.result(0.01)

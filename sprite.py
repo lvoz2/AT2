@@ -173,7 +173,7 @@ class Sprite:
             self.colour = (
                 self.colour
                 if self.colour is not None
-                else self.__get_val_from_dict(rect_options, "color")
+                else self.__get_val_from_dict(rect_options, "color", error=True)
             )
             self.color = self.colour
             self.surf = pygame.Surface((self.width, self.height))
@@ -188,13 +188,13 @@ class Sprite:
         else:
             raise TypeError("No argument given to create a Surface")
         self.center = self.__get_val_from_dict(rect_options, "center", False)
-        x: int = self.__get_val_from_dict(rect_options, "x", default=0, error=True)
-        y: int = self.__get_val_from_dict(rect_options, "y", default=0, error=True)
+        x: int = self.__get_val_from_dict(rect_options, "x", default=self.rect.x)
+        y: int = self.__get_val_from_dict(rect_options, "y", default=self.rect.y)
         if self.center:
             self.rect.center = (x, y)
         else:
-            self.rect.left = x
-            self.rect.top = y
+            self.rect.x = x
+            self.rect.y = y
 
     def scale(self, scale: float) -> pygame.Surface:
         new_dimensions: tuple[int, int] = (

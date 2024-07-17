@@ -66,7 +66,7 @@ class Sprite:
             res = fut.result()
             self.__surf = pygame.image.frombuffer(res[0], res[1], res[2])
         else:
-            self.__surf = new_surf.convert_alpha()
+            self.__surf = new_surf  # .convert_alpha()
 
     @property
     def rect(self) -> pygame.Rect:
@@ -164,7 +164,7 @@ class Sprite:
             self.background = self.__get_val_from_dict(font_options, "background")
             self.surf = self.font.render(
                 self.text, self.anti_alias, self.colour, self.background
-            )
+            ).convert_alpha()
             self.rect = rect if rect is not None else self.surf.get_rect()
         elif self.is_rect:
             if rect is None:
@@ -178,6 +178,7 @@ class Sprite:
             self.color = self.colour
             self.surf = pygame.Surface((self.width, self.height))
             self.surf.fill(self.colour)
+            self.surf = self.surf.convert_alpha()
         elif surf is not None:
             self.surf = surf
             if rect is None:
@@ -197,6 +198,8 @@ class Sprite:
             self.rect.y = y
 
     def scale(self, scale: float) -> pygame.Surface:
+        if scale == 1.0:
+            return self.surf
         new_dimensions: tuple[int, int] = (
             int(self.width * scale),
             int(self.height * scale),

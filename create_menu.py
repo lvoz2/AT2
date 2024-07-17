@@ -23,10 +23,13 @@ game_fonts: list[pygame.font.Font] = [
 
 def create_main_menu(
     width: int,
+    height: int,
     window: display.Display | display.AsyncDisplay,
     play: Callable[[pygame.event.Event, dict[str, Any]], None],
     settings: Callable[[pygame.event.Event, dict[str, Any]], None],
     leave: Callable[[pygame.event.Event, dict[str, Any]], None],
+    back: Callable[[pygame.event.Event, dict[str, Any]], None],
+    select_class: Callable[[pygame.event.Event, dict[str, Any]], None],
 ) -> scene.Scene:
     font = game_fonts[0]
     if "assets/main_menu_background.png" not in bgrounds:
@@ -94,8 +97,14 @@ def create_main_menu(
         ]
     )
     main_menu.register_listener(pygame.KEYDOWN, play, {"key": pygame.K_RETURN})
-    main_menu.elements[0][0].register_listener(pygame.MOUSEBUTTONDOWN, play)
-    main_menu.elements[0][1].register_listener(pygame.MOUSEBUTTONDOWN, settings)
+    main_menu.elements[0][0].register_listener(
+        pygame.MOUSEBUTTONDOWN,
+        play,
+        {"args": [width, window, height, back, select_class]},
+    )
+    main_menu.elements[0][1].register_listener(
+        pygame.MOUSEBUTTONDOWN, settings, {"args": [height, window, back]}
+    )
     main_menu.elements[0][2].register_listener(pygame.MOUSEBUTTONDOWN, leave)
     return main_menu
 

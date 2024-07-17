@@ -91,13 +91,16 @@ class Element(ListenerHolder):
         self.__design: list[mp_sync.Lock | sprite.Sprite] = [mp.Lock(), design]
         self.mask = mask
         self.visible = visible
-        self.bytes: tuple[
-            bytes, Sequence[int], Literal["P", "RGB", "RGBX", "RGBA", "ARGB", "BGRA"]
-        ] = (
-            pygame.image.tobytes(self.design.surf, "RGBA"),
-            [self.design.rect.width, self.design.rect.height],
-            "RGBA",
-        )
+        if self.design.is_async:
+            self.bytes: tuple[
+                bytes,
+                Sequence[int],
+                Literal["P", "RGB", "RGBX", "RGBA", "ARGB", "BGRA"],
+            ] = (
+                pygame.image.tobytes(self.design.surf, "RGBA"),
+                [self.design.rect.width, self.design.rect.height],
+                "RGBA",
+            )
 
     @property
     def design(self) -> sprite.Sprite:

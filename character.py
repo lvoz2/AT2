@@ -27,7 +27,6 @@ class Character(dynentity.DynEntity):
             visible=True,
             mask=mask,
         )
-        window: display.Display = display.Display()
         self.name = name
         self.lvl: int = 0
         self.skills: dict[str, Any] = {}

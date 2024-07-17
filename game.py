@@ -16,6 +16,7 @@ import entity
 import mage
 import player
 import rogue
+import utils
 import warrior
 
 # import time
@@ -26,6 +27,10 @@ def play(
     options: dict[str, Any],  # pylint: disable=unused-argument
 ) -> None:  # pylint: disable=unused-argument
     window: display.Display = display.Display()
+    window.add_scene(
+        "class_select_menu",
+        cm.create_class_select_menu(*options["args"]),
+    )
     window.set_scene("class_select_menu")
 
 
@@ -34,6 +39,7 @@ def settings(
     options: dict[str, Any],  # pylint: disable=unused-argument
 ) -> None:  # pylint: disable=unused-argument
     window: display.Display = display.Display()
+    window.add_scene("settings_menu", cm.create_settings_menu(*options["args"]))
     window.set_scene("settings_menu")
 
 
@@ -150,17 +156,22 @@ def init() -> None:
     path: pathlib.Path = pathlib.Path.joinpath(
         pathlib.Path.cwd(), "fonts/static/GrenzeGotisch-Regular.ttf"
     )
+    images: list[str] = [
+        "assets/rogue_button.png",
+        "assets/mage_button.png",
+        "assets/warrior_button.png",
+    ]
+    for img in images:
+        utils.get_asset(img)
     if path.exists():
         cm.game_fonts = [pygame.font.Font(path, 36), pygame.font.Font(path, 20)]
     else:
         cm.game_fonts = [pygame.font.Font(path, 36), pygame.font.Font(path, 20)]
     window.add_scene(
-        "main_menu", cm.create_main_menu(width, window, play, settings, leave)
-    )
-    window.add_scene("settings_menu", cm.create_settings_menu(height, window, back))
-    window.add_scene(
-        "class_select_menu",
-        cm.create_class_select_menu(width, window, height, back, select_class),
+        "main_menu",
+        cm.create_main_menu(
+            width, height, window, play, settings, leave, back, select_class
+        ),
     )
     window.set_scene("main_menu", no_event=True)
     while True:

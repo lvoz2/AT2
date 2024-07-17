@@ -11,7 +11,7 @@ import pygame
 import draw_process_funcs as dpf
 import sprite
 
-__assets: dict[str, sprite.Sprite] = {}
+__assets: dict[str, pygame.Surface] = {}
 
 
 class AsyncRunner:
@@ -41,7 +41,11 @@ def get_asset(
     rect: Optional[pygame.Rect] = None,
     rect_options: Optional[dict[str, Any]] = None,
     scale: float = 1.0,
+    is_async: bool = False,
+    executor: Optional[cf_p.ProcessPoolExecutor] = None,
 ) -> sprite.Sprite:
+    if is_async and executor is None:
+        raise TypeError("An executor must be provided to do asynchronous execution")
     absolute_path: pathlib.Path = pathlib.Path.joinpath(
         pathlib.Path.cwd(), asset_location
     )
@@ -73,15 +77,16 @@ def get_asset(
     posix_path: str = absolute_path.as_posix()
     if posix_path in __assets:
         return sprite.Sprite(
-            __assets[posix_path].clone(),
+            __assets[posix_path].copy(),
             rect,
             rect_options=rect_options,
             scale=scale,
-            is_async=__assets[posix_path].is_async,
-            executor=__assets[posix_path].executor,
+            is_async=is_async,
+            executor=executor,
         )
     if "display" not in runners:
-        surf: pygame.Surface = pygame.image.load(absolute_path).convert_alpha()
+        surf: pygame.Surface = pygame.image.load(absolute_path)
+        surf = surf.convert_alpha()
         design: sprite.Sprite = sprite.Sprite(
             surf, rect, rect_options=rect_options, scale=scale, path=absolute_path
         )
@@ -105,7 +110,7 @@ def get_asset(
             is_async=True,
             executor=runners["display"].executor,
         )
-    __assets[posix_path] = design
+    __assets[posix_path] = surf
     return design
 
 

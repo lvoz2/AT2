@@ -41,7 +41,8 @@ def load_image(
     Sequence[int] | tuple[int, int],
     Literal["P", "RGB", "BGR", "BGRA", "RGBX", "RGBA", "ARGB"],
 ]:
-    surf: pygame.Surface = pygame.image.load(path).convert_alpha()
+    surf: pygame.Surface = pygame.image.load(path)
+    surf = surf.convert_alpha()
     return (
         pygame.image.tobytes(surf, "RGBA"),
         [surf.get_width(), surf.get_height()],
@@ -64,7 +65,8 @@ def convert(
         surf_as_bytes[0],
         surf_as_bytes[1],
         surf_as_bytes[2],
-    ).convert_alpha()
+    )
+    surf = surf.convert_alpha()
     return (
         pygame.image.tobytes(surf, surf_as_bytes[2]),
         [surf.get_width(), surf.get_height()],

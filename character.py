@@ -17,7 +17,7 @@ class Character(dynentity.DynEntity):
         mask: Optional[pygame.Rect] = None,
         health_regen_speed: float = 5,
         defense: int = 10,
-        mana: int = 10,
+        energy: int = 10,
         strength: int = 10,
     ) -> None:
         super().__init__(
@@ -32,7 +32,7 @@ class Character(dynentity.DynEntity):
         self.skills: dict[str, Any] = {}
         self.attacks: list[tuple[str, attack.Attack]] = []
         self.defense: int = defense
-        self.mana: int = mana
+        self.energy: int = energy
         self.strength: int = strength
         self.max_lvl: int = 50
         self.register_listener("dmg_event", self.go_to_game)
@@ -47,7 +47,12 @@ class Character(dynentity.DynEntity):
             window.set_scene("game")
 
     def attack(self, category: int, target: entity.Entity, event_id: int) -> None:
-        self.attacks[category][1].damage(self.strength, target, event_id)
+        print(self.energy)
+        if self.attacks[category][1].cost <= self.energy:
+            self.attacks[category][1].damage(self.strength, target, event_id)
+            self.energy -= self.attacks[category][1].cost
+            return
+        raise ValueError("Inadequate energy to perform this action")
 
     def damage(self, dmg: int, event_id: int) -> None:
         self.health -= min(dmg, self.health)

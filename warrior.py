@@ -26,7 +26,7 @@ class Warrior(player.Player):
             strength=15,
         )
         self.attacks: list[tuple[str, attack.Attack]] = [
-            ("Charge", attack.Attack(2, 0)),
-            ("Cleave", attack.Attack(4, 0)),
-            ("Shield Bash", attack.Attack(3, 0)),
+            ("Charge", attack.Attack(2, 1)),
+            ("Shield Bash", attack.Attack(3, 3)),
+            ("Cleave", attack.Attack(4, 6)),
         ]

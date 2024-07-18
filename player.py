@@ -16,7 +16,7 @@ class Player(character.Character):
         character_class: str,
         mask: Optional[pygame.Rect] = None,
         defense: int = 10,
-        mana: int = 10,
+        energy: int = 10,
         strength: int = 10,
         stamina: int = 10,
         stamina_regen_speed: int = 1,
@@ -27,7 +27,7 @@ class Player(character.Character):
             name,
             health_regen_speed=health_regen_speed,
             defense=defense,
-            mana=mana,
+            energy=energy,
             strength=strength,
             mask=mask,
         )

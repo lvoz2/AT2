@@ -11,7 +11,7 @@ import player
 import scene
 import sprite
 import utils
-import zombie
+import skeleton
 
 pygame.font.init()
 bgrounds: dict[str, sprite.Sprite] = {}
@@ -252,7 +252,8 @@ def create_game_scene(
         },
     ]
     enemies: list[enemy.Enemy] = [
-        zombie.Zombie(rect_options=rect_options) for rect_options in enemy_rect_options
+        skeleton.Skeleton(rect_options=rect_options)
+        for rect_options in enemy_rect_options
     ]
     game_scene: scene.Scene = scene.Scene(bground)
     game_scene.elements[0].append(player_sprite)
@@ -424,8 +425,8 @@ def create_attack_scene(  # pylint: disable=too-many-locals
         )
         attack_funcs.append(
             functools.partial(
-                attack.damage,
-                player_entity.strength,
+                player_entity.attack,
+                i,
                 target,
                 window.events.event_types["dmg_event"],
             )

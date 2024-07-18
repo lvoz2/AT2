@@ -2,11 +2,12 @@ from typing import Any, Optional
 
 import pygame
 
+import attack
 import enemy
 import utils
 
 
-class Zombie(enemy.Enemy):
+class Skeleton(enemy.Enemy):
     def __init__(
         self,
         rect: Optional[pygame.Rect] = None,
@@ -17,7 +18,12 @@ class Zombie(enemy.Enemy):
             utils.get_asset(
                 "assets/skeleton.png", rect=rect, rect_options=rect_options
             ),
-            "Zombie",
+            "Skeleton",
             health_regen_speed=0.1,
             mask=mask,
         )
+        self.attacks: list[tuple[str, attack.Attack]] = [
+            ("Throw", attack.Attack(2.5, 2)),
+            ("Slam", attack.Attack(4, 4)),
+            ("Skelton's Rage", attack.Attack(6, 8)),
+        ]

@@ -26,5 +26,5 @@ class Rogue(player.Player):
             defense=15,
         )
         self.attacks: list[tuple[str, attack.Attack]] = [
-            ("Charge", attack.Attack(2.5, 0))
+            ("Charge", attack.Attack(2.5, 1))
         ]

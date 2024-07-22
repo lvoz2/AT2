@@ -1,5 +1,5 @@
 import functools
-from typing import Any, Callable, Iterator, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Callable, Iterator, Optional
 
 import pygame
 

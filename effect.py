@@ -13,11 +13,11 @@ class Effect:
     def is_finished(self) -> bool:
         return self.duration <= 0
 
-    def damage(self, target: "entity.Entity", delta: int, event_id: int) -> None:
+    def damage(self, target: "entity.Entity", delta: int) -> None:
         seconds: float = 0
         if delta < self.duration:
             self.duration -= delta
             seconds = delta / 100
         else:
             seconds = self.duration / 1000
-        target.damage(int(self.dps * seconds), event_id)
+        target.damage(int(self.dps * seconds))

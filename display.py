@@ -12,10 +12,11 @@ import draw_process_funcs as dpf
 import element
 import events
 import scene
+import sprite
 import utils
 
 
-class DrawProps(metaclass=utils.Singleton):
+class DrawProps(element.Element, metaclass=utils.Singleton):
     def __init__(
         self,
         dim: Sequence[int] = (0, 0),
@@ -33,6 +34,12 @@ class DrawProps(metaclass=utils.Singleton):
                     mp.Lock(),
                     pygame.display.set_mode(dim),
                 ]
+            super().__init__(
+                sprite.Sprite(
+                    rect=pygame.Rect(0, 0, dim[0], dim[1]),
+                    rect_options={"colour": [0, 0, 0]},
+                )
+            )
             self.from_async = from_async
             self.executor: Optional[cf_p.ProcessPoolExecutor] = None
             self.__built: bool = True  # pylint: disable=unused-private-member
@@ -45,7 +52,9 @@ class DrawProps(metaclass=utils.Singleton):
         ):
             with self.__cur_scene[0] as lock:  # pylint: disable=unused-variable
                 return self.__cur_scene[1]
-        raise TypeError("__cur_scene has the wrong types")
+        raise TypeError(
+            f"__cur_scene has the wrong types. Type: {type(self.__cur_scene[1])}"
+        )
 
     @cur_scene.setter
     def cur_scene(self, new_scene: scene.Scene) -> None:
@@ -53,6 +62,10 @@ class DrawProps(metaclass=utils.Singleton):
             with self.__cur_scene[0] as lock:  # pylint: disable=unused-variable
                 self.__cur_scene[1] = new_scene
                 self.events.cur_scene = new_scene
+
+    @cur_scene.deleter
+    def cur_scene(self) -> None:
+        del self.__cur_scene
 
     @property
     def window(self) -> pygame.Surface:
@@ -74,6 +87,10 @@ class DrawProps(metaclass=utils.Singleton):
             with self.__window[0] as lock:  # pylint: disable=unused-variable
                 self.__window[1] = new_window
 
+    @window.deleter
+    def window(self) -> None:
+        del self.__window
+
     @property
     def dimensions(self) -> Sequence[int]:
         if isinstance(self.__dimensions[0], mp_sync.Lock) and isinstance(
@@ -89,8 +106,12 @@ class DrawProps(metaclass=utils.Singleton):
             with self.__dimensions[0] as lock:  # pylint: disable=unused-variable
                 self.__dimensions[1] = new_dimensions
 
+    @dimensions.deleter
+    def dimensions(self) -> None:
+        del self.__dimensions
 
-class Display(DrawProps, element.ListenerHolder, metaclass=utils.Singleton):
+
+class Display(DrawProps, metaclass=utils.Singleton):
     def __init__(
         self,
         title: str = "",
@@ -118,11 +139,23 @@ class Display(DrawProps, element.ListenerHolder, metaclass=utils.Singleton):
             if no_event:
                 self.cur_scene = self.scenes[new_scene]
                 return
-            evt: pygame.event.Event = pygame.event.Event(
-                self.events.event_types["switch_scene"],
-                new_scene=self.scenes[new_scene],
-                scene_name=new_scene,
-            )
+            if self.cur_scene is None:
+                evt: pygame.event.Event = pygame.event.Event(
+                    self.events.event_types["switch_scene"],
+                    new_scene=(new_scene, self.scenes[new_scene]),
+                    old_scene=(None, None),
+                )
+            else:
+                evt = pygame.event.Event(
+                    self.events.event_types["switch_scene"],
+                    new_scene=(new_scene, self.scenes[new_scene]),
+                    old_scene=(
+                        list(self.scenes.keys())[
+                            list(self.scenes.values()).index(self.cur_scene)
+                        ],
+                        self.cur_scene,
+                    ),
+                )
             pygame.event.post(evt)
         else:
             raise KeyError(
@@ -151,16 +184,16 @@ class Display(DrawProps, element.ListenerHolder, metaclass=utils.Singleton):
 
     def handle_events(self) -> None:
         if self.cur_scene is not None:
-            self.draw()
-            self.cur_scene.get_all_listeners()
+            self.draw(self)
+            self.cur_scene.get_all_listeners(self)
             for e in pygame.event.get():
                 if self.cur_scene is not None:
                     self.events.notify(e, self.cur_scene.all_listeners)
                 if e.type == self.events.event_types["switch_scene"]:
                     if e.new_scene is not None:
-                        self.cur_scene = e.new_scene
+                        self.cur_scene = e.new_scene[1]
 
-    def draw(self) -> None:
+    def draw(self, window: DrawProps) -> None:
         if self.cur_scene is not None:
             self.delta.append(self.clock.tick(25))
             if len(self.delta) > 10:
@@ -202,8 +235,8 @@ class AsyncDisplay(Display, metaclass=utils.Singleton):
 
     def handle_events(self) -> None:
         if self.cur_scene is not None:
-            self.draw()
-            self.cur_scene.get_all_listeners()
+            self.draw(self)
+            self.cur_scene.get_all_listeners(self)
             events_fut = self.runner.executor.submit(dpf.get_events)
             events_fut.add_done_callback(self.event_callback)
             time.sleep(0.04)
@@ -216,7 +249,7 @@ class AsyncDisplay(Display, metaclass=utils.Singleton):
             )
         self.cur_scene.design.rect = future.result(0.05)
 
-    def draw(self) -> None:
+    def draw(self, window: DrawProps) -> None:
         if self.cur_scene is not None:
             self.delta.append(self.clock.tick(25))
             if len(self.delta) > 10:

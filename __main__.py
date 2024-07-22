@@ -4,7 +4,6 @@
 
 import math
 import pathlib
-import sys
 from typing import Any, Optional
 
 import pygame
@@ -41,14 +40,6 @@ def settings(
     window: display.Display = display.Display()
     window.add_scene("settings_menu", cm.create_settings_menu(*options["args"]))
     window.set_scene("settings_menu")
-
-
-def leave(
-    event: pygame.event.Event,  # pylint: disable=unused-argument
-    options: dict[str, Any],  # pylint: disable=unused-argument
-) -> None:  # pylint: disable=unused-argument
-    if not pygame.event.post(pygame.event.Event(pygame.QUIT)):
-        sys.exit()
 
 
 def back(
@@ -169,9 +160,7 @@ def init() -> None:
         cm.game_fonts = [pygame.font.Font(path, 36), pygame.font.Font(path, 20)]
     window.add_scene(
         "main_menu",
-        cm.create_main_menu(
-            width, height, window, play, settings, leave, back, select_class
-        ),
+        cm.create_main_menu(width, height, window, play, settings, back, select_class),
     )
     window.set_scene("main_menu", no_event=True)
     while True:
@@ -182,9 +171,9 @@ def init() -> None:
             # snapshot = tracemalloc.take_snapshot()
             # top_stats = top_stats = snapshot.statistics("lineno")
             # print("[ Top 500 ]")
-            # for stat in top_stats[:500]:
-            #    if str(stat)[:32] == "/home/mint/Documents/GitHub/AT2/":
-            #        print(stat)
+            # for stat in top_stats[:1000]:
+            #     if str(stat)[:32] == "/home/mint/Documents/GitHub/AT2/":
+            #         print(stat)
             # sys.exit()
 
 

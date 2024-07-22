@@ -1,3 +1,4 @@
+import gc
 from typing import Optional
 
 import pygame
@@ -22,10 +23,27 @@ class Entity(element.Element):
             mask=mask,
             visible=visible,
         )
-        self.health = health
+        self.__health = health
         self.max_health = health
         self.health_regen_speed = health_regen_speed
         self.effects: dict[str, effect.Effect] = {}
+
+    @property
+    def health(self) -> float:
+        return self.__health
+
+    @health.setter
+    def health(self, new_health: float) -> None:
+        self.__health = new_health
+        window: display.Display = display.Display()
+        stat_edit: pygame.event.Event = pygame.event.Event(
+            window.events.event_types["stat_edit"], target=self, stat=self.__health
+        )
+        pygame.event.post(stat_edit)
+
+    @health.deleter
+    def health(self) -> None:
+        del self.__health
 
     def get_opp_corner(self) -> list[int]:
         return [
@@ -34,18 +52,18 @@ class Entity(element.Element):
         ]
 
     def is_alive(self) -> bool:
-        return self.health == 0
+        return self.health > 0
 
-    def damage(self, dmg: int, event_id: int) -> None:
+    def damage(self, dmg: int) -> None:
         self.health -= min(dmg, self.health)
-        dmg_event: pygame.event.Event = pygame.event.Event(event_id, target=self)
-        pygame.event.post(dmg_event)
         if self.health == 0:
             window: display.Display = display.Display()
             for scene in window.scenes.values():
                 for element_layer in scene.elements:
                     if self in element_layer:
                         element_layer.remove(self)
+                        gc.collect()
+                        print("gc", gc.garbage)
 
     def regen_health(self) -> None:
         if self.health > 0:

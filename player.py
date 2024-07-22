@@ -1,8 +1,11 @@
+import asyncio
 from typing import Any, Optional
 
 import pygame
 
 import character
+import enemy
+import entity
 import sprite
 
 # import screen
@@ -18,28 +21,50 @@ class Player(character.Character):
         defense: int = 10,
         energy: int = 10,
         strength: int = 10,
-        stamina: int = 10,
-        stamina_regen_speed: int = 1,
-        health_regen_speed: float = 1,
+        health_regen_speed: float = 1.0,
+        energy_regen_speed: float = 1.0,
     ) -> None:
         super().__init__(
             design,
             name,
             health_regen_speed=health_regen_speed,
+            energy_regen_speed=energy_regen_speed,
             defense=defense,
             energy=energy,
             strength=strength,
             mask=mask,
         )
         self.character_class = character_class
-        self.stamina: int = stamina
-        self.stamina_regen_speed = stamina_regen_speed
-        self.max_stamina: int = stamina
         self.xp: int = 0
         self.inventory: list[Any] = []
         self.money: int = 0
         self.attr_pts: int = 0
         self.attr_pts_per_lvl: int = 3
+
+    # def __del__(self) -> None:
+    #     pygame.event.post(pygame.event.Event(pygame.QUIT))
+    #     print("deleting")
+    #     super().__del__()
+
+    async def enemy_attack_self(self, target: enemy.Enemy) -> None:
+        await asyncio.sleep(0.5)
+        target.choose_attack(self)
+
+    def attack(self, category: int, target: entity.Entity) -> None:
+        try:
+            super().attack(category, target)
+            if isinstance(target, enemy.Enemy):
+                asyncio.run(
+                    self.enemy_attack_self(
+                        target,
+                    )
+                )
+            del target
+        except ValueError as e:
+            msg: str = str(e)
+            if msg != "Inadequate energy to perform this action":
+                raise e
+            raise e
 
     def assign_attr_pts(self, attr: str, pts: int) -> None:
         if attr in self.__dict__:
@@ -62,14 +87,13 @@ class Player(character.Character):
     def calc_req_xp(lvl: int) -> int:
         return int((100 / 2) * lvl * (1 + lvl))
 
-    def regen_stamina(self) -> None:
-        if (self.stamina + self.stamina_regen_speed) <= self.max_stamina:
-            self.stamina += self.stamina_regen_speed
+    def regen_energy(self) -> None:
+        if (self.energy + self.energy_regen_speed) <= self.max_energy:
+            self.energy += self.energy_regen_speed
         else:
-            self.stamina = self.max_stamina
+            self.energy = self.max_energy
 
-    def use_stamina(self, amount: int) -> bool:
-        if (self.stamina - amount) >= 0:
-            self.stamina -= amount
-            return True
-        return False
+    def damage(self, dmg: int) -> None:
+        super().damage(dmg)
+        if not self.is_alive():
+            pygame.event.post(pygame.event.Event(pygame.QUIT))

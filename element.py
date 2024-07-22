@@ -54,7 +54,6 @@ class ListenerHolder:
         func: Callable[
             [pygame.event.Event, dict[str, Any]], Optional[functools.partial[None]]
         ],
-        options: Optional[dict[str, Any]] = None,
     ) -> None:
         if isinstance(event_type, str):
             evts: events.Events = events.Events()
@@ -70,12 +69,6 @@ class ListenerHolder:
             raise KeyError(
                 "Event listener does not exist. Event Type: "
                 f"{evt_type}, Function: {func}"
-            )
-        if self.listeners[evt_type][func] != options:
-            raise ValueError(
-                "The options argument provided did not match what was expected. "
-                f"Expected {self.listeners[evt_type][func]}, "
-                f"received {options}"
             )
         del self.listeners[evt_type][func]
 
@@ -98,7 +91,7 @@ class Element(ListenerHolder):
                 Literal["P", "RGB", "RGBX", "RGBA", "ARGB", "BGRA"],
             ] = (
                 pygame.image.tobytes(self.design.surf, "RGBA"),
-                [self.design.rect.width, self.design.rect.height],
+                [self.design.width, self.design.height],
                 "RGBA",
             )
 
@@ -118,9 +111,13 @@ class Element(ListenerHolder):
                 self.__design[1] = new_design
                 self.bytes = (
                     pygame.image.tobytes(self.design.surf, "RGBA"),
-                    [self.design.rect.width, self.design.rect.height],
+                    [self.design.width, self.design.height],
                     "RGBA",
                 )
+
+    @design.deleter
+    def design(self) -> None:
+        del self.__design
 
     def update_rect(self, future: cf_b.Future) -> None:
         res: pygame.Rect = future.result(0.01)

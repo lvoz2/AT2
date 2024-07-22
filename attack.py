@@ -22,10 +22,11 @@ class Attack:
     def has_effects(self) -> bool:
         return self.effects is not None and len(self.effects) != 0
 
-    def damage(self, strength: int, target: entity.Entity, event_id: int) -> None:
-        target.damage(round(self.dmg * strength), event_id)
+    def damage(self, strength: int, target: entity.Entity) -> None:
+        target.damage(round(self.dmg * strength))
+        # del target
 
-    def apply_effects(self, target: entity.Entity, delta: int, event_id: int) -> None:
+    def apply_effects(self, target: entity.Entity, delta: int) -> None:
         if self.effects is not None:
             self.duration -= delta
             self.duration = max(self.duration, 0)
@@ -33,6 +34,9 @@ class Attack:
                 if value.is_finished():
                     del self.effects[key]
                 else:
-                    value.damage(target, delta, event_id)
+                    value.damage(
+                        target,
+                        delta,
+                    )
                     if value.is_finished():
                         del self.effects[key]

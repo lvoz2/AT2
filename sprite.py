@@ -68,6 +68,10 @@ class Sprite:
         else:
             self.__surf = new_surf  # .convert_alpha()
 
+    @surf.deleter
+    def surf(self) -> None:
+        del self.__surf
+
     @property
     def rect(self) -> pygame.Rect:
         if self.__rect is not None:
@@ -82,6 +86,10 @@ class Sprite:
         self.width = new_rect.width
         self.height = new_rect.height
 
+    @rect.deleter
+    def rect(self) -> None:
+        del self.__rect
+
     @property
     def x(self) -> int:
         return self.__x
@@ -90,6 +98,10 @@ class Sprite:
     def x(self, new_x: int) -> None:
         self.__x = new_x
         self.rect.x = new_x
+
+    @x.deleter
+    def x(self) -> None:
+        del self.__x
 
     @property
     def y(self) -> int:
@@ -100,6 +112,10 @@ class Sprite:
         self.__y = new_y
         self.rect.y = new_y
 
+    @y.deleter
+    def y(self) -> None:
+        del self.__y
+
     @property
     def width(self) -> int:
         return self.__width
@@ -109,6 +125,10 @@ class Sprite:
         self.__width = new_width
         self.rect.width = new_width
 
+    @width.deleter
+    def width(self) -> None:
+        del self.__width
+
     @property
     def height(self) -> int:
         return self.__height
@@ -117,6 +137,10 @@ class Sprite:
     def height(self, new_height: int) -> None:
         self.__height = new_height
         self.rect.height = new_height
+
+    @height.deleter
+    def height(self) -> None:
+        del self.__height
 
     def clone(self) -> pygame.Surface:
         if self.surf is not None:

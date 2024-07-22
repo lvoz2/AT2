@@ -1,10 +1,13 @@
 import functools
-from typing import Any, Callable, Iterator, Optional
+from typing import Any, Callable, Iterator, Optional, TYPE_CHECKING
 
 import pygame
 
 import element
 import sprite
+
+if TYPE_CHECKING:
+    import display
 
 
 class Scene(element.Element):
@@ -32,7 +35,7 @@ class Scene(element.Element):
                 if e.visible:
                     yield e
 
-    def get_all_listeners(self) -> None:
+    def get_all_listeners(self, window: "display.Display") -> None:
         listeners: dict[
             int,
             dict[
@@ -43,7 +46,7 @@ class Scene(element.Element):
                 list[dict[str, Any]],
             ],
         ] = {}
-        all_elements: list[list[element.Element]] = [[self]]
+        all_elements: list[list[element.Element]] = [[window, self]]
         all_elements.extend(self.elements)
         for layer in all_elements:
             for e in layer:

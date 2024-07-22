@@ -127,7 +127,7 @@ class Events(metaclass=utils.Singleton):
                 copy.deepcopy(self.reversed_event_types)
             )
             self.event_types["key_press"] = pygame.event.custom_type()
-            self.event_types["dmg_event"] = pygame.event.custom_type()
+            self.event_types["stat_edit"] = pygame.event.custom_type()
             self.event_types["switch_scene"] = pygame.event.custom_type()
 
             def __process_key_up_or_down(
@@ -168,7 +168,8 @@ class Events(metaclass=utils.Singleton):
                 ],  # pylint: disable=unused-argument
                 options: Optional[dict[str, Any]],  # pylint: disable=unused-argument
             ) -> bool:  # pylint: disable=unused-argument
-                sys.exit()
+                self.quit()
+                return True
 
             def __process_dmg(
                 event: pygame.event.Event,
@@ -212,8 +213,9 @@ class Events(metaclass=utils.Singleton):
             self.register_processor("key_down", __process_key_up_or_down)
             self.register_processor("key_up", __process_key_up_or_down)
             self.register_processor("mouse_button_down", __process_mouse_button_down)
-            self.register_processor("dmg_event", __process_dmg)
+            self.register_processor("stat_edit", __process_dmg)
             self.register_processor("key_press", __process_key_press)
+            self.__timers: set[int] = set([])
 
     @property
     def event_types(self) -> dict[str, int]:
@@ -225,6 +227,10 @@ class Events(metaclass=utils.Singleton):
         self.__reversed_event_types = {
             event_id: event_name for event_name, event_id in new_event_types.items()
         }
+
+    @event_types.deleter
+    def event_types(self) -> None:
+        del self.__event_types
 
     @property
     def reversed_event_types(self) -> dict[int, str]:
@@ -238,13 +244,25 @@ class Events(metaclass=utils.Singleton):
             for event_name, event_id in new_reversed_event_types.items()
         }
 
+    @reversed_event_types.deleter
+    def reversed_event_types(self) -> None:
+        del self.__reversed_event_types
+
     @property
     def pygame_evts(self) -> types.MappingProxyType[str, int]:
         return self.__pygame_evts
 
+    @pygame_evts.deleter
+    def pygame_evts(self) -> None:
+        del self.__pygame_evts
+
     @property
     def reversed_pygame_evts(self) -> types.MappingProxyType[int, str]:
         return self.__reversed_pygame_evts
+
+    @reversed_pygame_evts.deleter
+    def reversed_pygame_evts(self) -> None:
+        del self.__reversed_pygame_evts
 
     def get_event_id(self, event_name: str) -> int:
         if event_name not in self.event_types:
@@ -308,7 +326,45 @@ class Events(metaclass=utils.Singleton):
         return full_delta
 
     def quit(self) -> None:
+        pygame.quit()
         sys.exit()
+
+    def toggle_timer(
+        self, interval: int, loops: int = 0, **kwargs: Any
+    ) -> tuple[bool, pygame.event.Event]:
+        """Toggle a repeatable timer on or off
+
+        Args:
+        interval (int): The number of milliseconds between events
+        loops (int) = 0: The number of repetitions, 0 being infinite
+        Has unlimited keyword args, which are passed to the constructor if toggling on
+        """
+        if interval <= 0:
+            raise ValueError("Interval must be positive")
+        if loops < 0:
+            raise ValueError("The number of loops must be at least 0")
+        name: str = "timer" + str(interval)
+        if name not in self.event_types:
+            self.event_types[name] = pygame.event.custom_type()
+        if interval not in self.__timers:
+            event: pygame.event.Event = pygame.event.Event(
+                self.event_types[name], **kwargs
+            )
+            self.__timers.add(interval)
+        else:
+            event = pygame.event.Event(self.event_types[name])
+            self.__timers.discard(interval)
+            interval = 0
+        pygame.time.set_timer(event, interval, loops)
+        return (interval in self.__timers, event)
+
+    @property
+    def timers(self) -> set[int]:
+        return self.__timers
+
+    @timers.deleter
+    def timers(self) -> None:
+        del self.__timers
 
     def default_processor(
         self,
@@ -440,6 +496,8 @@ class Events(metaclass=utils.Singleton):
         if listeners is None:
             return
         if event.type not in listeners:
+            # print(pygame.event.event_name(event.type))
+            # print(event.type)  # , self.event_types)
             return
         for func, options_list in listeners[event.type].items():
             for options in options_list:

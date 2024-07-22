@@ -6,12 +6,12 @@ import pygame
 import display
 import element
 import enemy
-import healthbar
 import player
+import progress_bar
 import scene
+import skeleton
 import sprite
 import utils
-import skeleton
 
 pygame.font.init()
 bgrounds: dict[str, sprite.Sprite] = {}
@@ -19,6 +19,14 @@ game_fonts: list[pygame.font.Font] = [
     pygame.font.Font(None, 36),
     pygame.font.Font(None, 20),
 ]
+progress_bars: list[progress_bar.ProgressBar] = []
+
+
+def leave(
+    event: pygame.event.Event,  # pylint: disable=unused-argument
+    options: dict[str, Any],  # pylint: disable=unused-argument
+) -> None:
+    pygame.event.post(pygame.event.Event(pygame.QUIT))
 
 
 def create_main_menu(
@@ -27,7 +35,6 @@ def create_main_menu(
     window: display.Display | display.AsyncDisplay,
     play: Callable[[pygame.event.Event, dict[str, Any]], None],
     settings: Callable[[pygame.event.Event, dict[str, Any]], None],
-    leave: Callable[[pygame.event.Event, dict[str, Any]], None],
     back: Callable[[pygame.event.Event, dict[str, Any]], None],
     select_class: Callable[[pygame.event.Event, dict[str, Any]], None],
 ) -> scene.Scene:
@@ -105,7 +112,10 @@ def create_main_menu(
     main_menu.elements[0][1].register_listener(
         pygame.MOUSEBUTTONDOWN, settings, {"args": [height, window, back]}
     )
-    main_menu.elements[0][2].register_listener(pygame.MOUSEBUTTONDOWN, leave)
+    main_menu.elements[0][2].register_listener(
+        pygame.MOUSEBUTTONDOWN,
+        leave,
+    )
     return main_menu
 
 
@@ -268,17 +278,26 @@ def create_game_scene(
         ),
         visible=True,
     )
-    player_hp_bar = healthbar.HealthBar(
+    player_hp_bar = progress_bar.ProgressBar(
         player_sprite.health,
         pygame.Rect(15, 15, 250, 20),
         {"x": 15, "y": 15, "colour": [255, 0, 0]},
     )
+    hp_text: element.Element = element.Element(
+        sprite.Sprite(
+            font_options={"text": "HP", "font": game_fonts[1]},
+            rect_options={"x": 18, "y": 10},
+        )
+    )
+    progress_bars.append(player_hp_bar)
     player_sprite.register_listener(
-        window.events.event_types["dmg_event"],
+        "stat_edit",
         lambda event, options: player_hp_bar.update(event.target.health),
     )
     game_scene.elements[0].append(player_hp_bar_bground)
     game_scene.elements.append([player_hp_bar])
+    game_scene.elements.append([hp_text])
+    # window.events.toggle_timer(1000)
     keys: list[int] = [pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d]
     game_scene.register_listener(
         "key_press",
@@ -288,6 +307,57 @@ def create_game_scene(
             "mods": [pygame.KMOD_NONE],
             "args": player_sprite,
         },
+    )
+
+    def toggle_second_timer(
+        event: pygame.event.Event,
+        options: dict[str, Any],  # pylint: disable=unused-argument
+    ) -> None:
+        window: display.Display = display.Display()
+        if event.old_scene[0] == "game" and 1000 in window.events.timers:
+            window.events.toggle_timer(1000)
+        elif event.new_scene[0] == "game" and 1000 not in window.events.timers:
+            window.events.toggle_timer(
+                1000,
+                0,
+                player_sprite=options["player_sprite"],
+                enemies=options["enemies"],
+            )
+
+        def regen(
+            event: pygame.event.Event,
+            options: dict[str, Any],  # pylint: disable=unused-argument
+        ) -> None:
+            event.player_sprite.health += min(
+                event.player_sprite.max_health - event.player_sprite.health,
+                event.player_sprite.health_regen_speed,
+            )
+            event.player_sprite.energy += min(
+                event.player_sprite.max_energy - event.player_sprite.energy,
+                event.player_sprite.energy_regen_speed,
+            )
+            for e in event.enemies:
+                e.health += min(
+                    e.max_health - e.health,
+                    e.health_regen_speed,
+                )
+                e.energy += min(
+                    e.max_energy - e.energy,
+                    e.energy_regen_speed,
+                )
+
+        options["target"].scenes["game"].register_listener("timer1000", regen)
+
+    window.events.toggle_timer(
+        1000,
+        0,
+        player_sprite=player_sprite,
+        enemies=enemies,
+    )
+    window.register_listener(
+        "switch_scene",
+        toggle_second_timer,
+        {"player_sprite": player_sprite, "enemies": enemies},
     )
     return game_scene
 
@@ -302,14 +372,18 @@ def create_attack_scene(  # pylint: disable=too-many-locals
     window: display.Display = display.Display()
     if "assets/attack_screen.png" not in bgrounds:
         bground: sprite.Sprite = utils.get_asset("assets/attack_screen.png")
-        bground.surf = pygame.transform.scale(
-            bground.surf, (window.dimensions[0], window.dimensions[1])
-        )
-        bground.width = window.dimensions[0]
-        bground.height = window.dimensions[1]
     else:
         bground = bgrounds["assets/attack_screen.png"]
-    attack_scene: scene.Scene = scene.Scene(bground)
+    black_bground = sprite.Sprite(
+        rect=pygame.Rect(0, 0, 800, 600), rect_options={"colour": [0, 0, 0]}
+    )
+    attack_scene: scene.Scene = scene.Scene(black_bground)
+    attack_scene.elements[0] = [
+        player_entity,
+        progress_bars[0],
+        element.Element(black_bground),
+        element.Element(bground),
+    ]
     player_rect = player_entity.design.rect.copy()
     player_scale = 150 / min(player_rect.width, player_rect.height)
     player_e = element.Element(
@@ -376,14 +450,16 @@ def create_attack_scene(  # pylint: disable=too-many-locals
         )
     )
     leave_text_container.register_listener("mouse_button_down", back, {"args": "game"})
-    attack_scene.elements[0] = [
-        player_e,
-        target_e,
-        left_panel_title,
-        right_panel_title,
-        leave_text_container,
-        leave_text,
-    ]
+    attack_scene.elements.append(
+        [
+            player_e,
+            target_e,
+            left_panel_title,
+            right_panel_title,
+            leave_text_container,
+            leave_text,
+        ]
+    )
     attack_funcs: list[functools.partial[None]] = []
     # attack_menu_rect = pygame.Rect(45, 355, 340, 190)
     for i, (name, attack) in enumerate(player_entity.attacks):
@@ -396,22 +472,16 @@ def create_attack_scene(  # pylint: disable=too-many-locals
             ),
             visible=True,
         )
-        dmg: element.Element = element.Element(
+        details: element.Element = element.Element(
             sprite.Sprite(
-                rect_options={"x": 235, "y": 355 + (i * 30)},
+                rect_options={"x": 245, "y": 355 + (i * 30)},
                 font_options={
-                    "text": "DMG: " + str(int(attack.dmg * player_entity.strength)),
+                    "text": "Damage: "
+                    + str(int(attack.dmg * player_entity.strength))
+                    + " | Cost: "
+                    + str(attack.cost),
                     "font": text_font,
                 },
-                is_async=window.from_async,
-                executor=window.executor,
-            ),
-            visible=True,
-        )
-        cost: element.Element = element.Element(
-            sprite.Sprite(
-                rect_options={"x": 310, "y": 355 + (i * 30)},
-                font_options={"text": "Cost: " + str(attack.cost), "font": text_font},
                 is_async=window.from_async,
                 executor=window.executor,
             ),
@@ -428,7 +498,6 @@ def create_attack_scene(  # pylint: disable=too-many-locals
                 player_entity.attack,
                 i,
                 target,
-                window.events.event_types["dmg_event"],
             )
         )
         container.register_listener(
@@ -436,9 +505,6 @@ def create_attack_scene(  # pylint: disable=too-many-locals
             lambda event, options: attack_funcs[options["i"]](),
             {"i": i},
         )
-        attack_scene.elements[0].append(container)
-        attack_scene.elements[0].append(text)
-        attack_scene.elements[0].append(dmg)
-        attack_scene.elements[0].append(cost)
+        attack_scene.elements.append([container, text, details])
     # other_menu_rect = pygame.Rect(445, 355, 340, 190)
     return attack_scene

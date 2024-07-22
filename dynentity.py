@@ -60,16 +60,16 @@ class DynEntity(entity.Entity):
             return -1.0
         rect_vals: dict[str, dict[str, int]] = {
             "self": {
-                "x": self.design.rect.x,
-                "y": self.design.rect.y,
-                "width": self.design.rect.width,
-                "height": self.design.rect.height,
+                "x": self.design.x,
+                "y": self.design.y,
+                "width": self.design.width,
+                "height": self.design.height,
             },
             "other": {
-                "x": other.design.rect.x,
-                "y": other.design.rect.y,
-                "width": other.design.rect.width,
-                "height": other.design.rect.height,
+                "x": other.design.x,
+                "y": other.design.y,
+                "width": other.design.width,
+                "height": other.design.height,
             },
         }
         opp_corner: dict[str, list[int]] = {

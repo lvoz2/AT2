@@ -4,6 +4,7 @@ from typing import Any, Optional
 import pygame
 
 import character
+import display
 import enemy
 import entity
 import sprite
@@ -19,7 +20,7 @@ class Player(character.Character):
         character_class: str,
         mask: Optional[pygame.Rect] = None,
         defense: int = 10,
-        energy: int = 10,
+        energy: float = 10.0,
         strength: int = 10,
         health_regen_speed: float = 1.0,
         energy_regen_speed: float = 1.0,
@@ -35,7 +36,8 @@ class Player(character.Character):
             mask=mask,
         )
         self.character_class = character_class
-        self.xp: int = 0
+        self.__xp: float = 0
+        # self.lvl: int = 0
         self.inventory: list[Any] = []
         self.money: int = 0
         self.attr_pts: int = 0
@@ -50,16 +52,19 @@ class Player(character.Character):
         await asyncio.sleep(0.5)
         target.choose_attack(self)
 
-    def attack(self, category: int, target: entity.Entity) -> None:
+    def attack(self, category: int, target: entity.Entity) -> bool:
         try:
-            super().attack(category, target)
+            res: bool = super().attack(category, target)
             if isinstance(target, enemy.Enemy):
                 asyncio.run(
                     self.enemy_attack_self(
                         target,
                     )
                 )
+            if not res and isinstance(target, character.Character):
+                self.gain_xp(target.reward)
             del target
+            return res
         except ValueError as e:
             msg: str = str(e)
             if msg != "Inadequate energy to perform this action":
@@ -73,12 +78,32 @@ class Player(character.Character):
         else:
             raise KeyError("Character attribute does not exist")
 
-    def gain_xp(self, xp: int) -> None:
+    @property
+    def xp(self) -> float:
+        return self.__xp
+
+    @xp.setter
+    def xp(self, new_xp: float) -> None:
+        if new_xp < self.__xp:
+            raise ValueError("xp can only increase")
+        self.__xp = new_xp
+        window: display.Display = display.Display()
+        stat_edit: pygame.event.Event = pygame.event.Event(
+            window.events.event_types["stat_edit"], target=self, stat=("xp", self.__xp)
+        )
+        pygame.event.post(stat_edit)
+
+    @xp.deleter
+    def xp(self) -> None:
+        del self.__xp
+
+    def gain_xp(self, xp: float) -> None:
         self.xp += xp
+        xp = self.xp
         req_xp: int = self.calc_req_xp(self.lvl + 1)
-        while self.xp >= req_xp and self.lvl < self.max_lvl:
+        while xp >= req_xp and self.lvl < self.max_lvl:
             self.lvl += 1
-            self.xp -= req_xp
+            xp -= req_xp
             self.attr_pts += self.attr_pts_per_lvl
             # screen.show("Level Up", f"{self.name} is now level {self.level}")
             req_xp = self.calc_req_xp(self.lvl + 1)
@@ -93,7 +118,9 @@ class Player(character.Character):
         else:
             self.energy = self.max_energy
 
-    def damage(self, dmg: int) -> None:
+    def damage(self, dmg: int) -> bool:
         super().damage(dmg)
         if not self.is_alive():
             pygame.event.post(pygame.event.Event(pygame.QUIT))
+            return False
+        return True

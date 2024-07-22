@@ -21,6 +21,7 @@ class Skeleton(enemy.Enemy):
             "Skeleton",
             health_regen_speed=0.1,
             mask=mask,
+            reward=50.0,
         )
         self.attacks: list[tuple[str, attack.Attack]] = [
             ("Throw", attack.Attack(2.5, 2)),

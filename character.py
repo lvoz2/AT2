@@ -22,8 +22,9 @@ class Character(dynentity.DynEntity):
         health_regen_speed: float = 5.0,
         energy_regen_speed: float = 1.0,
         defense: int = 10,
-        energy: float = 10,
+        energy: float = 10.0,
         strength: int = 10,
+        reward: float = 50.0,
     ) -> None:
         super().__init__(
             design,
@@ -37,12 +38,13 @@ class Character(dynentity.DynEntity):
         self.skills: dict[str, Any] = {}
         self.attacks: list[tuple[str, attack.Attack]] = []
         self.defense: int = defense
-        self.energy: float = energy
+        self.__energy: float = energy
         self.energy_regen_speed: float = energy_regen_speed
-        self.max_energy: int = int(energy)
+        self.max_energy: float = energy
         self.strength: int = strength
         self.max_lvl: int = 50
         self.register_listener("stat_edit", self.go_to_game)
+        self.reward = reward
 
     def go_to_game(  # pylint: disable=unused-argument
         self,  # pylint: disable=unused-argument
@@ -54,19 +56,23 @@ class Character(dynentity.DynEntity):
             window.set_scene("game")
         del self
 
-    def attack(self, category: int, target: entity.Entity) -> None:
+    def attack(self, category: int, target: entity.Entity) -> bool:
         if self.attacks[category][1].cost <= self.energy:
-            self.attacks[category][1].damage(self.strength, target)
+            res: bool = self.attacks[category][1].damage(self.strength, target)
             del target
             gc.collect()
             self.energy -= self.attacks[category][1].cost
-            return
+            return res
         raise ValueError("Inadequate energy to perform this action")
 
-    def damage(self, dmg: int) -> None:
+    def damage(self, dmg: int) -> bool:
         self.health -= min(dmg, self.health)
         if self.health == 0:
             window: display.Display = display.Display()
+            evt: pygame.event.Event = pygame.event.Event(
+                window.events.event_types["death_event"], target=self
+            )
+            pygame.event.post(evt)
             for scene in window.scenes.values():
                 listeners: list[
                     tuple[
@@ -90,11 +96,30 @@ class Character(dynentity.DynEntity):
                         # del self.attacks
                         # del self.design
                         self.deregister_listener("stat_edit", self.go_to_game)
-                        del self
                         gc.collect()
                         # print("gc", gc.garbage)
                         # print("refcount", sys.getrefcount(self) - 1)
                         # print("gc_ref", gc.get_referrers(self)[1:])
                         # print(self)
                         window.set_scene("game")
-                        return
+            return False
+        return True
+
+    @property
+    def energy(self) -> float:
+        return self.__energy
+
+    @energy.setter
+    def energy(self, new_energy: float) -> None:
+        self.__energy = new_energy
+        window: display.Display = display.Display()
+        stat_edit: pygame.event.Event = pygame.event.Event(
+            window.events.event_types["stat_edit"],
+            target=self,
+            stat=("energy", self.__energy),
+        )
+        pygame.event.post(stat_edit)
+
+    @energy.deleter
+    def energy(self) -> None:
+        del self.__energy

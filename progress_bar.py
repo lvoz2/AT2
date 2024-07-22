@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 import pygame
 
@@ -13,12 +13,24 @@ class ProgressBar(element.Element):
         rect: pygame.Rect,
         rect_options: dict[str, Any],
         visible: bool = True,
+        value: Optional[float] = None,
     ) -> None:
         self.max_width = rect.width
         self.max_value = max_value
         design = sprite.Sprite(rect=rect, rect_options=rect_options)
         super().__init__(
-            design, mask=pygame.Rect(0, 0, rect.width, rect.height), visible=visible
+            design,
+            mask=pygame.Rect(
+                0,
+                0,
+                (
+                    rect.width
+                    if value is None
+                    else self.max_width * (value / self.max_value)
+                ),
+                rect.height,
+            ),
+            visible=visible,
         )
 
     def update(self, new_value: int) -> None:

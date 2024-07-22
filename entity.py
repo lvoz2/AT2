@@ -37,7 +37,9 @@ class Entity(element.Element):
         self.__health = new_health
         window: display.Display = display.Display()
         stat_edit: pygame.event.Event = pygame.event.Event(
-            window.events.event_types["stat_edit"], target=self, stat=self.__health
+            window.events.event_types["stat_edit"],
+            target=self,
+            stat=("health", self.__health),
         )
         pygame.event.post(stat_edit)
 
@@ -54,7 +56,7 @@ class Entity(element.Element):
     def is_alive(self) -> bool:
         return self.health > 0
 
-    def damage(self, dmg: int) -> None:
+    def damage(self, dmg: int) -> bool:
         self.health -= min(dmg, self.health)
         if self.health == 0:
             window: display.Display = display.Display()
@@ -64,6 +66,8 @@ class Entity(element.Element):
                         element_layer.remove(self)
                         gc.collect()
                         print("gc", gc.garbage)
+            return False
+        return True
 
     def regen_health(self) -> None:
         if self.health > 0:

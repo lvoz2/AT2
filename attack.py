@@ -22,8 +22,8 @@ class Attack:
     def has_effects(self) -> bool:
         return self.effects is not None and len(self.effects) != 0
 
-    def damage(self, strength: int, target: entity.Entity) -> None:
-        target.damage(round(self.dmg * strength))
+    def damage(self, strength: int, target: entity.Entity) -> bool:
+        return target.damage(round(self.dmg * strength))
         # del target
 
     def apply_effects(self, target: entity.Entity, delta: int) -> None:

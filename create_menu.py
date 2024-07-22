@@ -238,7 +238,7 @@ def create_class_select_menu(  # pylint: disable=too-many-locals
     return class_select_menu
 
 
-def create_game_scene(
+def create_game_scene(  # pylint: disable=too-many-locals
     player_sprite: player.Player,
     move_player: Callable[[pygame.event.Event, dict[str, Any]], None],
 ) -> scene.Scene:
@@ -265,13 +265,18 @@ def create_game_scene(
         skeleton.Skeleton(rect_options=rect_options)
         for rect_options in enemy_rect_options
     ]
+    for e in enemies:
+        e.register_listener(
+            "death_event",
+            lambda event, options: player_sprite.gain_xp(event.target.reward),
+        )
     game_scene: scene.Scene = scene.Scene(bground)
     game_scene.elements[0].append(player_sprite)
     for enemy_inst in enemies:
         game_scene.elements[0].append(enemy_inst)
     player_hp_bar_bground = element.Element(
         sprite.Sprite(
-            rect=pygame.Rect(10, 10, 260, 30),
+            rect=pygame.Rect(10, 10, 260, 90),
             rect_options={"x": 10, "y": 10, "colour": [192, 192, 192]},
             is_async=window.from_async,
             executor=window.executor,
@@ -280,23 +285,72 @@ def create_game_scene(
     )
     player_hp_bar = progress_bar.ProgressBar(
         player_sprite.health,
-        pygame.Rect(15, 15, 250, 20),
+        pygame.Rect(15, 15, 250, 30),
         {"x": 15, "y": 15, "colour": [255, 0, 0]},
+    )
+    player_energy_bar = progress_bar.ProgressBar(
+        player_sprite.energy,
+        pygame.Rect(15, 50, 250, 20),
+        {"x": 15, "y": 50, "colour": [0, 255, 0]},
+    )
+    player_xp_bar = progress_bar.ProgressBar(
+        player_sprite.calc_req_xp(1),
+        pygame.Rect(35, 75, 250, 20),
+        {"x": 15, "y": 75, "colour": [0, 0, 255]},
+        value=0,
     )
     hp_text: element.Element = element.Element(
         sprite.Sprite(
             font_options={"text": "HP", "font": game_fonts[1]},
-            rect_options={"x": 18, "y": 10},
+            rect_options={"x": 20, "y": 15},
+        )
+    )
+    energy_text: element.Element = element.Element(
+        sprite.Sprite(
+            font_options={"text": "Energy", "font": game_fonts[1]},
+            rect_options={"x": 20, "y": 43},
+        )
+    )
+    xp_text: element.Element = element.Element(
+        sprite.Sprite(
+            font_options={"text": "Lvl: 0 | XP: 0/100", "font": game_fonts[1]},
+            rect_options={"x": 20, "y": 68},
         )
     )
     progress_bars.append(player_hp_bar)
+    progress_bars.append(player_energy_bar)
+    progress_bars.append(player_xp_bar)
     player_sprite.register_listener(
         "stat_edit",
         lambda event, options: player_hp_bar.update(event.target.health),
     )
+    player_sprite.register_listener(
+        "stat_edit",
+        lambda event, options: player_energy_bar.update(event.target.energy),
+    )
+
+    def calc_xp(
+        event: pygame.event.Event,  # pylint: disable=unused-argument
+        options: dict[str, Any],  # pylint: disable=unused-argument
+    ) -> None:
+        player_xp_bar.max_value = event.target.calc_req_xp(event.target.lvl + 1)
+        curr_xp: int = event.target.xp - event.target.calc_req_xp(event.target.lvl)
+        player_xp_bar.update(curr_xp)
+        xp_text.design.change_design(
+            font_options={
+                "text": (
+                    f"Lvl: {event.target.lvl} | XP: "
+                    f"{int(curr_xp)}/{player_xp_bar.max_value}"
+                ),
+                "font": game_fonts[1],
+            },
+            rect_options={"x": 20, "y": 68},
+        )
+
+    player_sprite.register_listener("stat_edit", calc_xp)
     game_scene.elements[0].append(player_hp_bar_bground)
-    game_scene.elements.append([player_hp_bar])
-    game_scene.elements.append([hp_text])
+    game_scene.elements.append([player_hp_bar, player_energy_bar, player_xp_bar])
+    game_scene.elements.append([hp_text, energy_text, xp_text])
     # window.events.toggle_timer(1000)
     keys: list[int] = [pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d]
     game_scene.register_listener(
@@ -323,6 +377,7 @@ def create_game_scene(
                 player_sprite=options["player_sprite"],
                 enemies=options["enemies"],
             )
+        print("big test")
 
         def regen(
             event: pygame.event.Event,
@@ -336,6 +391,7 @@ def create_game_scene(
                 event.player_sprite.max_energy - event.player_sprite.energy,
                 event.player_sprite.energy_regen_speed,
             )
+            print("test")
             for e in event.enemies:
                 e.health += min(
                     e.max_health - e.health,
@@ -380,7 +436,7 @@ def create_attack_scene(  # pylint: disable=too-many-locals
     attack_scene: scene.Scene = scene.Scene(black_bground)
     attack_scene.elements[0] = [
         player_entity,
-        progress_bars[0],
+        *progress_bars,
         element.Element(black_bground),
         element.Element(bground),
     ]
@@ -460,7 +516,7 @@ def create_attack_scene(  # pylint: disable=too-many-locals
             leave_text,
         ]
     )
-    attack_funcs: list[functools.partial[None]] = []
+    attack_funcs: list[functools.partial[bool]] = []
     # attack_menu_rect = pygame.Rect(45, 355, 340, 190)
     for i, (name, attack) in enumerate(player_entity.attacks):
         text: element.Element = element.Element(

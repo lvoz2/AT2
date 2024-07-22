@@ -18,8 +18,9 @@ class Enemy(character.Character):
         health_regen_speed: float = 1.0,
         energy_regen_speed: float = 1.0,
         defense: int = 10,
-        energy: int = 10,
+        energy: float = 10.0,
         strength: int = 10,
+        reward: float = 50.0,
     ):
         super().__init__(
             surf,
@@ -30,6 +31,7 @@ class Enemy(character.Character):
             energy=energy,
             strength=strength,
             mask=mask,
+            reward=reward,
         )
         self.attacks: list[tuple[str, attack.Attack]] = [
             ("Charge", attack.Attack(0.5, 1))

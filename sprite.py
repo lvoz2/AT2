@@ -164,9 +164,9 @@ class Sprite:
 
     def change_design(
         self,
-        surf: Optional[pygame.Surface],
-        rect: Optional[pygame.Rect],
-        scale: float,
+        surf: Optional[pygame.Surface] = None,
+        rect: Optional[pygame.Rect] = None,
+        scale: float = 1.0,
         rect_options: Optional[dict[str, Any]] = None,
         font_options: Optional[dict[str, Any]] = None,
     ) -> None:

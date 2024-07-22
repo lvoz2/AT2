@@ -60,17 +60,10 @@ class ListenerHolder:
             evt_type: int = evts.get_event_id(event_type)
         else:
             evt_type = event_type
-        if evt_type not in self.listeners:
-            raise KeyError(
-                "No event listeners created yet for event type "
-                f"{evt_type}. Function: {func}"
-            )
-        if func not in self.listeners[evt_type]:
-            raise KeyError(
-                "Event listener does not exist. Event Type: "
-                f"{evt_type}, Function: {func}"
-            )
-        del self.listeners[evt_type][func]
+        try:
+            del self.listeners[evt_type][func]
+        except KeyError as e:  # pylint: disable=unused-variable
+            pass
 
 
 class Element(ListenerHolder):

@@ -377,7 +377,6 @@ def create_game_scene(  # pylint: disable=too-many-locals
                 player_sprite=options["player_sprite"],
                 enemies=options["enemies"],
             )
-        print("big test")
 
         def regen(
             event: pygame.event.Event,
@@ -391,7 +390,6 @@ def create_game_scene(  # pylint: disable=too-many-locals
                 event.player_sprite.max_energy - event.player_sprite.energy,
                 event.player_sprite.energy_regen_speed,
             )
-            print("test")
             for e in event.enemies:
                 e.health += min(
                     e.max_health - e.health,

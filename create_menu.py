@@ -358,7 +358,7 @@ def create_game_scene(  # pylint: disable=too-many-locals
         move_player,
         {
             "key": keys,
-            "mods": [pygame.KMOD_NONE],
+            "mods": [pygame.KMOD_NONE, pygame.KMOD_CAPS, pygame.KMOD_NUM, pygame.KMOD_MODE],
             "args": player_sprite,
         },
     )

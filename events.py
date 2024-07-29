@@ -195,17 +195,17 @@ class Events(metaclass=utils.Singleton):
                 options: Optional[dict[str, Any]],
             ) -> bool:
                 if options is not None:
-                    keys_in: int = 0
-                    mods_in: int = 0
+                    keys_in: bool = False
+                    mods_in: bool = False
                     for key in options["key"]:
-                        keys_in += int(key in event.key)
-                        if keys_in > 0:
+                        keys_in = key in event.key
+                        if keys_in:
                             break
-                    for mod in options["mods"]:
-                        mods_in += int(mod in event.mod)
-                        if mods_in > 0:
-                            break
-                    if keys_in > 0 and mods_in > 0:
+                    mods_in = (options["mods"] == [pygame.KMOD_NONE]) and (event.mod == [pygame.KMOD_NONE])
+                    if not mods_in:
+                        for mod in options["mods"]:
+                            mods_in = mods_in if mods_in else mod & event.mod[0]
+                    if keys_in and mods_in:
                         func(event, options)
                         return True
                 return False
@@ -474,25 +474,24 @@ class Events(metaclass=utils.Singleton):
             self.quit()
         elif event.type == pygame.KEYDOWN:
             self.__pressed_keys["keys"].append(event.key)
-            self.__pressed_keys["mods"].append(event.mod)
+            self.__pressed_keys["mods"] = [event.mod]
             self.__pressed_keys["unicode"].append(event.unicode)
             self.__pressed_keys["scancode"].append(event.scancode)
         elif event.type == pygame.KEYUP:
             if event.key in self.__pressed_keys["keys"]:
                 self.__pressed_keys["keys"].remove(event.key)
             if event.mod in self.__pressed_keys["mods"]:
-                self.__pressed_keys["mods"].remove(event.mod)
+                self.__pressed_keys["mods"] = [pygame.KMOD_NONE]
             if event.unicode in self.__pressed_keys["unicode"]:
                 self.__pressed_keys["unicode"].remove(event.unicode)
             if event.scancode in self.__pressed_keys["scancode"]:
                 self.__pressed_keys["scancode"].remove(event.scancode)
             if (
                 len(self.__pressed_keys["keys"])
-                == len(self.__pressed_keys["mods"])
                 == len(self.__pressed_keys["unicode"])
                 == len(self.__pressed_keys["scancode"])
                 == 0
-            ):
+            ) and self.__pressed_keys["mods"] == [pygame.KMOD_NONE]:
                 self.__repeat = False
         if listeners is None:
             return
